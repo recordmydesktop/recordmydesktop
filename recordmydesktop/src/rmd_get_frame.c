@@ -269,10 +269,10 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 //make a deep copy
 static void rmdBRWinCpy(BRWindow *target, BRWindow *source) {
 
-	target->rect.x=source->rect.x;
-	target->rect.y=source->rect.y;
-	target->rect.width=source->rect.width;
-	target->rect.height=source->rect.height;
+	target->winrect.x=source->winrect.x;
+	target->winrect.y=source->winrect.y;
+	target->winrect.width=source->winrect.width;
+	target->winrect.height=source->winrect.height;
 	target->rrect.x=source->rrect.x;
 	target->rrect.y=source->rrect.y;
 	target->rrect.width=source->rrect.width;

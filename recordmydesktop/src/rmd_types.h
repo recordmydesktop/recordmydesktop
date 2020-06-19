@@ -102,11 +102,11 @@ typedef struct _RectArea{   //an area that has been damaged gets stored
 	struct _RectArea *prev,*next;
 }RectArea;
 
-typedef struct _BRWindow{   //'basic recorded window' specs
-	XRectangle rect;		 //window attributes
-	XRectangle rrect;		//part of window that is recorded (rounded to alignment)
-	int nbytes;			 //size of zpixmap when screenshoting
-	Window windowid;		//id
+typedef struct _BRWindow{ //'basic recorded window' specs
+	XRectangle winrect;	//window attributes
+	XRectangle rrect;	//part of window that is recorded (rounded to alignment)
+	int nbytes;		//size of zpixmap when screenshoting
+	Window windowid;	//id
 }BRWindow;
 
 //defaults in the following comment lines may be out of sync with reality

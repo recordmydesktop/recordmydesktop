@@ -117,9 +117,9 @@ boolean rmdSetBRWindow(	Display *dpy,
 	if (args->windowid==0) {//root window
 		//first set it up
 		brwin->windowid=specs->root;
-		brwin->rect.x=brwin->rect.y=0;
-		brwin->rect.width=specs->width;
-		brwin->rect.height=specs->height;
+		brwin->winrect.x=brwin->winrect.y=0;
+		brwin->winrect.width=specs->width;
+		brwin->winrect.height=specs->height;
 		brwin->rrect.x=args->x;
 		brwin->rrect.y=args->y;
 		brwin->rrect.width=((args->width)? args->width:specs->width-brwin->rrect.x);
@@ -153,24 +153,24 @@ boolean rmdSetBRWindow(	Display *dpy,
 					&transl_y,
 					&wchid);
 
-		brwin->rect.x=attribs.x-transl_x;
-		brwin->rect.y=attribs.y-transl_y;
-		brwin->rect.width=attribs.width;
-		brwin->rect.height=attribs.height;
+		brwin->winrect.x=attribs.x-transl_x;
+		brwin->winrect.y=attribs.y-transl_y;
+		brwin->winrect.width=attribs.width;
+		brwin->winrect.height=attribs.height;
 
-		if ((brwin->rect.x+brwin->rect.width>specs->width)||
-			(brwin->rect.y+brwin->rect.height>specs->height)) {
+		if ((brwin->winrect.x+brwin->winrect.width>specs->width)||
+			(brwin->winrect.y+brwin->winrect.height>specs->height)) {
 			fprintf(stderr,"Window must be on visible screen area!\n");
 			return FALSE;
 		}
 
-		brwin->rrect.x=brwin->rect.x+args->x;
-		brwin->rrect.y=brwin->rect.y+args->y;
-		brwin->rrect.width=((args->width)? args->width:brwin->rect.width-args->x);
-		brwin->rrect.height=((args->height)? args->height:brwin->rect.height-args->y);
+		brwin->rrect.x=brwin->winrect.x+args->x;
+		brwin->rrect.y=brwin->winrect.y+args->y;
+		brwin->rrect.width=((args->width)? args->width:brwin->winrect.width-args->x);
+		brwin->rrect.height=((args->height)? args->height:brwin->winrect.height-args->y);
 
-		if ((args->x+brwin->rrect.width>brwin->rect.width)||
-			(args->y+brwin->rrect.height>brwin->rect.height)) {
+		if ((args->x+brwin->rrect.width>brwin->winrect.width)||
+			(args->y+brwin->rrect.height>brwin->winrect.height)) {
 			fprintf(stderr,"Specified Area is larger than window!\n");
 			return FALSE;
 		}
