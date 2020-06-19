@@ -70,8 +70,8 @@ typedef u_int32_t cmp_int_t;
 //type of pixel proccessing for the Cb,Cr planes
 //when converting from full rgb to 4:2:2 Ycbcr
 enum{
-    __PXL_DISCARD,  //only select 1 pixel in every block of four
-    __PXL_AVERAGE   //calculate the average of all four pixels
+	__PXL_DISCARD,  //only select 1 pixel in every block of four
+	__PXL_AVERAGE   //calculate the average of all four pixels
 };
 
 // Boolean type
@@ -89,123 +89,123 @@ typedef int boolean;
 typedef struct _ProgData ProgData;
 
 typedef struct _DisplaySpecs{   //this struct holds some basic information
-    int screen;                 //about the display,needed mostly for
-    unsigned int width, height; //validity checks at startup
-    Window root;
-    Visual *visual;
-    GC gc;
-    int depth;
+	int screen;				 //about the display,needed mostly for
+	unsigned int width, height; //validity checks at startup
+	Window root;
+	Visual *visual;
+	GC gc;
+	int depth;
 }DisplaySpecs;
 
 typedef struct _RectArea{   //an area that has been damaged gets stored
-    XRectangle rect;         //in a list comprised of structs of this type
-    struct _RectArea *prev,*next;
+	XRectangle rect;		 //in a list comprised of structs of this type
+	struct _RectArea *prev,*next;
 }RectArea;
 
 typedef struct _BRWindow{   //'basic recorded window' specs
-    XRectangle rect;         //window attributes
-    XRectangle rrect;        //part of window that is recorded
-    int nbytes;             //size of zpixmap when screenshoting
-    Window windowid;        //id
+	XRectangle rect;		 //window attributes
+	XRectangle rrect;		//part of window that is recorded (rounded to alignment)
+	int nbytes;			 //size of zpixmap when screenshoting
+	Window windowid;		//id
 }BRWindow;
 
 //defaults in the following comment lines may be out of sync with reality
 //check the SetupDefaultArgs() function further bellow
 typedef struct _ProgArgs{
-    int delay;          //start up delay
-    Window windowid;    //window to record(default root)
-    char *display;      //display to connect(default :0)
-    int x,y;            //x,y offset(default 0,0)
-    int width,height;   //defaults to window width and height
-    char *filename;     //output file(default out.[ogg|*])
-    int cursor_color;   //black or white=>1 or 0
-    int have_dummy_cursor;  //disable/enable drawing of the dummy cursor
-    int xfixes_cursor;      //disable/enable drawing of a cursor obtained
-                            //through the xfixes extension
-    float fps;              //desired framerate(default 15)
-    unsigned int frequency;     //desired frequency (default 22050)
-    unsigned int channels;      //no of channels(default 2)
-    char *device;               //default sound device
+	int delay;		  //start up delay
+	Window windowid;	//window to record(default root)
+	char *display;	  //display to connect(default :0)
+	int x,y;			//x,y offset(default 0,0)
+	int width,height;   //defaults to window width and height
+	char *filename;	 //output file(default out.[ogg|*])
+	int cursor_color;   //black or white=>1 or 0
+	int have_dummy_cursor;  //disable/enable drawing of the dummy cursor
+	int xfixes_cursor;	  //disable/enable drawing of a cursor obtained
+							//through the xfixes extension
+	float fps;			  //desired framerate(default 15)
+	unsigned int frequency;	 //desired frequency (default 22050)
+	unsigned int channels;	  //no of channels(default 2)
+	char *device;			   //default sound device
 #ifdef HAVE_LIBASOUND
-    snd_pcm_uframes_t buffsize; //buffer size(in frames) for sound capturing
+	snd_pcm_uframes_t buffsize; //buffer size(in frames) for sound capturing
 #else
-    u_int32_t buffsize;
+	u_int32_t buffsize;
 #endif
-    const char* rescue_path;
-    int nosound;        //do not record sound(default 0)
-    int noshared;       //do not use shared memory extension(default 0)
-    int nowmcheck;      //do not check if there's a 3d comp window manager
-                        //(which changes full-shots and with-shared to 1)
-    int full_shots;     //do not poll damage, take full screenshots
-    int follow_mouse;   //capture area follows the mouse(fullshots auto enabled)
-    int no_encode;      //do not encode or delete the temporary files(debug opt)
-    int no_quick_subsample;             //average pixels in chroma planes
-    int v_bitrate,v_quality,s_quality;  //video bitrate,video-sound quality
-    int encOnTheFly;    //encode while recording, no caching(default 0)
-    char *workdir;      //directory to be used for cache files(default $HOME)
-    char *pause_shortcut;   //pause/unpause shortcut sequence(Control+Alt+p)
-    char *stop_shortcut;    //stop shortcut sequence(Control+Alt+s)
-    int noframe;            //don't draw a frame around the recording area
-    int zerocompression;    //image data are always flushed uncompressed
-    int overwrite;          //overwite a previously existing file
-                            //(do not add a .number postfix)
-    int use_jack;           //record audio with jack
-    unsigned int jack_nports;
-    char *jack_port_names[RMD_MAX_JACK_PORTS];
-    float jack_ringbuffer_secs;
+	const char* rescue_path;
+	int nosound;		//do not record sound(default 0)
+	int noshared;	   //do not use shared memory extension(default 0)
+	int nowmcheck;	  //do not check if there's a 3d comp window manager
+						//(which changes full-shots and with-shared to 1)
+	int full_shots;	 //do not poll damage, take full screenshots
+	int follow_mouse;   //capture area follows the mouse(fullshots auto enabled)
+	int no_encode;	  //do not encode or delete the temporary files(debug opt)
+	int no_quick_subsample;			 //average pixels in chroma planes
+	int v_bitrate,v_quality,s_quality;  //video bitrate,video-sound quality
+	int encOnTheFly;			//encode while recording, no caching(default 0)
+	char *workdir;	  //directory to be used for cache files(default $HOME)
+	char *pause_shortcut;   //pause/unpause shortcut sequence(Control+Alt+p)
+	char *stop_shortcut;	//stop shortcut sequence(Control+Alt+s)
+	int noframe;			//don't draw a frame around the recording area
+	int zerocompression;	//image data are always flushed uncompressed
+	int overwrite;		  //overwite a previously existing file
+							//(do not add a .number postfix)
+	int use_jack;		   //record audio with jack
+	unsigned int jack_nports;
+	char *jack_port_names[RMD_MAX_JACK_PORTS];
+	float jack_ringbuffer_secs;
 }ProgArgs;
 
 //this struct holds anything related to encoding AND
 //writting out to file.
 typedef struct _EncData{
-    ogg_stream_state m_ogg_ts;  //theora
-    ogg_stream_state m_ogg_vs;  //vorbis
-    ogg_page         m_ogg_pg;  //this could be avoided since
-                                // it is used only while initializing
-    ogg_packet       m_ogg_pckt1;   //theora stream
-    ogg_packet       m_ogg_pckt2;   //vorbis stream
+	ogg_stream_state m_ogg_ts;  //theora
+	ogg_stream_state m_ogg_vs;  //vorbis
+	ogg_page		 m_ogg_pg;  //this could be avoided since
+								// it is used only while initializing
+	ogg_packet	   m_ogg_pckt1;   //theora stream
+	ogg_packet	   m_ogg_pckt2;   //vorbis stream
 //theora data
-    theora_state     m_th_st;
-    theora_info      m_th_inf;
-    theora_comment   m_th_cmmnt;
-    yuv_buffer       yuv;
+	theora_state	 m_th_st;
+	theora_info	  m_th_inf;
+	theora_comment   m_th_cmmnt;
+	yuv_buffer	   yuv;
 //vorbis data
-    vorbis_info      m_vo_inf;
-    vorbis_comment   m_vo_cmmnt;
-    vorbis_dsp_state m_vo_dsp;
-    vorbis_block     m_vo_block;
+	vorbis_info	  m_vo_inf;
+	vorbis_comment   m_vo_cmmnt;
+	vorbis_dsp_state m_vo_dsp;
+	vorbis_block	 m_vo_block;
 //these should be 0, since area is quantized
 //before input
-    int             x_offset,
-                    y_offset;
+	int			 x_offset,
+					y_offset;
 //our file
-    FILE            *fp;
+	FILE			*fp;
 }EncData;
 
 //this struct will hold a few basic
 //information, needed for caching the frames.
 typedef struct _CacheData{
-    char    *workdir,   //The directory were the project
-                        //will be stored, while recording.
-                        //Since this will take a lot of space, the user must be
-                        //able to change the location.
-            *projname,  //This is the name of the folder that
-                        //will hold the project.
-                        //It is rMD-session-%d where %d is the pid
-                        //of the current proccess.
-                        //This way, running two instances
-                        //will not create problems
-                        //and also, a frontend can identify
-                        //leftovers from a possible crash
-                        //and delete them
-            *specsfile, //workdir+projname+specs.txt
-            *imgdata,   //workdir+projname+img.out.gz
-            *audiodata; //workdir+projname+audio.pcm
+	char	*workdir,	//The directory were the project
+				//will be stored, while recording.
+				//Since this will take a lot of space, the user must be
+				//able to change the location.
+		*projname,	//This is the name of the folder that
+				//will hold the project.
+				//It is rMD-session-%d where %d is the pid
+				//of the current proccess.
+				//This way, running two instances
+				//will not create problems
+				//and also, a frontend can identify
+				//leftovers from a possible crash
+				//and delete them
+		*specsfile,	//workdir+projname+specs.txt
+		*imgdata,	//workdir+projname+img.out.gz
+		*audiodata;	//workdir+projname+audio.pcm
 
-    gzFile  *ifp;       //image data file pointer
-    FILE    *uncifp;    //uncompressed image data file pointer
+	gzFile  *ifp;		//image data file pointer
+	FILE	*uncifp;	//uncompressed image data file pointer
 
-    FILE    *afp;       //audio data file pointer
+	FILE	*afp;		//audio data file pointer
 
 }CacheData;
 
@@ -213,33 +213,33 @@ typedef struct _CacheData{
 //sound keeps coming so we que it in this list
 //which we then traverse
 typedef struct _SndBuffer{
-    signed char *data;
-    struct _SndBuffer *next;
+	signed char *data;
+	struct _SndBuffer *next;
 }SndBuffer;
 
 #ifdef HAVE_LIBJACK
 typedef struct _JackData{
-    ProgData *pdata;            //pointer to prog data
-    jack_client_t   *client;
-    unsigned int    buffersize, //buffer size for every port in frames.
-                    frequency,  //samplerate with which jack server was started.
-                    nports;     //number of ports.
-    float           ringbuffer_secs;
-    char **port_names;          //names of ports(as specified in args).
-    jack_port_t **ports;        //connections to thes ports.
-    jack_default_audio_sample_t **portbuf;  //retrieval of audio buffers.
-    pthread_mutex_t *snd_buff_ready_mutex;  //mutex and cond_var
-    pthread_cond_t *sound_data_read;        //in the pdata struct
-    jack_ringbuffer_t *sound_buffer;        //data exchange happens through this
-    int capture_started;        //used to hold recording in the beginning
+	ProgData *pdata;			//pointer to prog data
+	jack_client_t   *client;
+	unsigned int	buffersize, //buffer size for every port in frames.
+					frequency,  //samplerate with which jack server was started.
+					nports;	 //number of ports.
+	float		   ringbuffer_secs;
+	char **port_names;		  //names of ports(as specified in args).
+	jack_port_t **ports;		//connections to thes ports.
+	jack_default_audio_sample_t **portbuf;  //retrieval of audio buffers.
+	pthread_mutex_t *snd_buff_ready_mutex;  //mutex and cond_var
+	pthread_cond_t *sound_data_read;		//in the pdata struct
+	jack_ringbuffer_t *sound_buffer;		//data exchange happens through this
+	int capture_started;		//used to hold recording in the beginning
 }JackData;
 #endif
 
-typedef struct _HotKey{     //Hold info about the shortcuts
-    int modnum;             //modnum is the number of modifier masks
-    unsigned int mask[4];  //that should be checked (the initial
-    int key;                //user requested modifier plus it's
-}HotKey;                    //combinations with LockMask and NumLockMask).
+typedef struct _HotKey{	 //Hold info about the shortcuts
+	int modnum;			 //modnum is the number of modifier masks
+	unsigned int mask[4];  //that should be checked (the initial
+	int key;				//user requested modifier plus it's
+}HotKey;					//combinations with LockMask and NumLockMask).
 
 //this structure holds any data related to the program
 //It's usage is mostly to be given as an argument to the
@@ -247,96 +247,96 @@ typedef struct _HotKey{     //Hold info about the shortcuts
 //at the same time usage of any globals.
 struct _ProgData {
 /**recordMyDesktop specific structs*/
-    ProgArgs args;          //the program arguments
-    DisplaySpecs specs;     //Display specific information
-    BRWindow brwin;         //recording window
-    RectArea *rect_root;    //the interchanging list roots for storing
-                            //the changed regions
-    SndBuffer   *sound_buffer;
-    EncData     *enc_data;
-    CacheData   *cache_data;
-    HotKey      pause_key,  //Shortcuts
-                stop_key;
+	ProgArgs args;		  //the program arguments
+	DisplaySpecs specs;	 //Display specific information
+	BRWindow brwin;		 //recording window
+	RectArea *rect_root;	//the interchanging list roots for storing
+							//the changed regions
+	SndBuffer   *sound_buffer;
+	EncData	 *enc_data;
+	CacheData   *cache_data;
+	HotKey	  pause_key,  //Shortcuts
+				stop_key;
 #ifdef HAVE_LIBJACK
-    JackData    *jdata;
+	JackData	*jdata;
 #endif
 /**X related info*/
-    Display *dpy;           //curtrent display
+	Display *dpy;		   //curtrent display
 /** Mutexes*/
-    pthread_mutex_t sound_buffer_mutex,
-                    snd_buff_ready_mutex,
-                    img_buff_ready_mutex,
-                    theora_lib_mutex,
-                    vorbis_lib_mutex,
-                    libogg_mutex,   //libogg is not thread safe,
-                    yuv_mutex;  //this might not be needed since we only have
-                                //one read-only and  one write-only thread
-                                //also on previous versions,
-                                //y component was looped separately
-                                //and then u and v so this was needed
-                                //to avoid wrong coloring to render
-                                //Currently this mutex only prevents
-                                //the cursor from flickering
+	pthread_mutex_t sound_buffer_mutex,
+					snd_buff_ready_mutex,
+					img_buff_ready_mutex,
+					theora_lib_mutex,
+					vorbis_lib_mutex,
+					libogg_mutex,   //libogg is not thread safe,
+					yuv_mutex;  //this might not be needed since we only have
+								//one read-only and  one write-only thread
+								//also on previous versions,
+								//y component was looped separately
+								//and then u and v so this was needed
+								//to avoid wrong coloring to render
+								//Currently this mutex only prevents
+								//the cursor from flickering
 /**Condition Variables*/
-    pthread_cond_t  time_cond,  //this gets a broadcast by the handler
-                                //whenever it's time to get a screenshot
-                    pause_cond, //this is blocks execution,
-                                //when program is paused
-                    sound_data_read,    //a buffer is ready for proccessing
-                    image_buffer_ready, //image encoding finished
-                    theora_lib_clean,   //the flush_ogg thread cannot
-                                        //procceed to creating last
-                    vorbis_lib_clean;   //packages until these two libs
-                                        //are no longer used, by other threads
+	pthread_cond_t  time_cond,  //this gets a broadcast by the handler
+								//whenever it's time to get a screenshot
+					pause_cond, //this is blocks execution,
+								//when program is paused
+					sound_data_read,	//a buffer is ready for proccessing
+					image_buffer_ready, //image encoding finished
+					theora_lib_clean,   //the flush_ogg thread cannot
+										//procceed to creating last
+					vorbis_lib_clean;   //packages until these two libs
+										//are no longer used, by other threads
 /**Buffers,Flags and other vars*/
-    unsigned char *dummy_pointer,   //a dummy pointer to be drawn
-                                    //in every frame
-                                    //data is casted to unsigned for
-                                    //later use in YUV buffer
-                  npxl;     //this is the no pixel convention
-                            //when drawing the dummy pointer
-    unsigned int periodtime,//time that a sound buffer lasts (microsecs)
-                frametime;  //time that a frame lasts (microsecs)
-    Window  shaped_w;       //frame
-    int damage_event,       //damage event base code
-        damage_error,       //damage error base code
-        shm_opcode,         //MIT-Shm opcode
-        dummy_p_size,       //dummy pointer size,initially 16x16,always square
-        th_encoding_clean,      //thread exit inidcator
-        v_encoding_clean,       //  >>  >>
-        v_enc_thread_waiting,   //these indicate a wait
-        th_enc_thread_waiting,  //condition on the cond vars.
-        timer_alive,        //determines loop of timer thread
-        hard_pause,         //if sound device doesn't support pause
-                            //we have to close and reopen
-        avd,                //syncronization among audio and video
-        sound_framesize;    //size of each sound frame
+	unsigned char *dummy_pointer,   //a dummy pointer to be drawn
+									//in every frame
+									//data is casted to unsigned for
+									//later use in YUV buffer
+				  npxl;	 //this is the no pixel convention
+							//when drawing the dummy pointer
+	unsigned int periodtime,//time that a sound buffer lasts (microsecs)
+				frametime;  //time that a frame lasts (microsecs)
+	Window  shaped_w;	   //frame
+	int damage_event,	   //damage event base code
+		damage_error,	   //damage error base code
+		shm_opcode,		 //MIT-Shm opcode
+		dummy_p_size,	   //dummy pointer size,initially 16x16,always square
+		th_encoding_clean,	  //thread exit inidcator
+		v_encoding_clean,	   //  >>  >>
+		v_enc_thread_waiting,   //these indicate a wait
+		th_enc_thread_waiting,  //condition on the cond vars.
+		timer_alive,		//determines loop of timer thread
+		hard_pause,		 //if sound device doesn't support pause
+							//we have to close and reopen
+		avd,				//syncronization among audio and video
+		sound_framesize;	//size of each sound frame
 
-    /** Progam state vars */
-    boolean running;             //1 while the program is capturing/paused/encoding
-    boolean paused;              //1 while the program is paused 
-    boolean aborted;             //1 if we should abort
-    boolean pause_state_changed; //1 if pause state changed
+	/** Progam state vars */
+	boolean running;			 //1 while the program is capturing/paused/encoding
+	boolean paused;			  //1 while the program is paused 
+	boolean aborted;			 //1 if we should abort
+	boolean pause_state_changed; //1 if pause state changed
 
-    //the following values are of no effect
-    //but they might be usefull later for profiling
-    unsigned int    frames_total,   //frames calculated by total time expirations
-                    frames_lost;    //the value of shame
+	//the following values are of no effect
+	//but they might be usefull later for profiling
+	unsigned int	frames_total,   //frames calculated by total time expirations
+			frames_lost;	//the value of shame
 
-    //used to determine frame drop which can
-    //happen on failure to receive a signal over a condition variable
-    boolean capture_busy,
-            encoder_busy;
+	//used to determine frame drop which can
+	//happen on failure to receive a signal over a condition variable
+	boolean capture_busy,
+			encoder_busy;
 
-    pthread_mutex_t pause_mutex;
-    pthread_mutex_t time_mutex;
+	pthread_mutex_t pause_mutex;
+	pthread_mutex_t time_mutex;
 
 #ifdef HAVE_LIBASOUND
-    snd_pcm_t *sound_handle;
-    snd_pcm_uframes_t periodsize;
+	snd_pcm_t *sound_handle;
+	snd_pcm_uframes_t periodsize;
 #else
-    int sound_handle;
-    u_int32_t periodsize;
+	int sound_handle;
+	u_int32_t periodsize;
 #endif
 };
 
@@ -354,13 +354,13 @@ struct _ProgData {
 
 
 typedef struct _FrameHeader{
-    char        frame_prefix[4];    //always FRAM
-    u_int32_t   frameno,            //number of frame(cached frames)
-                current_total;      //number of frames that should have been
-                                    //taken at time of caching this one
-    u_int32_t   Ynum,   //number of changed blocks in the Y plane
-                Unum,   //number of changed blocks in the U plane
-                Vnum;   //number of changed blocks in the V plane
+	char		frame_prefix[4];	//always FRAM
+	u_int32_t   frameno,			//number of frame(cached frames)
+				current_total;	  //number of frames that should have been
+									//taken at time of caching this one
+	u_int32_t   Ynum,   //number of changed blocks in the Y plane
+				Unum,   //number of changed blocks in the U plane
+				Vnum;   //number of changed blocks in the V plane
 }FrameHeader;
 
 #endif

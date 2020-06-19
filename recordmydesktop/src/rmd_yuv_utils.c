@@ -31,30 +31,29 @@
 
 
 // Keep these global (for performance reasons I assume).
-unsigned char Yr[256], Yg[256], Yb[256],
-              Ur[256], Ug[256], UbVr[256],
-              Vg[256], Vb[256];
+unsigned char	Yr[256], Yg[256], Yb[256],
+		Ur[256], Ug[256], UbVr[256],
+		Vg[256], Vb[256];
 
 // FIXME: These globals are modified in other source files! We keep
 // thsee here for now. These are the cache blocks. They need to be
 // accesible in the dbuf macros
-u_int32_t *yblocks,
-          *ublocks,
-          *vblocks;
+u_int32_t	*yblocks,
+		*ublocks,
+		*vblocks;
 
 void rmdMakeMatrices (void) {
-    
-    int i;
+	int i;
  
  	/* assuming 8-bit precision */
  	float Yscale = 219.0, Yoffset = 16.0;
  	float Cscale = 224.0, Coffset = 128.0;
  	float RGBscale = 255.0;
  
- 	float r, g, b;
- 	float yr, yg, yb;
- 	float ur, ug, ub;
- 	float     vg, vb;	/* vr intentionally missing */
+ 	float	r, g, b;
+ 	float	yr, yg, yb;
+ 	float	ur, ug, ub;
+ 	float	 vg, vb;	/* vr intentionally missing */
  
  	/* as for ITU-R BT-601-6 specifications: */
  	r = 0.299;
@@ -75,20 +74,16 @@ void rmdMakeMatrices (void) {
  	vg = ( -0.5 * g / ( 1 - r ) ) * Cscale / RGBscale;
  	vb = ( -0.5 * b / ( 1 - r ) ) * Cscale / RGBscale;
  
-     for( i = 0 ; i < 256 ; i++ ) {
+	 for (i = 0; i < 256; i++) {
+		 Yr[i] = (unsigned char) rmdRoundf( Yoffset + yr * i );
+		 Yg[i] = (unsigned char) rmdRoundf( yg * i );
+		 Yb[i] = (unsigned char) rmdRoundf( yb * i );
 
-         Yr[i] = (unsigned char) rmdRoundf( Yoffset + yr * i );
-         Yg[i] = (unsigned char) rmdRoundf( yg * i );
-         Yb[i] = (unsigned char) rmdRoundf( yb * i );
+		 Ur[i] = (unsigned char) rmdRoundf( Coffset + ur * i );
+		 Ug[i] = (unsigned char) rmdRoundf( ug * i );
+		 UbVr[i] = (unsigned char) rmdRoundf( ub * i );
 
-         Ur[i] = (unsigned char) rmdRoundf( Coffset + ur * i );
-         Ug[i] = (unsigned char) rmdRoundf( ug * i );
-         UbVr[i] = (unsigned char) rmdRoundf( ub * i );
-
-         Vg[i] = (unsigned char) rmdRoundf( vg * i );
-         Vb[i] = (unsigned char) rmdRoundf( Coffset + vb * i );
-
-    }
-
+		 Vg[i] = (unsigned char) rmdRoundf( vg * i );
+		 Vb[i] = (unsigned char) rmdRoundf( Coffset + vb * i );
+	}
 }
-

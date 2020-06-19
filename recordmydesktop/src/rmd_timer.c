@@ -38,51 +38,40 @@
 
 
 void *rmdTimer(ProgData *pdata){
-    
-    long unsigned int secs_tw=1/pdata->args.fps;
-    long unsigned int usecs_tw=(1000000)/pdata->args.fps-
-                               secs_tw*1000000;
+	long unsigned int secs_tw=1/pdata->args.fps;
+	long unsigned int usecs_tw=(1000000)/pdata->args.fps- secs_tw*1000000;
 
-    while(pdata->timer_alive){
+	while (pdata->timer_alive){
+		if (pdata->pause_state_changed) {
+			pdata->pause_state_changed = FALSE;
 
-        if (pdata->pause_state_changed) {
-            pdata->pause_state_changed = FALSE;
+			if (!pdata->paused) {
+				pdata->paused = TRUE;
+				fprintf(stderr,"STATE:PAUSED\n");fflush(stderr);
+			} else{
+				pdata->paused = FALSE;
+				fprintf(stderr,"STATE:RECORDING\n");fflush(stderr);
+				pthread_mutex_lock(&pdata->pause_mutex);
+				pthread_cond_broadcast(&pdata->pause_cond);
+				pthread_mutex_unlock(&pdata->pause_mutex);
+			}
+		}
 
-            if (!pdata->paused) {
-                pdata->paused = TRUE;
-                fprintf(stderr,"STATE:PAUSED\n");fflush(stderr);
-            }
-            else{
-                pdata->paused = FALSE;
-                fprintf(stderr,"STATE:RECORDING\n");fflush(stderr);
-                pthread_mutex_lock(&pdata->pause_mutex);
-                pthread_cond_broadcast(&pdata->pause_cond);
-                pthread_mutex_unlock(&pdata->pause_mutex);
-            }
+		if (!pdata->paused) {
+			pdata->frames_total++;
+			if (pdata->capture_busy)
+				pdata->frames_lost++;
+		}
+		
+		pthread_mutex_lock(&pdata->time_mutex);
+		pthread_cond_broadcast(&pdata->time_cond);
+		pthread_mutex_unlock(&pdata->time_mutex);
 
-        }
+		if (secs_tw)
+			sleep(secs_tw);
 
-        if (!pdata->paused) {
-            pdata->frames_total++;
-            if (pdata->capture_busy) {
-                pdata->frames_lost++;
-            }
-        }
-        
-        pthread_mutex_lock(&pdata->time_mutex);
-        pthread_cond_broadcast(&pdata->time_cond);
-        pthread_mutex_unlock(&pdata->time_mutex);
-        
+		usleep(usecs_tw);
+	}
 
-        if(secs_tw)
-            sleep(secs_tw);
-        usleep(usecs_tw);
-
-    }
-
-
-    pthread_exit(&errno);
+	pthread_exit(&errno);
 }
-
-
-

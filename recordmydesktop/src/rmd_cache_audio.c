@@ -38,75 +38,73 @@
 
 
 
-void *rmdCacheSoundBuffer(ProgData *pdata){
+void *rmdCacheSoundBuffer(ProgData *pdata) {
+	size_t	write_size = pdata->periodsize * pdata->sound_framesize;
+
+#ifdef HAVE_LIBJACK
+	if (pdata->args.use_jack)
+		write_size = pdata->sound_framesize * pdata->jdata->buffersize;
+#endif
+
 //We are simply going to throw sound on the disk.
 //It's sound is tiny compared to that of image, so
 //compressing would reducethe overall size by only an
 //insignificant fraction.
-#ifdef HAVE_LIBJACK
-    void *jackbuf=NULL;
-    if(pdata->args.use_jack){
-        jackbuf=malloc(pdata->sound_framesize*pdata->jdata->buffersize);
-    }
-#endif
-    while((pdata->running)){
-        SndBuffer *buff=NULL;
 
-        if (pdata->paused) {
-            pthread_mutex_lock(&pdata->pause_mutex);
-            pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
-            pthread_mutex_unlock(&pdata->pause_mutex);
-        }
-        if(!pdata->args.use_jack){
-            if(pdata->sound_buffer==NULL){
-                pdata->v_enc_thread_waiting=1;
-                pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-                pthread_cond_wait(&pdata->sound_data_read,
-                                &pdata->snd_buff_ready_mutex);
-                pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-                pdata->v_enc_thread_waiting=0;
-            }
-            if(pdata->sound_buffer==NULL || !pdata->running){
-                break;
-            }
-            pthread_mutex_lock(&pdata->sound_buffer_mutex);
-            buff=pdata->sound_buffer;
-            //advance the list
-            pdata->sound_buffer=pdata->sound_buffer->next;
-            pthread_mutex_unlock(&pdata->sound_buffer_mutex);
-            fwrite(buff->data,1,pdata->periodsize*pdata->sound_framesize,
-                   pdata->cache_data->afp);
-            free(buff->data);
-            free(buff);
-        }
-        else{
 #ifdef HAVE_LIBJACK
-            if((*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer)>=
-               (pdata->sound_framesize*pdata->jdata->buffersize)){
-                (*jack_ringbuffer_read)(pdata->jdata->sound_buffer,
-                                          jackbuf,
-                                          (pdata->sound_framesize*
-                                           pdata->jdata->buffersize));
-                fwrite(jackbuf,1,(pdata->sound_framesize*
-                                  pdata->jdata->buffersize),
-                       pdata->cache_data->afp);
-            }
-            else{
-                pdata->v_enc_thread_waiting=1;
-                pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-                pthread_cond_wait(&pdata->sound_data_read,
-                                &pdata->snd_buff_ready_mutex);
-                pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-                pdata->v_enc_thread_waiting=0;
-                continue;
-            }
+	void	*jackbuf = NULL;
+	if (pdata->args.use_jack)
+		jackbuf=malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 #endif
-        }
-        pdata->avd-=pdata->periodtime;
-    }
 
-    fclose(pdata->cache_data->afp);
-    pthread_exit(&errno);
+	while (pdata->running) {
+		SndBuffer	*buff = NULL;
+
+		if (pdata->paused) {
+			pthread_mutex_lock(&pdata->pause_mutex);
+			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
+			pthread_mutex_unlock(&pdata->pause_mutex);
+		}
+
+		if (!pdata->args.use_jack) {
+			if (pdata->sound_buffer == NULL) {
+				pdata->v_enc_thread_waiting = 1;
+				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
+				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
+				pdata->v_enc_thread_waiting = 0;
+			}
+
+			if (pdata->sound_buffer == NULL || !pdata->running)
+				break;
+
+			pthread_mutex_lock(&pdata->sound_buffer_mutex);
+			buff = pdata->sound_buffer;
+			//advance the list
+			pdata->sound_buffer = pdata->sound_buffer->next;
+			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
+			fwrite(buff->data, 1, write_size, pdata->cache_data->afp);
+			free(buff->data);
+			free(buff);
+		} else {
+#ifdef HAVE_LIBJACK
+			if ((*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer) >= write_size) {
+				(*jack_ringbuffer_read)(pdata->jdata->sound_buffer, jackbuf, write_size);
+				fwrite(jackbuf, 1, write_size, pdata->cache_data->afp);
+			} else {
+				pdata->v_enc_thread_waiting=1;
+				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
+				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
+				pdata->v_enc_thread_waiting=0;
+
+				continue;
+			}
+#endif
+		}
+		pdata->avd-=pdata->periodtime;
+	}
+
+	fclose(pdata->cache_data->afp);
+	pthread_exit(&errno);
 }
-
-

@@ -34,53 +34,53 @@
 
 // There seem to be no way of passing user data to the signal handler,
 // so hack around not being able to pass ProgData to them
-static int *pdata_running             = NULL;
-static int *pdata_paused              = NULL;
-static int *pdata_aborted             = NULL;
+static int *pdata_running			 = NULL;
+static int *pdata_paused			  = NULL;
+static int *pdata_aborted			 = NULL;
 static int *pdata_pause_state_changed = NULL;
 
 
 static void rmdSetPaused(int signum) {
 
-    *pdata_pause_state_changed = TRUE;
+	*pdata_pause_state_changed = TRUE;
 }
 
 static void rmdSetRunning(int signum) {
 
-    if (!*pdata_paused) {
+	if (!*pdata_paused) {
 
-        *pdata_running = FALSE;
+		*pdata_running = FALSE;
 
-        if (signum == SIGABRT) {
-            *pdata_aborted = TRUE;
-        }
-    }
+		if (signum == SIGABRT) {
+			*pdata_aborted = TRUE;
+		}
+	}
 }
 
 void rmdRegisterCallbacks(ProgData *pdata) {
 
-    struct sigaction pause_act;
-    struct sigaction end_act;
+	struct sigaction pause_act;
+	struct sigaction end_act;
 
-    // Is there some way to pass pdata to the signal handlers?
-    pdata_running             = &pdata->running;
-    pdata_paused              = &pdata->paused;
-    pdata_aborted             = &pdata->aborted;
-    pdata_pause_state_changed = &pdata->pause_state_changed;
-    
-    // Setup pause_act
-    sigfillset(&pause_act.sa_mask);
-    pause_act.sa_flags   = SA_RESTART;
-    pause_act.sa_handler = rmdSetPaused;
+	// Is there some way to pass pdata to the signal handlers?
+	pdata_running			 = &pdata->running;
+	pdata_paused			  = &pdata->paused;
+	pdata_aborted			 = &pdata->aborted;
+	pdata_pause_state_changed = &pdata->pause_state_changed;
+	
+	// Setup pause_act
+	sigfillset(&pause_act.sa_mask);
+	pause_act.sa_flags   = SA_RESTART;
+	pause_act.sa_handler = rmdSetPaused;
 
-    sigaction(SIGUSR1, &pause_act, NULL);
+	sigaction(SIGUSR1, &pause_act, NULL);
 
-    // Setup end_act
-    sigfillset(&end_act.sa_mask);
-    end_act.sa_flags   = SA_RESTART;
-    end_act.sa_handler = rmdSetRunning;
+	// Setup end_act
+	sigfillset(&end_act.sa_mask);
+	end_act.sa_flags   = SA_RESTART;
+	end_act.sa_handler = rmdSetRunning;
 
-    sigaction(SIGINT,  &end_act, NULL);
-    sigaction(SIGTERM, &end_act, NULL);
-    sigaction(SIGABRT, &end_act, NULL);
+	sigaction(SIGINT,  &end_act, NULL);
+	sigaction(SIGTERM, &end_act, NULL);
+	sigaction(SIGABRT, &end_act, NULL);
 }

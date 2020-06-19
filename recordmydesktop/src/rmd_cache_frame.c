@@ -44,266 +44,272 @@
 #define CACHE_FILE_SIZE_LIMIT (500 * 1024 * 1024)
 
 
-static int rmdFlushBlock(unsigned char *buf,
-                         int blockno,
-                         int width,
-                         int height,
-                         int blockwidth,
-                         gzFile *fp,
-                         FILE *ucfp,
-                         int flush) {
-    int j,i,
-        bytes_written=0,
-        block_i=(!blockwidth)?0:(blockno/(width/blockwidth)),//place on the grid
-        block_k=(!blockwidth)?0:(blockno%(width/blockwidth));
-    register unsigned char *buf_reg=(&buf[(block_i*
-                                         width+
-                                         block_k)*blockwidth]);
-    static unsigned char out_buffer[CACHE_OUT_BUFFER_SIZE];
-    static unsigned int out_buffer_bytes=0;
+static int rmdFlushBlock(
+			unsigned char *buf,
+			int blockno,
+			int width,
+			int height,
+			int blockwidth,
+			gzFile *fp,
+			FILE *ucfp,
+			int flush) {
 
-    if(out_buffer_bytes+pow(blockwidth,2)>=CACHE_OUT_BUFFER_SIZE ||
-       (flush && out_buffer_bytes)){
-        if(ucfp==NULL)
-            gzwrite(fp,(void *)out_buffer,out_buffer_bytes);
-        else
-            fwrite((void *)out_buffer,1,out_buffer_bytes,ucfp);
-        bytes_written=out_buffer_bytes;
-        out_buffer_bytes=0;
-    }
-    if(!flush){
-        register unsigned char *out_buf_reg=&out_buffer[out_buffer_bytes];
-        for(j=0;j<blockwidth;j++){
-            for(i=0;i<blockwidth;i++)
-                (*out_buf_reg++)=(*buf_reg++);
-            out_buffer_bytes+=blockwidth;
-            buf_reg+=width-blockwidth;
-        }
-    }
+	int	j,i,
+		bytes_written=0,
+		block_i=(!blockwidth)?0:(blockno/(width/blockwidth)),//place on the grid
+		block_k=(!blockwidth)?0:(blockno%(width/blockwidth));
+	register unsigned char *buf_reg = (&buf[(block_i * width + block_k) * blockwidth]);
+	static unsigned char out_buffer[CACHE_OUT_BUFFER_SIZE];
+	static unsigned int out_buffer_bytes=0;
 
-    return bytes_written;
+	if (out_buffer_bytes+pow(blockwidth,2)>=CACHE_OUT_BUFFER_SIZE || (flush && out_buffer_bytes)) {
+		if (ucfp==NULL)
+			gzwrite(fp,(void *)out_buffer,out_buffer_bytes);
+		else
+			fwrite((void *)out_buffer,1,out_buffer_bytes,ucfp);
+
+		bytes_written=out_buffer_bytes;
+		out_buffer_bytes=0;
+	}
+	if (!flush) {
+		register unsigned char *out_buf_reg=&out_buffer[out_buffer_bytes];
+
+		for(j=0;j<blockwidth;j++) {
+
+			for(i=0;i<blockwidth;i++)
+				(*out_buf_reg++)=(*buf_reg++);
+
+			out_buffer_bytes+=blockwidth;
+			buf_reg+=width-blockwidth;
+		}
+	}
+
+	return bytes_written;
 }
 
-void *rmdCacheImageBuffer(ProgData *pdata){
+void *rmdCacheImageBuffer(ProgData *pdata) {
 
-    gzFile *fp=NULL;
-    FILE *ucfp=NULL;
-    int index_entry_size=sizeof(u_int32_t),
-        blocknum_x=pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH,
-        blocknum_y=pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH,
-        firstrun=1,
-        frameno=0,
-        nbytes=0,
-        nth_cache=1;
-    u_int32_t   ynum,unum,vnum,
-                y_short_blocks[blocknum_x*blocknum_y],
-                u_short_blocks[blocknum_x*blocknum_y],
-                v_short_blocks[blocknum_x*blocknum_y];
-    unsigned long long int total_bytes          = 0;
-    unsigned long long int total_received_bytes = 0;
+	gzFile *fp=NULL;
+	FILE *ucfp=NULL;
+	int index_entry_size=sizeof(u_int32_t),
+		blocknum_x=pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH,
+		blocknum_y=pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH,
+		firstrun=1,
+		frameno=0,
+		nbytes=0,
+		nth_cache=1;
+	u_int32_t	ynum,unum,vnum,
+			y_short_blocks[blocknum_x*blocknum_y],
+			u_short_blocks[blocknum_x*blocknum_y],
+			v_short_blocks[blocknum_x*blocknum_y];
+	unsigned long long int total_bytes		  = 0;
+	unsigned long long int total_received_bytes = 0;
 
-    if(!pdata->args.zerocompression){
-        fp=pdata->cache_data->ifp;
-        if(fp==NULL)exit(13);
-    }
-    else{
-        ucfp=pdata->cache_data->uncifp;
-        if(ucfp==NULL)exit(13);
-    }
+	if (!pdata->args.zerocompression) {
+		fp=pdata->cache_data->ifp;
 
+		if (fp==NULL)
+			exit(13);
+	} else {
+		ucfp=pdata->cache_data->uncifp;
 
-    while(pdata->running){
-        int j;
-        FrameHeader fheader;
-        ynum=unum=vnum=0;
+		if (ucfp==NULL)
+			exit(13);
+	}
 
-        pdata->th_enc_thread_waiting=1;
-        pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-        pthread_cond_wait(&pdata->image_buffer_ready,
-                          &pdata->img_buff_ready_mutex);
-        pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
-        pdata->th_enc_thread_waiting=0;
+	while (pdata->running) {
+		int j;
 
-        if (pdata->paused) {
-            pthread_mutex_lock(&pdata->pause_mutex);
-            pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
-            pthread_mutex_unlock(&pdata->pause_mutex);
-        }
+		FrameHeader fheader;
+		ynum=unum=vnum=0;
 
-        pthread_mutex_lock(&pdata->yuv_mutex);
+		pdata->th_enc_thread_waiting=1;
+		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
+		pthread_cond_wait(&pdata->image_buffer_ready, &pdata->img_buff_ready_mutex);
+		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
+		pdata->th_enc_thread_waiting=0;
 
-        //find and flush different blocks
-        if(firstrun){
-            firstrun=0;
-            for(j=0;j<blocknum_x*blocknum_y;j++){
-                    ynum++;
-                    yblocks[ynum-1]=1;
-                    y_short_blocks[ynum-1]=j;
-                    unum++;
-                    ublocks[unum-1]=1;
-                    u_short_blocks[ynum-1]=j;
-                    vnum++;
-                    vblocks[vnum-1]=1;
-                    v_short_blocks[ynum-1]=j;
-            }
-        }
-        else{
-            /**COMPRESS ARRAYS*/
-            for(j=0;j<blocknum_x*blocknum_y;j++){
-                if(yblocks[j]){
-                    ynum++;
-                    y_short_blocks[ynum-1]=j;
-                }
-                if(ublocks[j]){
-                    unum++;
-                    u_short_blocks[unum-1]=j;
-                }
-                if(vblocks[j]){
-                    vnum++;
-                    v_short_blocks[vnum-1]=j;
-                }
-            }
-        }
+		if (pdata->paused) {
+			pthread_mutex_lock(&pdata->pause_mutex);
+			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
+			pthread_mutex_unlock(&pdata->pause_mutex);
+		}
 
-        /**WRITE FRAME TO DISK*/
-        if(!pdata->args.zerocompression){
-            if(ynum*4+unum+vnum>(blocknum_x*blocknum_y*6)/10)
-                gzsetparams (fp,1,Z_FILTERED);
-            else
-                gzsetparams (fp,0,Z_FILTERED);
-        }
+		pthread_mutex_lock(&pdata->yuv_mutex);
 
-        strncpy(fheader.frame_prefix,"FRAM",4);
-        fheader.frameno=++frameno;
-        fheader.current_total = pdata->frames_total;
+		//find and flush different blocks
+		if (firstrun) {
+			firstrun=0;
+			for(j=0;j<blocknum_x*blocknum_y;j++) {
+					ynum++;
+					yblocks[ynum-1]=1;
+					y_short_blocks[ynum-1]=j;
+					unum++;
+					ublocks[unum-1]=1;
+					u_short_blocks[ynum-1]=j;
+					vnum++;
+					vblocks[vnum-1]=1;
+					v_short_blocks[ynum-1]=j;
+			}
+		} else {
+			/**COMPRESS ARRAYS*/
+			for(j=0;j<blocknum_x*blocknum_y;j++) {
+				if (yblocks[j]) {
+					ynum++;
+					y_short_blocks[ynum-1]=j;
+				}
+				if (ublocks[j]) {
+					unum++;
+					u_short_blocks[unum-1]=j;
+				}
+				if (vblocks[j]) {
+					vnum++;
+					v_short_blocks[vnum-1]=j;
+				}
+			}
+		}
 
-        fheader.Ynum=ynum;
-        fheader.Unum=unum;
-        fheader.Vnum=vnum;
-        if(!pdata->args.zerocompression){
-            nbytes+=gzwrite(fp,(void*)&fheader,sizeof(FrameHeader));
-            //flush indexes
-            if(ynum)nbytes+=gzwrite(fp,
-                                    (void*)y_short_blocks,
-                                    ynum*index_entry_size);
-            if(unum)nbytes+=gzwrite(fp,
-                                    (void*)u_short_blocks,
-                                    unum*index_entry_size);
-            if(vnum)nbytes+=gzwrite(fp,
-                                    (void*)v_short_blocks,
-                                    vnum*index_entry_size);
-        }
-        else{
-            nbytes+=sizeof(FrameHeader)*
-                    fwrite((void*)&fheader,sizeof(FrameHeader),1,ucfp);
-            //flush indexes
-            if(ynum)nbytes+=index_entry_size*
-                            fwrite(y_short_blocks,index_entry_size,ynum,ucfp);
-            if(unum)nbytes+=index_entry_size*
-                            fwrite(u_short_blocks,index_entry_size,unum,ucfp);
-            if(vnum)nbytes+=index_entry_size*
-                            fwrite(v_short_blocks,index_entry_size,vnum,ucfp);
-        }
-        //flush the blocks for each buffer
-        if(ynum){
-            for(j=0;j<ynum;j++)
-                nbytes+=rmdFlushBlock(pdata->enc_data->yuv.y,y_short_blocks[j],
-                                      pdata->enc_data->yuv.y_width,
-                                      pdata->enc_data->yuv.y_height,
-                                      Y_UNIT_WIDTH,
-                                      fp,
-                                      ucfp,
-                                      0);
-        }
-        if(unum){
-            for(j=0;j<unum;j++)
-                nbytes+=rmdFlushBlock(pdata->enc_data->yuv.u,u_short_blocks[j],
-                                      pdata->enc_data->yuv.uv_width,
-                                      pdata->enc_data->yuv.uv_height,
-                                      UV_UNIT_WIDTH,
-                                      fp,
-                                      ucfp,
-                                      0);
-        }
-        if(vnum){
-            for(j=0;j<vnum;j++)
-                nbytes+=rmdFlushBlock(pdata->enc_data->yuv.v,v_short_blocks[j],
-                                      pdata->enc_data->yuv.uv_width,
-                                      pdata->enc_data->yuv.uv_height,
-                                      UV_UNIT_WIDTH,
-                                      fp,
-                                      ucfp,
-                                      0);
-        }
-        //release main buffer
-        pthread_mutex_unlock(&pdata->yuv_mutex);
+		/**WRITE FRAME TO DISK*/
+		if (!pdata->args.zerocompression) {
+			if (ynum*4+unum+vnum>(blocknum_x*blocknum_y*6)/10)
+				gzsetparams (fp,1,Z_FILTERED);
+			else
+				gzsetparams (fp,0,Z_FILTERED);
+		}
 
-        nbytes+=rmdFlushBlock(NULL,0,0,0,0,fp,ucfp,1);
-        /**@________________@**/
-        pdata->avd+=pdata->frametime;
-        if(nbytes>CACHE_FILE_SIZE_LIMIT){
-            if(rmdSwapCacheFilesWrite(pdata->cache_data->imgdata,
-                                   nth_cache,&fp,&ucfp)){
-                fprintf(stderr,"New cache file could not be created.\n"
-                               "Ending recording...\n");
-                fflush(stderr);
-                raise(SIGINT);  //if for some reason we cannot make a new file
-                                //we have to stop. If we are out of space,
-                                //which means
-                                //that encoding cannot happen either,
-                                //InitEncoder will cause an abrupt end with an
-                                //error code and the cache will remain intact.
-                                //If we've chosen separate two-stages,
-                                //the program will make a
-                                //clean exit.
-                                //In either case data will be preserved so if
-                                //space is freed the recording
-                                //can be proccessed later.
-            }
-            total_bytes += nbytes;
-            nth_cache++;
-            nbytes=0;
-        }
-    }
-    total_bytes += nbytes;
+		strncpy(fheader.frame_prefix,"FRAM",4);
+		fheader.frameno=++frameno;
+		fheader.current_total = pdata->frames_total;
 
-    {
-      unsigned int bytes_per_pixel  = pdata->specs.depth >= 24 ? 4 : 2;
-      unsigned int pixels_per_frame = pdata->brwin.rrect.width * pdata->brwin.rrect.height;
-      
-      total_received_bytes = ((unsigned long long int)frameno) * bytes_per_pixel * pixels_per_frame;
-    }
+		fheader.Ynum=ynum;
+		fheader.Unum=unum;
+		fheader.Vnum=vnum;
 
-    if(total_received_bytes){
-        double percent_of_data_left = (total_bytes / (double)total_received_bytes) * 100;
+		if (!pdata->args.zerocompression) {
+			nbytes+=gzwrite(fp,(void*)&fheader,sizeof(FrameHeader));
+			//flush indexes
+			if (ynum)
+				nbytes+=gzwrite(fp, (void*)y_short_blocks, ynum*index_entry_size);
 
-        fprintf(stderr,
-                "\n"
-                "*********************************************\n"
-                "\n"
-                "Cached %llu MB, from %llu MB that were received.\n"
-                "Average cache compression ratio: %.1f %%\n"
-                "\n"
-                "*********************************************\n",
-                total_bytes / BYTES_PER_MB,
-                total_received_bytes / BYTES_PER_MB,
-                100 - percent_of_data_left);
+			if (unum)
+				nbytes+=gzwrite(fp, (void*)u_short_blocks, unum*index_entry_size);
 
-    }
+			if (vnum)
+				nbytes+=gzwrite(fp, (void*)v_short_blocks, vnum*index_entry_size);
+		} else {
+			nbytes+=sizeof(FrameHeader)*
+					fwrite((void*)&fheader,sizeof(FrameHeader),1,ucfp);
+			//flush indexes
+			if (ynum)
+				nbytes+=index_entry_size* fwrite(y_short_blocks,index_entry_size,ynum,ucfp);
 
-    fprintf(stderr,
-            "Saved %d frames in a total of %d requests\n",
-            frameno,
-            pdata->frames_total);
-    fflush(stderr);
+			if (unum)
+				nbytes+=index_entry_size* fwrite(u_short_blocks,index_entry_size,unum,ucfp);
 
-    if(!pdata->args.zerocompression){
-        gzflush(fp,Z_FINISH);
-        gzclose(fp);
-    }
-    else{
-        fflush(ucfp);
-        fclose(ucfp);
-    }
-    pthread_exit(&errno);
+			if (vnum)
+				nbytes+=index_entry_size* fwrite(v_short_blocks,index_entry_size,vnum,ucfp);
+		}
+		//flush the blocks for each buffer
+		if (ynum) {
+			for(j=0;j<ynum;j++)
+				nbytes+=rmdFlushBlock(	pdata->enc_data->yuv.y,y_short_blocks[j],
+							pdata->enc_data->yuv.y_width,
+							pdata->enc_data->yuv.y_height,
+							Y_UNIT_WIDTH,
+							fp,
+							ucfp,
+							0);
+		}
+
+		if (unum) {
+			for(j=0;j<unum;j++)
+				nbytes+=rmdFlushBlock(	pdata->enc_data->yuv.u,u_short_blocks[j],
+							pdata->enc_data->yuv.uv_width,
+							pdata->enc_data->yuv.uv_height,
+							UV_UNIT_WIDTH,
+							fp,
+							ucfp,
+							0);
+		}
+
+		if (vnum) {
+			for(j=0;j<vnum;j++)
+				nbytes+=rmdFlushBlock(	pdata->enc_data->yuv.v,v_short_blocks[j],
+							pdata->enc_data->yuv.uv_width,
+							pdata->enc_data->yuv.uv_height,
+							UV_UNIT_WIDTH,
+							fp,
+							ucfp,
+							0);
+		}
+
+		//release main buffer
+		pthread_mutex_unlock(&pdata->yuv_mutex);
+
+		nbytes+=rmdFlushBlock(NULL,0,0,0,0,fp,ucfp,1);
+		/**@________________@**/
+		pdata->avd+=pdata->frametime;
+
+		if (nbytes>CACHE_FILE_SIZE_LIMIT) {
+			if (rmdSwapCacheFilesWrite(pdata->cache_data->imgdata, nth_cache,&fp,&ucfp)) {
+				fprintf(stderr,"New cache file could not be created.\n"
+							   "Ending recording...\n");
+				fflush(stderr);
+				raise(SIGINT);  //if for some reason we cannot make a new file
+								//we have to stop. If we are out of space,
+								//which means
+								//that encoding cannot happen either,
+								//InitEncoder will cause an abrupt end with an
+								//error code and the cache will remain intact.
+								//If we've chosen separate two-stages,
+								//the program will make a
+								//clean exit.
+								//In either case data will be preserved so if
+								//space is freed the recording
+								//can be proccessed later.
+			}
+			total_bytes += nbytes;
+			nth_cache++;
+			nbytes=0;
+		}
+	}
+	total_bytes += nbytes;
+
+	{
+	  unsigned int bytes_per_pixel  = pdata->specs.depth >= 24 ? 4 : 2;
+	  unsigned int pixels_per_frame = pdata->brwin.rrect.width * pdata->brwin.rrect.height;
+	  
+	  total_received_bytes = ((unsigned long long int)frameno) * bytes_per_pixel * pixels_per_frame;
+	}
+
+	if (total_received_bytes) {
+		double percent_of_data_left = (total_bytes / (double)total_received_bytes) * 100;
+
+		fprintf(stderr, "\n"
+				"*********************************************\n"
+				"\n"
+				"Cached %llu MB, from %llu MB that were received.\n"
+				"Average cache compression ratio: %.1f %%\n"
+				"\n"
+				"*********************************************\n",
+				total_bytes / BYTES_PER_MB,
+				total_received_bytes / BYTES_PER_MB,
+				100 - percent_of_data_left);
+
+	}
+
+	fprintf(stderr, "Saved %d frames in a total of %d requests\n",
+			frameno,
+			pdata->frames_total);
+	fflush(stderr);
+
+	if (!pdata->args.zerocompression) {
+		gzflush(fp,Z_FINISH);
+		gzclose(fp);
+	} else {
+		fflush(ucfp);
+		fclose(ucfp);
+	}
+
+	pthread_exit(&errno);
 }

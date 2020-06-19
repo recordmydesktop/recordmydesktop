@@ -36,32 +36,26 @@
 
 
 boolean rmdWMIsCompositing( Display *dpy, int screen ) {
-    
-    Window win;
-    Atom atom;
-    char buf[32];
-    char *window_manager=rmdWMCheck( dpy, 
-                                     RootWindow( dpy, screen ) );
-    
-    //If the wm name is queried successfully the wm is compliant (source  
-    //http://standards.freedesktop.org/wm-spec/1.4/ar01s03.html#id2568282 )
-    //in which case we will also free() the allcoated string.
-    
-    if( window_manager == NULL )
-        return FALSE;
-    else
-        free( window_manager ); 
+	Window win;
+	Atom atom;
+	char buf[32];
+	char *window_manager=rmdWMCheck( dpy, RootWindow( dpy, screen ) );
 
+	//If the wm name is queried successfully the wm is compliant (source  
+	//http://standards.freedesktop.org/wm-spec/1.4/ar01s03.html#id2568282 )
+	//in which case we will also free() the allcoated string.
 
-    snprintf( buf, sizeof(buf), "_NET_WM_CM_S%d", screen);
-    atom = XInternAtom(dpy, buf, True);
-    if (atom == None) return FALSE;
+	if (window_manager == NULL)
+		return FALSE;
+	else
+		free(window_manager); 
 
-    win = XGetSelectionOwner(dpy, atom);
+	snprintf( buf, sizeof(buf), "_NET_WM_CM_S%d", screen);
+	atom = XInternAtom(dpy, buf, True);
+	if (atom == None)
+		return FALSE;
 
-    return win != None;
+	win = XGetSelectionOwner(dpy, atom);
 
-
-
+	return win != None;
 }
-

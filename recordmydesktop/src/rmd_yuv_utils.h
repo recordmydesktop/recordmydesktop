@@ -93,7 +93,7 @@ extern u_int32_t *yblocks,
                        __bit_depth__){ \
     int k,i;\
     register u_int##__bit_depth__##_t t_val;\
-    register unsigned char  *yuv_y=yuv->y+x_tm+y_tm*yuv->y_width,\
+    register unsigned char  *yuv_y=(yuv)->y+x_tm+y_tm*(yuv)->y_width,\
                             *_yr=Yr,*_yg=Yg,*_yb=Yb;\
     register u_int##__bit_depth__##_t *datapi=(u_int##__bit_depth__##_t *)data;\
     for(k=0;k<height_tm;k++){\
@@ -105,7 +105,7 @@ extern u_int32_t *yblocks,
             datapi++;\
             yuv_y++;\
         }\
-        yuv_y+=yuv->y_width-width_tm;\
+        yuv_y+=(yuv)->y_width-width_tm;\
     }\
 }
 
@@ -142,8 +142,8 @@ extern u_int32_t *yblocks,
                          __bit_depth__){  \
     int k,i;\
     register u_int##__bit_depth__##_t t_val;\
-    register unsigned char  *yuv_u=yuv->u+x_tm/2+(y_tm*yuv->uv_width)/2,\
-                            *yuv_v=yuv->v+x_tm/2+(y_tm*yuv->uv_width)/2,\
+    register unsigned char  *yuv_u=(yuv)->u+x_tm/2+(y_tm*(yuv)->uv_width)/2,\
+                            *yuv_v=(yuv)->v+x_tm/2+(y_tm*(yuv)->uv_width)/2,\
                             *_ur=Ur,*_ug=Ug,*_ubvr=UbVr,\
                             *_vg=Vg,*_vb=Vb;\
     register u_int##__bit_depth__##_t *datapi=(u_int##__bit_depth__##_t *)data,\
@@ -167,8 +167,8 @@ extern u_int32_t *yblocks,
             yuv_u++;\
             yuv_v++;\
         }\
-        yuv_u+=(yuv->y_width-width_tm)/2;\
-        yuv_v+=(yuv->y_width-width_tm)/2;\
+        yuv_u+=((yuv)->y_width-width_tm)/2;\
+        yuv_v+=((yuv)->y_width-width_tm)/2;\
         datapi+=width_tm;\
         if(__sampling_type==__PXL_AVERAGE)\
             datapi_next+=width_tm;\
@@ -232,11 +232,11 @@ extern u_int32_t *yblocks,
                     Yg[data_tm[(j*4)+__GBYTE]] +\
                     Yb[data_tm[(j*4)+__BBYTE]];\
                 if((k%2)&&(i%2)){\
-                    yuv->u[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*y_width_2]=\
+                    (yuv)->u[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*y_width_2]=\
                         Ur[data_tm[(k*width_tm+i)*4+__RBYTE]] +\
                         Ug[data_tm[(k*width_tm+i)*4+__GBYTE]] +\
                         UbVr[data_tm[(k*width_tm+i)*4+__BBYTE]];\
-                    yuv->v[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*y_width_2]=\
+                    (yuv)->v[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*y_width_2]=\
                         UbVr[data_tm[(k*width_tm+i)*4+__RBYTE]] +\
                         Vg[data_tm[(k*width_tm+i)*4+__GBYTE]] +\
                         Vb[data_tm[(k*width_tm+i)*4+__BBYTE]] ;\
@@ -256,7 +256,7 @@ extern u_int32_t *yblocks,
                             __bit_depth__){ \
     int k,i;\
     register u_int##__bit_depth__##_t t_val;\
-    register unsigned char  *yuv_y=yuv->y+x_tm+y_tm*yuv->y_width,\
+    register unsigned char  *yuv_y=(yuv)->y+x_tm+y_tm*(yuv)->y_width,\
                             *_yr=Yr,*_yg=Yg,*_yb=Yb;\
     register u_int##__bit_depth__##_t *datapi=(u_int##__bit_depth__##_t *)data,\
                             *datapi_back=(u_int##__bit_depth__##_t *)data_back;\
@@ -273,7 +273,7 @@ extern u_int32_t *yblocks,
             datapi_back++;\
             yuv_y++;\
         }\
-        yuv_y+=yuv->y_width-width_tm;\
+        yuv_y+=(yuv)->y_width-width_tm;\
     }\
 }
 
@@ -288,8 +288,8 @@ extern u_int32_t *yblocks,
                                 __bit_depth__){  \
     int k,i;\
     register u_int##__bit_depth__##_t t_val;\
-    register unsigned char  *yuv_u=yuv->u+x_tm/2+(y_tm*yuv->uv_width)/2,\
-                            *yuv_v=yuv->v+x_tm/2+(y_tm*yuv->uv_width)/2,\
+    register unsigned char  *yuv_u=(yuv)->u+x_tm/2+(y_tm*(yuv)->uv_width)/2,\
+                            *yuv_v=(yuv)->v+x_tm/2+(y_tm*(yuv)->uv_width)/2,\
                             *_ur=Ur,*_ug=Ug,*_ubvr=UbVr,\
                             *_vg=Vg,*_vb=Vb;\
     register u_int##__bit_depth__##_t *datapi=(u_int##__bit_depth__##_t *)data,\
@@ -325,8 +325,8 @@ extern u_int32_t *yblocks,
                 yuv_u++;\
                 yuv_v++;\
             }\
-            yuv_u+=(yuv->y_width-width_tm)/2;\
-            yuv_v+=(yuv->y_width-width_tm)/2;\
+            yuv_u+=((yuv)->y_width-width_tm)/2;\
+            yuv_v+=((yuv)->y_width-width_tm)/2;\
             datapi+=width_tm;\
             datapi_back+=width_tm;\
             if(__sampling_type==__PXL_AVERAGE){\
@@ -359,8 +359,8 @@ extern u_int32_t *yblocks,
                 yuv_u++;\
                 yuv_v++;\
             }\
-            yuv_u+=(yuv->y_width-width_tm)/2;\
-            yuv_v+=(yuv->y_width-width_tm)/2;\
+            yuv_u+=((yuv)->y_width-width_tm)/2;\
+            yuv_v+=((yuv)->y_width-width_tm)/2;\
             datapi+=width_tm;\
             datapi_back+=width_tm;\
             if(__sampling_type==__PXL_AVERAGE){\

@@ -46,148 +46,139 @@
 #include <string.h>
 #include <errno.h>
 
-int main(int argc,char **argv){
-    ProgData pdata;
-    int exit_status = 0;
-    
-    rmdSetupDefaultArgs(&pdata.args);
+int main(int argc, char **argv){
+	ProgData pdata;
+	EncData enc_data;
+	CacheData cache_data;
+	int exit_status = 0;
 
-    if (!rmdParseArgs(argc, argv, &pdata.args)) {
-        exit(1);
-    }
-    if (pdata.args.rescue_path != NULL) {
-        exit(rmdRescue(pdata.args.rescue_path));
-    }
-    if(XInitThreads ()==0){
-        fprintf(stderr,"Couldn't initialize thread support!\n");
-        exit(7);
-    }
-    if(pdata.args.display!=NULL){
-        pdata.dpy = XOpenDisplay(pdata.args.display);
-        XSetErrorHandler(rmdErrorHandler);
-    }
-    else{
-        fprintf(stderr,"No display specified for connection!\n");
-        exit(8);
-    }
-    if (pdata.dpy == NULL) {
-        fprintf(stderr, "Cannot connect to X server %s\n",pdata.args.display);
-        exit(9);
-    }
-    else{
-        EncData enc_data;
-        CacheData cache_data;
 #ifdef HAVE_LIBJACK
-        JackData jdata;
+	JackData jdata;
 
-        // Give jack access to program data, mainly for program state
-        jdata.pdata = &pdata;
-        pdata.jdata = &jdata;
+	// Give jack access to program data, mainly for program state
+	jdata.pdata = &pdata;
+	pdata.jdata = &jdata;
 #endif
 
-        // Query display specs
-        pdata.specs.screen = DefaultScreen(pdata.dpy);
-        pdata.specs.width  = DisplayWidth(pdata.dpy, pdata.specs.screen);
-        pdata.specs.height = DisplayHeight(pdata.dpy, pdata.specs.screen);
-        pdata.specs.root   = RootWindow(pdata.dpy, pdata.specs.screen);
-        pdata.specs.visual = DefaultVisual(pdata.dpy, pdata.specs.screen);
-        pdata.specs.gc     = DefaultGC(pdata.dpy, pdata.specs.screen);
-        pdata.specs.depth  = DefaultDepth(pdata.dpy, pdata.specs.screen);
+	rmdSetupDefaultArgs(&pdata.args);
 
-        if((pdata.specs.depth!=32)&&
-           (pdata.specs.depth!=24)&&
-           (pdata.specs.depth!=16)){
-            fprintf(stderr,"Only 32bpp,24bpp and 16bpp"
-                           " color depth modes are currently supported.\n");
-            exit(10);
-        }
-        if (!rmdSetBRWindow(pdata.dpy, &pdata.brwin, &pdata.specs, &pdata.args))
-            exit(11);
+	if (!rmdParseArgs(argc, argv, &pdata.args))
+		exit(1);
 
-        if( !pdata.args.nowmcheck && 
-            rmdWMIsCompositing( pdata.dpy, pdata.specs.screen ) ) {
+	if (pdata.args.rescue_path != NULL)
+		exit(rmdRescue(pdata.args.rescue_path));
 
-            fprintf(stderr,"\nDetected compositing window manager.\n"
-                           "Reverting to full screen capture at every frame.\n"
-                           "To disable this check run with --no-wm-check\n"
-                           "(though that is not advised, since it will "
-                           "probably produce faulty results).\n\n");
-            pdata.args.full_shots=1;
-            pdata.args.noshared=0;
-        
-        }
+	if (XInitThreads()==0) {
+		fprintf(stderr, "Couldn't initialize thread support!\n");
+		exit(7);
+	}
 
-        rmdQueryExtensions(pdata.dpy,
-                           &pdata.args,
-                           &pdata.damage_event,
-                           &pdata.damage_error,
-                           &pdata.shm_opcode);
+	if (pdata.args.display != NULL) {
+		pdata.dpy = XOpenDisplay(pdata.args.display);
+		XSetErrorHandler(rmdErrorHandler);
+	} else {
+		fprintf(stderr, "No display specified for connection!\n");
+		exit(8);
+	}
 
+	if (pdata.dpy == NULL) {
+		fprintf(stderr, "Cannot connect to X server %s\n", pdata.args.display);
+		exit(9);
+	}
 
-        if((exit_status=rmdInitializeData(&pdata,&enc_data,&cache_data))==0){
+	// Query display specs
+	pdata.specs.screen	= DefaultScreen(pdata.dpy);
+	pdata.specs.width	= DisplayWidth(pdata.dpy, pdata.specs.screen);
+	pdata.specs.height	= DisplayHeight(pdata.dpy, pdata.specs.screen);
+	pdata.specs.root	= RootWindow(pdata.dpy, pdata.specs.screen);
+	pdata.specs.visual	= DefaultVisual(pdata.dpy, pdata.specs.screen);
+	pdata.specs.gc		= DefaultGC(pdata.dpy, pdata.specs.screen);
+	pdata.specs.depth	= DefaultDepth(pdata.dpy, pdata.specs.screen);
 
-            if(!strcmp(pdata.args.pause_shortcut,
-                      pdata.args.stop_shortcut)||
-                rmdRegisterShortcut(pdata.dpy,
-                                    pdata.specs.root,
-                                    pdata.args.pause_shortcut,
-                                    &(pdata.pause_key)) ||
-                rmdRegisterShortcut(pdata.dpy,
-                                    pdata.specs.root,
-                                    pdata.args.stop_shortcut,
-                                    &(pdata.stop_key))){
+	if (pdata.specs.depth != 32 && pdata.specs.depth != 24 && pdata.specs.depth != 16) {
+		fprintf(stderr,
+			"Only 32bpp, 24bpp, and 16bpp"
+			" color depth modes are currently supported.\n");
+		exit(10);
+	}
 
-                fprintf(stderr,"Invalid shortcut,"
-                               " or shortcuts are the same!\n\n"
-                               "Using defaults.\n");
+	if (!rmdSetBRWindow(pdata.dpy, &pdata.brwin, &pdata.specs, &pdata.args))
+		exit(11);
 
-                rmdRegisterShortcut(pdata.dpy,
-                                    pdata.specs.root,
-                                    "Control+Mod1+p",
-                                    &(pdata.pause_key));
-                rmdRegisterShortcut(pdata.dpy,
-                                    pdata.specs.root,
-                                    "Control+Mod1+s",
-                                    &(pdata.stop_key));
-            }
+	if (!pdata.args.nowmcheck && rmdWMIsCompositing( pdata.dpy, pdata.specs.screen ) ) {
 
-            //this is where the capturing happens.
-            rmdThreads(&pdata);
+		fprintf(stderr, "\nDetected compositing window manager.\n"
+			"Reverting to full screen capture at every frame.\n"
+			"To disable this check run with --no-wm-check\n"
+			"(though that is not advised, since it will "
+			"probably produce faulty results).\n\n");
+			pdata.args.full_shots=1;
+			pdata.args.noshared=0;
+	}
 
-            XCloseDisplay(pdata.dpy);
-            fprintf(stderr,".\n");
+	rmdQueryExtensions(	pdata.dpy,
+				&pdata.args,
+				&pdata.damage_event,
+				&pdata.damage_error,
+				&pdata.shm_opcode);
 
-            //encode and then cleanup cache
-            if(!pdata.args.encOnTheFly && !pdata.args.no_encode){
-                if (!pdata.aborted) {
-                    rmdEncodeCache(&pdata);
-                }
-                fprintf(stderr,"Cleanning up cache...\n");
-                if(rmdPurgeCache(pdata.cache_data,!pdata.args.nosound))
-                    fprintf(stderr,"Some error occured "
-                                "while cleaning up cache!\n");
-                fprintf(stderr,"Done!!!\n");
-            }
+	exit_status = rmdInitializeData(&pdata, &enc_data, &cache_data);
+	if (exit_status)
+		exit(exit_status);
 
+	if (	!strcmp(pdata.args.pause_shortcut, pdata.args.stop_shortcut) ||
+		rmdRegisterShortcut(	pdata.dpy, pdata.specs.root,
+					pdata.args.pause_shortcut,
+					&(pdata.pause_key)) ||
+		rmdRegisterShortcut(	pdata.dpy,
+					pdata.specs.root,
+					pdata.args.stop_shortcut,
+					&(pdata.stop_key))) {
 
-            if (pdata.aborted && pdata.args.encOnTheFly) {
-                if(remove(pdata.args.filename)){
-                    perror("Error while removing file:\n");
-                    return 1;
-                }
-                else{
-                    fprintf(stderr,"SIGABRT received,file %s removed\n",
-                                pdata.args.filename);
-                    return 0;
-                }
-            }
-            else
-                fprintf(stderr,"Goodbye!\n");
+			fprintf(stderr, "Invalid shortcut, or shortcuts are the same!\n\nUsing defaults.\n");
 
+			rmdRegisterShortcut(	pdata.dpy,
+						pdata.specs.root,
+						"Control+Mod1+p",
+						&(pdata.pause_key));
 
-            rmdCleanUp();
-        }
-    }
+			rmdRegisterShortcut(	pdata.dpy,
+						pdata.specs.root,
+						"Control+Mod1+s",
+						&(pdata.stop_key));
+	}
 
-    return exit_status;
+	//this is where the capturing happens.
+	rmdThreads(&pdata);
+
+	XCloseDisplay(pdata.dpy);
+	fprintf(stderr, ".\n");
+
+	//encode and then cleanup cache
+	if (!pdata.args.encOnTheFly && !pdata.args.no_encode) {
+		if (!pdata.aborted)
+			rmdEncodeCache(&pdata);
+
+		fprintf(stderr,"Cleanning up cache...\n");
+		if (rmdPurgeCache(pdata.cache_data,!pdata.args.nosound))
+			fprintf(stderr,"Some error occured while cleaning up cache!\n");
+
+		fprintf(stderr,"Done!!!\n");
+	}
+
+	if (pdata.aborted && pdata.args.encOnTheFly) {
+		if (remove(pdata.args.filename)) {
+			perror("Error while removing file:\n");
+			return 1;
+		} else {
+			fprintf(stderr,	"SIGABRT received,file %s removed\n",
+					pdata.args.filename);
+			return 0;
+		}
+	} else
+		fprintf(stderr,"Goodbye!\n");
+
+	rmdCleanUp();
+
+	return exit_status;
 }

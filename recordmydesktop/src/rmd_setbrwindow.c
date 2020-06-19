@@ -43,170 +43,155 @@
 * \note This is called separately for width and height.
 */
 static void rmdSizePack2_8_16(short *start, unsigned short *size, unsigned short limit) {
-    int octoffset,hexoffset;
+	int octoffset,hexoffset;
 
-    //align in two
-    //an odd x can always go down and still be in recording area.
-    //Resolutions come in even numbers
-    //so if x is an odd numer, width max is an odd number, too
-    //thus since x will go down one then width can go up one too and still
-    //be inbounds
-    (*size)+=((*size)%2)|((*start)%2);
-    //but if x goes down 1 and width is already even,it becomes odd so:
-    (*size)+=((*size)%2);
-    (*start)-=(*start)%2;
+	//align in two
+	//an odd x can always go down and still be in recording area.
+	//Resolutions come in even numbers
+	//so if x is an odd numer, width max is an odd number, too
+	//thus since x will go down one then width can go up one too and still
+	//be inbounds
+	(*size)+=((*size)%2)|((*start)%2);
+	//but if x goes down 1 and width is already even,it becomes odd so:
+	(*size)+=((*size)%2);
+	(*start)-=(*start)%2;
 
+	//32 bit pack align
+	//we already have disible by two width,so
+	//it's 2, 4 or 6
+	octoffset=((*size)%8);
+	if (octoffset==2) {
+		(*size)-=2;
+	} else if (octoffset==6) {
+		if ((*size)+(*start)+2<=limit)
+			(*size)+=2;
+		else if ((*start)>=2) {
+			(*start)-=2;
+			(*size)+=2;
+		} else{
+			(*start)+=2;
+			(*size)-=4;
+		}
+	} else if (octoffset==4) {
+		if (((*size)+(*start)+2<=limit)&&((*start)>=2)) {
+			(*start)-=2;
+			(*size)+=4;
+		} else if ((*size)+(*start)+4<=limit) {
+			(*size)+=4;
+		} else if ((*start)>=4) {
+			(*start)-=4;
+			(*size)+=4;
+		} else {
+			(*start)+=2;
+			(*size)-=4;
+		}
+	}
 
-    //32 bit pack align
-    //we already have disible by two width,so
-    //it's 2, 4 or 6
-    octoffset=((*size)%8);
-    if(octoffset==2){
-        (*size)-=2;
-
-    }
-    else if(octoffset==6){
-        if((*size)+(*start)+2<=limit)
-            (*size)+=2;
-        else if((*start)>=2){
-            (*start)-=2;
-            (*size)+=2;
-        }
-        else{
-            (*start)+=2;
-            (*size)-=4;
-        }
-    }
-
-    else if(octoffset==4){
-        if(((*size)+(*start)+2<=limit)&&((*start)>=2)){
-            (*start)-=2;
-            (*size)+=4;
-        }
-        else if((*size)+(*start)+4<=limit){
-            (*size)+=4;
-        }
-        else if((*start)>=4){
-            (*start)-=4;
-            (*size)+=4;
-        }
-        else{
-            (*start)+=2;
-            (*size)-=4;
-        }
-    }
-
-    //16 divisble width(needed for shared memory only,
-    //but applied anyway since theora wants it, too)
-    //we already have divisibility by 8 so module
-    //by 16 is euther 8 or 0
-    hexoffset=((*size)%16);
-    if(hexoffset){
-        if(((*size)+(*start)+4<=limit)&&((*start)>=4)){
-            (*start)-=4;
-            (*size)+=8;
-        }
-        else if((*size)+(*start)+8<=limit){
-            (*size)+=8;
-        }
-        else if((*start)>=8){
-            (*start)-=8;
-            (*size)+=8;
-        }
-        else{
-            (*start)+=4;
-            (*size)-=8;
-        }
-    }
-
+	//16 divisble width(needed for shared memory only,
+	//but applied anyway since theora wants it, too)
+	//we already have divisibility by 8 so module
+	//by 16 is euther 8 or 0
+	hexoffset=((*size)%16);
+	if (hexoffset) {
+		if (((*size)+(*start)+4<=limit)&&((*start)>=4)) {
+			(*start)-=4;
+			(*size)+=8;
+		} else if ((*size)+(*start)+8<=limit) {
+			(*size)+=8;
+		} else if ((*start)>=8) {
+			(*start)-=8;
+			(*size)+=8;
+		} else {
+			(*start)+=4;
+			(*size)-=8;
+		}
+	}
 }
 
+boolean rmdSetBRWindow(	Display *dpy,
+			BRWindow *brwin,
+			DisplaySpecs *specs,
+			ProgArgs *args) {
 
+	//before we start recording we have to make sure the ranges are valid
+	if (args->windowid==0) {//root window
+		//first set it up
+		brwin->windowid=specs->root;
+		brwin->rect.x=brwin->rect.y=0;
+		brwin->rect.width=specs->width;
+		brwin->rect.height=specs->height;
+		brwin->rrect.x=args->x;
+		brwin->rrect.y=args->y;
+		brwin->rrect.width=((args->width)? args->width:specs->width-brwin->rrect.x);
+		brwin->rrect.height=((args->height)? args->height:specs->height-brwin->rrect.y);
+		//and then check validity
+		if ((brwin->rrect.x+brwin->rrect.width>specs->width)||
+			(brwin->rrect.y+brwin->rrect.height>specs->height)) {
+			fprintf(stderr,	"Window size specification out of bounds!"
+					"(current resolution:%dx%d)\n",
+					specs->width,specs->height);
+			return FALSE;
+		}
+	} else {
+		Window wchid;
+		int transl_x,transl_y;
 
-boolean rmdSetBRWindow(Display *dpy,
-                       BRWindow *brwin,
-                       DisplaySpecs *specs,
-                       ProgArgs *args) {
-    //before we start recording we have to make sure the ranges are valid
-    if(args->windowid==0){//root window
-        //first set it up
-        brwin->windowid=specs->root;
-        brwin->rect.x=brwin->rect.y=0;
-        brwin->rect.width=specs->width;
-        brwin->rect.height=specs->height;
-        brwin->rrect.x=args->x;
-        brwin->rrect.y=args->y;
-        brwin->rrect.width=((args->width)?
-                            args->width:specs->width-brwin->rrect.x);
-        brwin->rrect.height=((args->height)?
-                             args->height:specs->height-brwin->rrect.y);
-        //and then check validity
-        if((brwin->rrect.x+brwin->rrect.width>specs->width)||
-            (brwin->rrect.y+brwin->rrect.height>specs->height)){
-            fprintf(stderr,"Window size specification out of bounds!"
-                           "(current resolution:%dx%d)\n",
-                           specs->width,specs->height);
-            return FALSE;
-        }
-    }
-    else{
-        Window wchid;
-        int transl_x,transl_y;
+		XWindowAttributes attribs;
+		XGetWindowAttributes(dpy,args->windowid,&attribs);
 
-        XWindowAttributes attribs;
-        XGetWindowAttributes(dpy,args->windowid,&attribs);
-        if((attribs.map_state==IsUnviewable)||(attribs.map_state==IsUnmapped)){
-            fprintf(stderr,"Window must be mapped and visible!\n");
-            return FALSE;
-        }
-        XTranslateCoordinates(dpy,
-                              specs->root,
-                              args->windowid,
-                              attribs.x,
-                              attribs.y,
-                              &transl_x,
-                              &transl_y,
-                              &wchid);
+		if ((attribs.map_state==IsUnviewable)||(attribs.map_state==IsUnmapped)) {
+			fprintf(stderr,"Window must be mapped and visible!\n");
+			return FALSE;
+		}
 
-        brwin->rect.x=attribs.x-transl_x;
-        brwin->rect.y=attribs.y-transl_y;
-        brwin->rect.width=attribs.width;
-        brwin->rect.height=attribs.height;
-        if((brwin->rect.x+brwin->rect.width>specs->width)||
-            (brwin->rect.y+brwin->rect.height>specs->height)){
-            fprintf(stderr,"Window must be on visible screen area!\n");
-            return FALSE;
-        }
+		XTranslateCoordinates(	dpy,
+					specs->root,
+					args->windowid,
+					attribs.x,
+					attribs.y,
+					&transl_x,
+					&transl_y,
+					&wchid);
 
-        brwin->rrect.x=brwin->rect.x+args->x;
-        brwin->rrect.y=brwin->rect.y+args->y;
-        brwin->rrect.width=((args->width)?
-                            args->width:brwin->rect.width-args->x);
-        brwin->rrect.height=((args->height)?
-                             args->height:brwin->rect.height-args->y);
-        if((args->x+brwin->rrect.width>brwin->rect.width)||
-            (args->y+brwin->rrect.height>brwin->rect.height)){
-            fprintf(stderr,"Specified Area is larger than window!\n");
-            return FALSE;
-        }
-    }
-    fprintf(stderr, "Initial recording window is set to:\n"
-                    "X:%d   Y:%d    Width:%d    Height:%d\n",
-                    brwin->rrect.x,brwin->rrect.y,
-                    brwin->rrect.width,brwin->rrect.height);
-    rmdSizePack2_8_16(&brwin->rrect.x,&brwin->rrect.width,specs->width);
-    rmdSizePack2_8_16(&brwin->rrect.y,&brwin->rrect.height,specs->height);
+		brwin->rect.x=attribs.x-transl_x;
+		brwin->rect.y=attribs.y-transl_y;
+		brwin->rect.width=attribs.width;
+		brwin->rect.height=attribs.height;
 
-    fprintf(stderr, "Adjusted recording window is set to:\n"
-                    "X:%d   Y:%d    Width:%d    Height:%d\n",
-                    brwin->rrect.x,brwin->rrect.y,
-                    brwin->rrect.width,brwin->rrect.height);
+		if ((brwin->rect.x+brwin->rect.width>specs->width)||
+			(brwin->rect.y+brwin->rect.height>specs->height)) {
+			fprintf(stderr,"Window must be on visible screen area!\n");
+			return FALSE;
+		}
 
+		brwin->rrect.x=brwin->rect.x+args->x;
+		brwin->rrect.y=brwin->rect.y+args->y;
+		brwin->rrect.width=((args->width)? args->width:brwin->rect.width-args->x);
+		brwin->rrect.height=((args->height)? args->height:brwin->rect.height-args->y);
 
+		if ((args->x+brwin->rrect.width>brwin->rect.width)||
+			(args->y+brwin->rrect.height>brwin->rect.height)) {
+			fprintf(stderr,"Specified Area is larger than window!\n");
+			return FALSE;
+		}
+	}
 
-    brwin->nbytes=(((brwin->rrect.width+15)>>4)<<4)*
-                  (((brwin->rrect.height+15)>>4)<<4)*
-                  ((specs->depth==16)?2:4);
+	fprintf(stderr,	"Initial recording window is set to:\n"
+			"X:%d   Y:%d	Width:%d	Height:%d\n",
+			brwin->rrect.x,brwin->rrect.y,
+			brwin->rrect.width,brwin->rrect.height);
 
-    return TRUE;
+	rmdSizePack2_8_16(&brwin->rrect.x,&brwin->rrect.width,specs->width);
+	rmdSizePack2_8_16(&brwin->rrect.y,&brwin->rrect.height,specs->height);
+
+	fprintf(stderr,	"Adjusted recording window is set to:\n"
+			"X:%d   Y:%d	Width:%d	Height:%d\n",
+			brwin->rrect.x,brwin->rrect.y,
+			brwin->rrect.width,brwin->rrect.height);
+
+	brwin->nbytes=	(((brwin->rrect.width+15)>>4)<<4)*
+			(((brwin->rrect.height+15)>>4)<<4)*
+			((specs->depth==16)?2:4);
+
+	return TRUE;
 }

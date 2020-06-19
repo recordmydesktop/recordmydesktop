@@ -37,77 +37,84 @@
 
 
 
-int rmdGetZPixmap(Display *dpy,
-                  Window root,
-                  char *data,
-                  int x,
-                  int y,
-                  int width,
-                  int height){
-    xGetImageReply reply;
-    xGetImageReq *request;
-    long nbytes;
+int rmdGetZPixmap(	Display *dpy,
+			Window root,
+			char *data,
+			int x,
+			int y,
+			int width,
+			int height) {
 
-    LockDisplay(dpy);
-    GetReq(GetImage,request);
-    request->drawable=root;
-    request->x=x;
-    request->y=y;
-    request->width=width;
-    request->height=height;
-    request->planeMask=AllPlanes;
-    request->format=ZPixmap;
-    if((!_XReply(dpy,(xReply *)&reply,0,xFalse))||(!reply.length)){
-        UnlockDisplay(dpy);
-        SyncHandle();
-        return 1;
-    }
-    nbytes=(long)reply.length<<2;
-    _XReadPad(dpy,data,nbytes);
-    UnlockDisplay(dpy);
-    SyncHandle();
-    return 0;
+	xGetImageReply reply;
+	xGetImageReq *request;
+	long nbytes;
+
+	LockDisplay(dpy);
+	GetReq(GetImage,request);
+	request->drawable=root;
+	request->x=x;
+	request->y=y;
+	request->width=width;
+	request->height=height;
+	request->planeMask=AllPlanes;
+	request->format=ZPixmap;
+
+	if (!_XReply(dpy,(xReply *)&reply,0,xFalse) || !reply.length) {
+		UnlockDisplay(dpy);
+		SyncHandle();
+
+		return 1;
+	}
+
+	nbytes=(long)reply.length<<2;
+	_XReadPad(dpy,data,nbytes);
+	UnlockDisplay(dpy);
+	SyncHandle();
+
+	return 0;
 }
 
-int rmdGetZPixmapSHM(Display *dpy,
-                     Window root,
-                     XShmSegmentInfo *shminfo,
-                     int shm_opcode,
-                     char *data,
-                     int x,
-                     int y,
-                     int width,
-                     int height){
-    xShmGetImageReply reply;
-    xShmGetImageReq *request=NULL;
-    long nbytes;
+int rmdGetZPixmapSHM(	Display *dpy,
+			Window root,
+			XShmSegmentInfo *shminfo,
+			int shm_opcode,
+			char *data,
+			int x,
+			int y,
+			int width,
+			int height) {
 
-    LockDisplay(dpy);
-    GetReq(ShmGetImage,request);
+	xShmGetImageReply reply;
+	xShmGetImageReq *request=NULL;
+	long nbytes;
 
-    request->reqType=shm_opcode;
-    request->shmReqType=X_ShmGetImage;
-    request->shmseg=shminfo->shmseg;
+	LockDisplay(dpy);
+	GetReq(ShmGetImage,request);
 
-    request->drawable=root;
-    request->x=x;
-    request->y=y;
-    request->width=width;
-    request->height=height;
-    request->planeMask=AllPlanes;
-    request->format=ZPixmap;
-    request->offset=data-shminfo->shmaddr;
+	request->reqType=shm_opcode;
+	request->shmReqType=X_ShmGetImage;
+	request->shmseg=shminfo->shmseg;
 
-    if((!_XReply(dpy,(xReply *)&reply,0,xFalse))||(!reply.length)){
-        UnlockDisplay(dpy);
-        SyncHandle();
-        return 1;
-    }
+	request->drawable=root;
+	request->x=x;
+	request->y=y;
+	request->width=width;
+	request->height=height;
+	request->planeMask=AllPlanes;
+	request->format=ZPixmap;
+	request->offset=data-shminfo->shmaddr;
 
-    nbytes=(long)reply.length << 2;
-    _XReadPad(dpy,data,nbytes);
-    UnlockDisplay(dpy);
-    SyncHandle();
+	if ((!_XReply(dpy,(xReply *)&reply,0,xFalse))||(!reply.length)) {
+		UnlockDisplay(dpy);
+		SyncHandle();
 
-    return 0;
+		return 1;
+	}
+
+	nbytes=(long)reply.length << 2;
+	_XReadPad(dpy,data,nbytes);
+	UnlockDisplay(dpy);
+	SyncHandle();
+
+	return 0;
 }
