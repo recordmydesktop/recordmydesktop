@@ -197,11 +197,23 @@
 //besides taking the first screenshot, this functions primary purpose is to 
 //initialize the structures and memory.
 static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shminfo) {
+	const BRWindow	*brwin = &pdata->brwin;
 
 	if ((pdata->args.noshared)) {
-		char *pxl_data;
+		char	*pxl_data;
+		size_t	nbytes;
 
-		pxl_data=(char *)malloc(pdata->brwin.nbytes);
+		/* XXX: this was blindly relocated from rmdSetBRWindow(),
+		 * I'm unclear on why there's this alignment crap happening,
+		 * but just wanted to to move nbytes out to the one place it's
+		 * used.
+		 */
+		nbytes =	(((brwin->rrect.width + 15) >> 4) << 4) *
+				(((brwin->rrect.height + 15) >> 4) << 4) *
+				((pdata->specs.depth == 16) ? 2 : 4);
+
+
+		pxl_data=(char *)malloc(nbytes);
 
 		(*image)=XCreateImage(	pdata->dpy,
 					pdata->specs.visual,
@@ -209,17 +221,17 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 					ZPixmap,
 					0,
 					pxl_data,
-					pdata->brwin.rrect.width,
-					pdata->brwin.rrect.height,
+					brwin->rrect.width,
+					brwin->rrect.height,
 					8,
 					0);
 		XInitImage((*image));
 		rmdGetZPixmap(	pdata->dpy,pdata->specs.root,
 				(*image)->data,
-				pdata->brwin.rrect.x,
-				pdata->brwin.rrect.y,
-				pdata->brwin.rrect.width,
-				pdata->brwin.rrect.height);
+				brwin->rrect.x,
+				brwin->rrect.y,
+				brwin->rrect.width,
+				brwin->rrect.height);
 	} else {
 		(*image)=XShmCreateImage(	pdata->dpy,
 						pdata->specs.visual,
@@ -227,8 +239,8 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 						ZPixmap,
 						NULL,
 						shminfo,
-						pdata->brwin.rrect.width,
-						pdata->brwin.rrect.height);
+						brwin->rrect.width,
+						brwin->rrect.height);
 
 		(*shminfo).shmid=shmget(IPC_PRIVATE,
 					(*image)->bytes_per_line*
@@ -251,15 +263,15 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 		XShmGetImage(pdata->dpy,
 					 pdata->specs.root,
 					 (*image),
-					 pdata->brwin.rrect.x,
-					 pdata->brwin.rrect.y,
+					 brwin->rrect.x,
+					 brwin->rrect.y,
 					 AllPlanes);
 	}
 
 	UPDATE_YUV_BUFFER((&pdata->enc_data->yuv),
 			((unsigned char*)((*image))->data),NULL,
 			(pdata->enc_data->x_offset),(pdata->enc_data->y_offset),
-			(pdata->brwin.rrect.width),(pdata->brwin.rrect.height),
+			(brwin->rrect.width),(brwin->rrect.height),
 			(pdata->args.no_quick_subsample),
 			pdata->specs.depth);
 
@@ -270,7 +282,6 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 static void rmdBRWinCpy(BRWindow *target, BRWindow *source) {
 	target->winrect = source->winrect;
 	target->rrect = source->rrect;
-	target->nbytes = source->nbytes;
 	target->windowid = source->windowid;
 }
 

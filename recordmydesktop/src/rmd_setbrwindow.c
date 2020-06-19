@@ -189,9 +189,5 @@ boolean rmdSetBRWindow(	Display *dpy,
 			brwin->rrect.x,brwin->rrect.y,
 			brwin->rrect.width,brwin->rrect.height);
 
-	brwin->nbytes=	(((brwin->rrect.width+15)>>4)<<4)*
-			(((brwin->rrect.height+15)>>4)<<4)*
-			((specs->depth==16)?2:4);
-
 	return TRUE;
 }
