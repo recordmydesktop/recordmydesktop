@@ -198,19 +198,19 @@
 //initialize the structures and memory.
 static int rmdFirstFrame(ProgData *pdata,
                          XImage **image,
-                         XShmSegmentInfo *shminfo,
-                         char **pxl_data) {
+                         XShmSegmentInfo *shminfo) {
 
     if((pdata->args.noshared)){
+        char *pxl_data;
 
-        *pxl_data=(char *)malloc(pdata->brwin.nbytes);
+        pxl_data=(char *)malloc(pdata->brwin.nbytes);
         
         (*image)=XCreateImage(pdata->dpy,
                             pdata->specs.visual,
                             pdata->specs.depth,
                             ZPixmap,
                             0,
-                            *pxl_data,
+                            pxl_data,
                             pdata->brwin.rrect.width,
                             pdata->brwin.rrect.height,
                             8,
@@ -228,7 +228,7 @@ static int rmdFirstFrame(ProgData *pdata,
                                      pdata->specs.visual,
                                      pdata->specs.depth,
                                      ZPixmap,
-                                     *pxl_data,
+                                     NULL,
                                      shminfo,
                                      pdata->brwin.rrect.width,
                                      pdata->brwin.rrect.height);
@@ -369,14 +369,10 @@ void *rmdGetFrame(ProgData *pdata){
     XShmSegmentInfo shminfo,shminfo_back;//info structure for the image above.
     int init_img1=0,init_img2=0,
         img_sel,d_buff;
-    char *pxl_data=NULL,*pxl_data_back=NULL;
-
-
-
 
     img_sel=d_buff=pdata->args.full_shots;
 
-    if((init_img1=rmdFirstFrame(pdata,&image,&shminfo,&pxl_data)!=0)){
+    if((init_img1=rmdFirstFrame(pdata,&image,&shminfo)!=0)){
         if(pdata->args.encOnTheFly){
             if(remove(pdata->args.filename)){
                 perror("Error while removing file:\n");
@@ -392,8 +388,7 @@ void *rmdGetFrame(ProgData *pdata){
         exit(init_img1);
     }
     if(d_buff){
-        if((init_img2=rmdFirstFrame(pdata,&image_back,&shminfo_back,
-                                    &pxl_data_back)!=0)){
+        if((init_img2=rmdFirstFrame(pdata,&image_back,&shminfo_back)!=0)){
             if(pdata->args.encOnTheFly){
                 if(remove(pdata->args.filename)){
                     perror("Error while removing file:\n");
