@@ -277,16 +277,16 @@ struct _ProgData {
 								//Currently this mutex only prevents
 								//the cursor from flickering
 /**Condition Variables*/
-	pthread_cond_t  time_cond,  //this gets a broadcast by the handler
+	pthread_cond_t			time_cond,		//this gets a broadcast by the handler
 								//whenever it's time to get a screenshot
-					pause_cond, //this is blocks execution,
+					pause_cond,		//this is blocks execution,
 								//when program is paused
 					sound_data_read,	//a buffer is ready for proccessing
-					image_buffer_ready, //image encoding finished
-					theora_lib_clean,   //the flush_ogg thread cannot
-										//procceed to creating last
-					vorbis_lib_clean;   //packages until these two libs
-										//are no longer used, by other threads
+					image_buffer_ready,	//image encoding finished
+					theora_lib_clean,	//the flush_ogg thread cannot
+								//procceed to creating last
+					vorbis_lib_clean;	//packages until these two libs
+								//are no longer used, by other threads
 /**Buffers,Flags and other vars*/
 	unsigned char *dummy_pointer,   //a dummy pointer to be drawn
 									//in every frame
@@ -322,10 +322,10 @@ struct _ProgData {
 	unsigned int	frames_total,   //frames calculated by total time expirations
 			frames_lost;	//the value of shame
 
-	//used to determine frame drop which can
-	//happen on failure to receive a signal over a condition variable
-	boolean capture_busy,
-			encoder_busy;
+	/* timer advances time_frameno, getframe copies time_frameno to capture_frameno
+	 * access to both is serialized by time_{mutex,cond}
+	 */
+	unsigned int	time_frameno, capture_frameno;
 
 	pthread_mutex_t pause_mutex;
 	pthread_mutex_t time_mutex;

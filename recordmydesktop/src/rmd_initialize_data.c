@@ -99,8 +99,8 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	pdata->pause_state_changed	= FALSE;
 	pdata->frames_total		= 0;
 	pdata->frames_lost		= 0;
-	pdata->encoder_busy		= FALSE;
-	pdata->capture_busy		= FALSE;
+	pdata->capture_frameno		= 0;
+	pdata->time_frameno		= 0;
 
 	if (!pdata->args.nosound) {
 		if (!pdata->args.use_jack) {

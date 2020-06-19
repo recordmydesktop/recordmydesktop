@@ -102,7 +102,7 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 			y_short_blocks[blocknum_x*blocknum_y],
 			u_short_blocks[blocknum_x*blocknum_y],
 			v_short_blocks[blocknum_x*blocknum_y];
-	unsigned long long int total_bytes		  = 0;
+	unsigned long long int total_bytes = 0;
 	unsigned long long int total_received_bytes = 0;
 
 	if (!pdata->args.zerocompression) {
@@ -123,17 +123,16 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 		FrameHeader fheader;
 		ynum=unum=vnum=0;
 
-		pdata->th_enc_thread_waiting=1;
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-		pthread_cond_wait(&pdata->image_buffer_ready, &pdata->img_buff_ready_mutex);
+		pdata->th_enc_thread_waiting = 1;
+		while (pdata->th_enc_thread_waiting)
+			pthread_cond_wait(&pdata->image_buffer_ready, &pdata->img_buff_ready_mutex);
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
-		pdata->th_enc_thread_waiting=0;
 
-		if (pdata->paused) {
-			pthread_mutex_lock(&pdata->pause_mutex);
+		pthread_mutex_lock(&pdata->pause_mutex);
+		while (pdata->paused)
 			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
-			pthread_mutex_unlock(&pdata->pause_mutex);
-		}
+		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		pthread_mutex_lock(&pdata->yuv_mutex);
 

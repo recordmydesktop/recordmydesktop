@@ -119,11 +119,13 @@ void rmdThreads(ProgData *pdata) {
 	pthread_join(image_capture_t,NULL);
 	fprintf(stderr,"Shutting down.");
 	//if no damage events have been received the thread will get stuck
-	while (!pdata->th_enc_thread_waiting && !pdata->th_encoding_clean) {
-		usleep(10000);
-		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
+	pthread_mutex_lock(&pdata->img_buff_ready_mutex);
+	while (pdata->th_enc_thread_waiting && !pdata->th_encoding_clean) {
+		puts("waiting for th_enc");
+		pdata->th_enc_thread_waiting = 0;
 		pthread_cond_signal(&pdata->image_buffer_ready);
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
+		usleep(10000);
 	}
 
 	if (pdata->args.encOnTheFly)
@@ -141,11 +143,13 @@ void rmdThreads(ProgData *pdata) {
 			pthread_join(sound_capture_t,NULL);
 
 		fprintf(stderr,".");
+		pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
 		while (pdata->v_enc_thread_waiting || !pdata->v_encoding_clean) {
-			usleep(10000);
-			pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
+			puts("waiting for v_enc");
+			pdata->v_enc_thread_waiting = 0;
 			pthread_cond_signal(&pdata->sound_data_read);
 			pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
+			usleep(10000);
 		}
 
 		if (pdata->args.encOnTheFly)

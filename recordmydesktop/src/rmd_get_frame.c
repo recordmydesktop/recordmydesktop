@@ -422,27 +422,24 @@ void *rmdGetFrame(ProgData *pdata) {
 		//if we are left behind we must not wait.
 		//also before actually pausing we must make sure the streams
 		//are synced. sound stops so this should only happen quickly.
-		if (pdata->avd>0 || pdata->args.nosound) {
-			pthread_mutex_lock(&pdata->time_mutex);
-			pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
-			pthread_mutex_unlock(&pdata->time_mutex);
+		pthread_mutex_lock(&pdata->time_mutex);
+		while (	(pdata->avd > 0 || pdata->args.nosound) &&
+			pdata->capture_frameno >= pdata->time_frameno)
+				pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
 
-			if (pdata->paused) {
-				//this is necessary since event loop processes
-				//the shortcuts which will unpause the program
-				rmdEventLoop(pdata);
-				continue;
-			}
-		}
+		pdata->capture_frameno = pdata->time_frameno;
+		pthread_mutex_unlock(&pdata->time_mutex);
+
 		//read all events and construct list with damage 
 		//events (if not full_shots)
 		rmdEventLoop(pdata);
 
+		if (pdata->paused)
+			continue;
+
 		//switch back and front buffers (full_shots only)
 		if (d_buff)
 			img_sel=(img_sel)?0:1;
-
-		pdata->capture_busy = TRUE;
 
 		rmdBRWinCpy(&temp_brwin, &pdata->brwin);
 
@@ -664,21 +661,21 @@ void *rmdGetFrame(ProgData *pdata) {
 		if (!pdata->args.full_shots)
 			rmdClearList(&pdata->rect_root);
 
-		if (pdata->encoder_busy)
-			pdata->frames_lost++;
 
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-		pthread_cond_broadcast(&pdata->image_buffer_ready);
+		pdata->th_enc_thread_waiting = 0;
+		pthread_cond_signal(&pdata->image_buffer_ready);
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
-		pdata->capture_busy = FALSE;
 	}
 
 	if (!pdata->args.noframe)
 		XDestroyWindow(pdata->dpy,pdata->shaped_w);
 
 	pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-	pthread_cond_broadcast(&pdata->image_buffer_ready);
+	pdata->th_enc_thread_waiting = 0;
+	pthread_cond_signal(&pdata->image_buffer_ready);
 	pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
+
 	if (!pdata->args.noshared) {
 		XShmDetach (pdata->dpy, &shminfo);
 		shmdt (shminfo.shmaddr);
@@ -689,5 +686,6 @@ void *rmdGetFrame(ProgData *pdata) {
 			shmctl (shminfo_back.shmid, IPC_RMID, 0);
 		}
 	}
+
 	pthread_exit(&errno);
 }

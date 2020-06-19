@@ -41,7 +41,9 @@ void *rmdTimer(ProgData *pdata){
 	long unsigned int secs_tw=1/pdata->args.fps;
 	long unsigned int usecs_tw=(1000000)/pdata->args.fps- secs_tw*1000000;
 
-	while (pdata->timer_alive){
+	while (pdata->timer_alive) {
+
+		pthread_mutex_lock(&pdata->pause_mutex);
 		if (pdata->pause_state_changed) {
 			pdata->pause_state_changed = FALSE;
 
@@ -51,22 +53,24 @@ void *rmdTimer(ProgData *pdata){
 			} else{
 				pdata->paused = FALSE;
 				fprintf(stderr,"STATE:RECORDING\n");fflush(stderr);
-				pthread_mutex_lock(&pdata->pause_mutex);
 				pthread_cond_broadcast(&pdata->pause_cond);
-				pthread_mutex_unlock(&pdata->pause_mutex);
 			}
 		}
 
 		if (!pdata->paused) {
-			pdata->frames_total++;
-			if (pdata->capture_busy)
-				pdata->frames_lost++;
-		}
-		
-		pthread_mutex_lock(&pdata->time_mutex);
-		pthread_cond_broadcast(&pdata->time_cond);
-		pthread_mutex_unlock(&pdata->time_mutex);
+			pthread_mutex_unlock(&pdata->pause_mutex);
 
+			/* FIXME TODO: detect dropped frames by delta between {time,capture}_frameno */
+			pdata->frames_total++;
+		} else
+			pthread_mutex_unlock(&pdata->pause_mutex);
+
+		pthread_mutex_lock(&pdata->time_mutex);
+		pdata->time_frameno++;
+		pthread_mutex_unlock(&pdata->time_mutex);
+		pthread_cond_signal(&pdata->time_cond);
+
+		/* FIXME use nanosleep */
 		if (secs_tw)
 			sleep(secs_tw);
 
