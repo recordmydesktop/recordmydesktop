@@ -268,18 +268,10 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 
 //make a deep copy
 static void rmdBRWinCpy(BRWindow *target, BRWindow *source) {
-
-	target->winrect.x=source->winrect.x;
-	target->winrect.y=source->winrect.y;
-	target->winrect.width=source->winrect.width;
-	target->winrect.height=source->winrect.height;
-	target->rrect.x=source->rrect.x;
-	target->rrect.y=source->rrect.y;
-	target->rrect.width=source->rrect.width;
-	target->rrect.height=source->rrect.height;
-	target->nbytes=source->nbytes;
-	target->windowid=source->windowid;
-
+	target->winrect = source->winrect;
+	target->rrect = source->rrect;
+	target->nbytes = source->nbytes;
+	target->windowid = source->windowid;
 }
 
 //recenters the capture area to the mouse
@@ -441,7 +433,7 @@ void *rmdGetFrame(ProgData *pdata) {
 
 		pdata->capture_busy = TRUE;
 
-		rmdBRWinCpy(&temp_brwin,&pdata->brwin);
+		rmdBRWinCpy(&temp_brwin, &pdata->brwin);
 
 
 		if (	pdata->args.xfixes_cursor ||
