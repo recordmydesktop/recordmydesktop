@@ -126,7 +126,7 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 
 	//init ogg streams
 	//skeleton first
-	ogg_stream_init(&m_ogg_skel,y0);
+	ogg_stream_init(&m_ogg_skel, y0);
 	m_add_fishead_packet(&m_ogg_skel);
 	if (ogg_stream_pageout(&m_ogg_skel,&skel_og_pg)!= 1) {
 		fprintf (stderr, "Internal Ogg library error.\n");
@@ -134,8 +134,6 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 	}
 	fwrite(skel_og_pg.header,1,skel_og_pg.header_len,enc_data_t->fp);
 	fwrite(skel_og_pg.body,1,skel_og_pg.body_len,enc_data_t->fp);
-	
-
 
 	ogg_stream_init(&enc_data_t->m_ogg_ts,y1);
 	if (!pdata->args.nosound)
@@ -325,7 +323,6 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 		exit(2);
 	}
 	fwrite(skel_og_pg.header,1,skel_og_pg.header_len,enc_data_t->fp);
-
 
 	//theora buffer allocation, if any
 	if (!buffer_ready) {

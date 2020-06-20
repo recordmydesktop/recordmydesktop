@@ -263,30 +263,30 @@ struct _ProgData {
 	Display *dpy;		   //curtrent display
 /** Mutexes*/
 	pthread_mutex_t sound_buffer_mutex,
-					snd_buff_ready_mutex,
-					img_buff_ready_mutex,
-					theora_lib_mutex,
-					vorbis_lib_mutex,
-					libogg_mutex,   //libogg is not thread safe,
-					yuv_mutex;  //this might not be needed since we only have
-								//one read-only and  one write-only thread
-								//also on previous versions,
-								//y component was looped separately
-								//and then u and v so this was needed
-								//to avoid wrong coloring to render
-								//Currently this mutex only prevents
-								//the cursor from flickering
+			snd_buff_ready_mutex,
+			img_buff_ready_mutex,
+			theora_lib_mutex,	//serializes access to th_encoding_clean w/theora_lib_clean
+			vorbis_lib_mutex,	//serializes acces to v_encoding_clean w/vorbis_lib_clean
+			libogg_mutex,		//libogg is not thread safe,
+			yuv_mutex;		//this might not be needed since we only have
+						//one read-only and  one write-only thread
+						//also on previous versions,
+						//y component was looped separately
+						//and then u and v so this was needed
+						//to avoid wrong coloring to render
+						//Currently this mutex only prevents
+						//the cursor from flickering
 /**Condition Variables*/
-	pthread_cond_t			time_cond,		//this gets a broadcast by the handler
-								//whenever it's time to get a screenshot
-					pause_cond,		//this is blocks execution,
-								//when program is paused
-					sound_data_read,	//a buffer is ready for proccessing
-					image_buffer_ready,	//image encoding finished
-					theora_lib_clean,	//the flush_ogg thread cannot
-								//procceed to creating last
-					vorbis_lib_clean;	//packages until these two libs
-								//are no longer used, by other threads
+	pthread_cond_t	time_cond,		//this gets a signal by the handler
+						//whenever it's time to get a screenshot
+			pause_cond,		//this is blocks execution,
+						//when program is paused
+			sound_data_read,	//a buffer is ready for proccessing
+			image_buffer_ready,	//image encoding finished
+			theora_lib_clean,	//the flush_ogg thread cannot
+						//procceed to creating last
+			vorbis_lib_clean;	//packages until these two libs
+						//are no longer used, by other threads
 /**Buffers,Flags and other vars*/
 	unsigned char *dummy_pointer,   //a dummy pointer to be drawn
 									//in every frame

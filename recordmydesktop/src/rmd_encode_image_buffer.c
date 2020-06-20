@@ -57,8 +57,8 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 			pthread_mutex_unlock(&pdata->yuv_mutex);
 		} else {
 			pthread_mutex_unlock(&pdata->yuv_mutex);
-			if (theora_encode_packetout(&enc_data->m_th_st, 0, &enc_data->m_ogg_pckt1) == 1) {
 
+			if (theora_encode_packetout(&enc_data->m_th_st, 0, &enc_data->m_ogg_pckt1) == 1) {
 				pthread_mutex_lock(&pdata->libogg_mutex);
 				ogg_stream_packetin(&enc_data->m_ogg_ts, &enc_data->m_ogg_pckt1);
 				pdata->avd += pdata->frametime;
