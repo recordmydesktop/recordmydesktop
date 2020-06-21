@@ -50,7 +50,7 @@ static int rmdFlushBlock(
 			int width,
 			int height,
 			int blockwidth,
-			gzFile *fp,
+			gzFile fp,
 			FILE *ucfp,
 			int flush) {
 
@@ -89,7 +89,7 @@ static int rmdFlushBlock(
 
 void *rmdCacheImageBuffer(ProgData *pdata) {
 
-	gzFile *fp=NULL;
+	gzFile fp=NULL;
 	FILE *ucfp=NULL;
 	int index_entry_size=sizeof(u_int32_t),
 		blocknum_x=pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH,

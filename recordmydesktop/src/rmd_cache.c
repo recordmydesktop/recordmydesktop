@@ -57,7 +57,7 @@ static void rmdCacheFileN(char *name, char **newname, int n) { // Nth cache file
 	strcat(*newname, numbuf);
 }
 
-int rmdSwapCacheFilesWrite(char *name, int n, gzFile **fp, FILE **ucfp) {
+int rmdSwapCacheFilesWrite(char *name, int n, gzFile *fp, FILE **ucfp) {
 	char *newname = malloc(strlen(name) + 10);
 
 	rmdCacheFileN(name, &newname, n);
@@ -75,7 +75,7 @@ int rmdSwapCacheFilesWrite(char *name, int n, gzFile **fp, FILE **ucfp) {
 	return ((*fp == NULL) && (*ucfp == NULL));
 }
 
-int rmdSwapCacheFilesRead(char *name, int n, gzFile **fp, FILE **ucfp) {
+int rmdSwapCacheFilesRead(char *name, int n, gzFile *fp, FILE **ucfp) {
 	char *newname = malloc(strlen(name) + 10);
 
 	rmdCacheFileN(name, &newname, n);
