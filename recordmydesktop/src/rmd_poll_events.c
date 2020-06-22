@@ -42,43 +42,58 @@
 #include <pthread.h>
 
 
-#define CLIP_EVENT_AREA(e,brwin,xrect) {\
-    if (((e)->area.x<=(brwin)->rrect.x)&&((e)->area.y<=(brwin)->rrect.y)&&\
-        ((e)->area.width>=(brwin)->rrect.width)&&\
-        ((e)->area.height<(brwin)->rrect.height)) {\
-        (xrect)->x=(brwin)->rrect.x;\
-        (xrect)->y=(brwin)->rrect.y;\
-        (xrect)->width=(brwin)->rrect.width;\
-        (xrect)->height=(brwin)->rrect.height;\
-    }\
-    else{\
-        (xrect)->x=((((e)->area.x+(e)->area.width>=(brwin)->rrect.x)&&\
-        ((e)->area.x<=(brwin)->rrect.x+(brwin)->rrect.width))?\
-        (((e)->area.x<=(brwin)->rrect.x)?(brwin)->rrect.x:(e)->area.x):-1);\
-    \
-        (xrect)->y=((((e)->area.y+(e)->area.height>=(brwin)->rrect.y)&&\
-        ((e)->area.y<=(brwin)->rrect.y+(brwin)->rrect.height))?\
-        (((e)->area.y<=(brwin)->rrect.y)?(brwin)->rrect.y:(e)->area.y):-1);\
-    \
-        (xrect)->width=((e)->area.x<=(brwin)->rrect.x)?\
-        (e)->area.width-((brwin)->rrect.x-(e)->area.x):\
-        ((e)->area.x<=(brwin)->rrect.x+(brwin)->rrect.width)?\
-        (((brwin)->rrect.width-(e)->area.x+(brwin)->rrect.x<(e)->area.width)?\
-        (brwin)->rrect.width-(e)->area.x+(brwin)->rrect.x:e->area.width):0;\
-    \
-        (xrect)->height=((e)->area.y<=(brwin)->rrect.y)?\
-        (e)->area.height-((brwin)->rrect.y-(e)->area.y):\
-        ((e)->area.y<=(brwin)->rrect.y+(brwin)->rrect.height)?\
-        (((brwin)->rrect.height-(e)->area.y+\
-         (brwin)->rrect.y<(e)->area.height)?\
-         (brwin)->rrect.height-(e)->area.y+\
-         (brwin)->rrect.y:(e)->area.height):0;\
-    \
-        if ((xrect)->width>(brwin)->rrect.width)\
-            (xrect)->width=(brwin)->rrect.width;\
-        if ((xrect)->height>(brwin)->rrect.height)\
-            (xrect)->height=(brwin)->rrect.height;\
-    }\
+static int clip_event_area(XDamageNotifyEvent *e, XRectangle *cliprect, XRectangle *res)
+{
+
+#if 0
+	printf("got area %x,%x %x,%x\n",
+		e->area.x,
+		e->area.y,
+		e->area.width,
+		e->area.height);
+#endif
+
+	if (	e->area.x <= cliprect->x &&
+		e->area.y <= cliprect->y &&
+		e->area.width >= cliprect->width &&
+		e->area.height >= cliprect->height) {
+
+		/* area completely covers cliprect, cliprect becomes the area */
+		res->x = cliprect->x;
+		res->y = cliprect->y;
+		res->width = cliprect->width;
+		res->height = cliprect->height;
+
+	} else if (	e->area.x + e->area.width < cliprect->x ||
+			e->area.x + e->area.width > cliprect->x + cliprect->width ||
+			e->area.y + e->area.height < cliprect->y ||
+			e->area.y + e->area.height > cliprect->y + cliprect->height) {
+
+		/* area has at least one axis with zero overlap, so they can't overlap */
+		return 0;
+
+	} else {
+
+		/* areas partially overlap */
+		res->x = MAX(e->area.x, cliprect->x);
+		res->width = MIN(e->area.x + e->area.width, cliprect->x + cliprect->width) - res->x;
+
+		res->y = MAX(e->area.y, cliprect->y);
+		res->height = MIN(e->area.y + e->area.height, cliprect->y + cliprect->height) - res->y;
+
+		if (!res->width || !res->height)
+			return 0;
+	}
+
+#if 0
+	printf("clipped to %x,%x %x,%x\n",
+		res->x,
+		res->y,
+		res->width,
+		res->height);
+#endif
+
+	return 1;
 }
 
 
@@ -181,15 +196,11 @@ void rmdEventLoop(ProgData *pdata) {
 								XDamageReportRawRectangles);
 				}
 			} else if (event.type == pdata->damage_event + XDamageNotify ) {
-				XDamageNotifyEvent *e =(XDamageNotifyEvent *)( &event );
-				XRectangle xrect;
-				CLIP_EVENT_AREA(e,&(pdata->brwin),&xrect);
-				if ((xrect.x>=0)&&(xrect.y>=0)&&
-				   (xrect.width>0)&&(xrect.height>0)) {
+				XDamageNotifyEvent	*e = (XDamageNotifyEvent *)&event;
+				XRectangle		xrect;
 
-					inserts+=rmdRectInsert(&pdata->rect_root,&xrect);
-
-				}
+				if (clip_event_area(e, &pdata->brwin.rrect, &xrect))
+					inserts += rmdRectInsert(&pdata->rect_root,&xrect);
 			}
 		}
 
