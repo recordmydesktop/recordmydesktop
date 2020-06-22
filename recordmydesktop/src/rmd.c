@@ -47,9 +47,9 @@
 #include <errno.h>
 
 int main(int argc, char **argv){
-	ProgData pdata;
-	EncData enc_data;
-	CacheData cache_data;
+	ProgData pdata = {};
+	EncData enc_data = {};
+	CacheData cache_data = {};
 	int exit_status = 0;
 
 #ifdef HAVE_LIBJACK
