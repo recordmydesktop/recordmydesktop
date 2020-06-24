@@ -179,12 +179,12 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 						brwin->rrect.width,
 						brwin->rrect.height);
 
-		(*shminfo).shmid=shmget(IPC_PRIVATE,
+		(*shminfo).shmid = shmget(IPC_PRIVATE,
 					(*image)->bytes_per_line*
 					(*image)->height,
 					IPC_CREAT|0777);
 
-		if ((*shminfo).shmid==-1) {
+		if ((*shminfo).shmid == -1) {
 			fprintf(stderr,"Failed to obtain Shared Memory segment!\n");
 			return 12;
 		}
@@ -197,12 +197,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 			return 12;
 		}
 
-		XShmGetImage(pdata->dpy,
-					 pdata->specs.root,
-					 (*image),
-					 brwin->rrect.x,
-					 brwin->rrect.y,
-					 AllPlanes);
+		XShmGetImage(pdata->dpy, pdata->specs.root, (*image), brwin->rrect.x, brwin->rrect.y, AllPlanes);
 	}
 
 	rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
@@ -210,8 +205,8 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 				NULL,
 				pdata->enc_data->x_offset,
 				pdata->enc_data->y_offset,
-				rrect->width,
-				rrect->height,
+				brwin->rrect.width,
+				brwin->rrect.height,
 				pdata->args.no_quick_subsample,
 				pdata->specs.depth);
 
@@ -261,29 +256,28 @@ static void rmdBlocksFromList(	RectArea   **root,
 				unsigned int blocknum_x,
 				unsigned int blocknum_y) {
 
-	RectArea	*temp = *root;
-	int		i, j, blockno, row_start, row_end, column_start, column_end;
+	memset(yblocks, 0, blocknum_x * blocknum_y * sizeof(*yblocks));
+	memset(ublocks, 0, blocknum_x * blocknum_y * sizeof(*ublocks));
+	memset(vblocks, 0, blocknum_x * blocknum_y * sizeof(*vblocks));
 
-	for (i = 0; i < blocknum_x * blocknum_y; i++)
-		yblocks[i] = ublocks[i] = vblocks[i] = 0;
-
-	while (temp != NULL) {
+	for (RectArea *temp = *root; temp; temp = temp->next) {
+		int	row_start, row_end, column_start, column_end;
 
 		column_start	= ((int)(temp->rect.x - x_offset)) / Y_UNIT_WIDTH;
 		column_end	= ((int)(temp->rect.x + (temp->rect.width - 1) - x_offset)) / Y_UNIT_WIDTH;
 		row_start	= ((int)(temp->rect.y - y_offset)) / Y_UNIT_WIDTH;
 		row_end		= ((int)(temp->rect.y + (temp->rect.height - 1) - y_offset)) / Y_UNIT_WIDTH;
 
-		for (i = row_start; i < row_end + 1; i++) {
-			for (j = column_start; j < column_end + 1; j++) {
-				blockno		  = i * blocknum_x + j;
+		for (int i = row_start; i < row_end + 1; i++) {
+			for (int j = column_start; j < column_end + 1; j++) {
+
+				int	blockno = i * blocknum_x + j;
+
 				yblocks[blockno] = 1;
 				ublocks[blockno] = 1;
 				vblocks[blockno] = 1;
 			}
 		}
-
-		temp = temp->next;
 	}
 }
 
@@ -432,17 +426,18 @@ void *rmdGetFrame(ProgData *pdata) {
 				//on every frame so there is no need for marking at all.
 
 				if (!pdata->args.full_shots) { 
-					rmdRectInsert(&pdata->rect_root,&mouse_pos_temp);
+					rmdRectInsert(&pdata->rect_root, &mouse_pos_temp);
 				} else if (d_buff) {
 					unsigned char *back_buff=
 								(img_sel)?((unsigned char*)image->data):
 								((unsigned char*)image_back->data);
 
+					/* FIXME TODO: why is this a macro? */
 					MARK_BUFFER_AREA(
 						back_buff,
-						(mouse_pos_temp.x- temp_brwin.rrect.x+ pdata->enc_data->x_offset),
-						(mouse_pos_temp.y- temp_brwin.rrect.y+ pdata->enc_data->y_offset),
-						mouse_pos_temp.width, mouse_pos_temp.height, (temp_brwin.rrect.width),
+						mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
+						mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
+						mouse_pos_temp.width, mouse_pos_temp.height, temp_brwin.rrect.width,
 						pdata->specs.depth
 					);
 				}
@@ -450,10 +445,8 @@ void *rmdGetFrame(ProgData *pdata) {
 		}
 		if (pdata->args.follow_mouse) {
 			rmdMoveCaptureArea(	&pdata->brwin,
-						mouse_pos_abs.x+
-						((pdata->args.xfixes_cursor)?xcim->xhot:0),
-						mouse_pos_abs.y+
-						((pdata->args.xfixes_cursor)?xcim->yhot:0),
+						mouse_pos_abs.x + pdata->args.xfixes_cursor ? xcim->xhot : 0,
+						mouse_pos_abs.y + pdata->args.xfixes_cursor ? xcim->yhot : 0,
 						pdata->specs.width,
 						pdata->specs.height);
 
@@ -578,8 +571,8 @@ void *rmdGetFrame(ProgData *pdata) {
 
 					MARK_BUFFER_AREA(
 						front_buff,
-						mouse_pos_temp.x- temp_brwin.rrect.x+ pdata->enc_data->x_offset,
-						mouse_pos_temp.y- temp_brwin.rrect.y+ pdata->enc_data->y_offset,
+						mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
+						mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
 						mouse_pos_temp.width,
 						mouse_pos_temp.height,
 						temp_brwin.rrect.width,
