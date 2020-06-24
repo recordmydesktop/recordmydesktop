@@ -46,12 +46,6 @@
 #include <stdlib.h>
 
 
-#define AVG_4_PIXELS(data_array,width_img,k_tm,i_tm,offset)\
-    ((data_array[(k_tm*width_img+i_tm)*RMD_ULONG_SIZE_T+offset]+\
-    data_array[((k_tm-1)*width_img+i_tm)*RMD_ULONG_SIZE_T+offset]+\
-    data_array[(k_tm*width_img+i_tm-1)*RMD_ULONG_SIZE_T+offset]+\
-    data_array[((k_tm-1)*width_img+i_tm-1)*RMD_ULONG_SIZE_T+offset])/4)
-
 #define CLIP_DUMMY_POINTER_AREA(dummy_p_area,brwin,xrect) {\
     (xrect)->x=((((dummy_p_area).x+\
                 (dummy_p_area).width>=(brwin)->rrect.x)&&\
@@ -87,63 +81,6 @@
         (xrect)->width=(brwin)->rrect.width;\
     if ((xrect)->height>(brwin)->rrect.height)\
         (xrect)->height=(brwin)->rrect.height;\
-}
-
-#define XFIXES_POINTER_TO_YUV(yuv,\
-                              data,\
-                              x_tm,\
-                              y_tm,\
-                              width_tm,\
-                              height_tm,\
-                              x_offset,\
-                              y_offset,\
-                              column_discard_stride) {\
-    int i,k,j=0;\
-    unsigned char avg0,avg1,avg2,avg3;\
-    int x_2=x_tm/2,y_2=y_tm/2;\
-    for(k=y_offset;k<y_offset+height_tm;k++) {\
-        for(i=x_offset;i<x_offset+width_tm;i++) {\
-                j=k*(width_tm+column_discard_stride)+i;\
-                (yuv)->y[x_tm+(i-x_offset)+(k+y_tm-y_offset)*(yuv)->y_width]=\
-                    ((yuv)->y[x_tm+(i-x_offset)+(k-y_offset+y_tm)*(yuv)->y_width]*\
-                    (UCHAR_MAX-data[(j*RMD_ULONG_SIZE_T)+__ABYTE])+\
-                    ( ( Yr[data[(j*RMD_ULONG_SIZE_T)+__RBYTE]]+\
-                        Yg[data[(j*RMD_ULONG_SIZE_T)+__GBYTE]] +\
-                        Yb[data[(j*RMD_ULONG_SIZE_T)+__BBYTE]] ) % \
-                      ( UCHAR_MAX + 1 ) ) * \
-                data[(j*RMD_ULONG_SIZE_T)+__ABYTE])/UCHAR_MAX ;\
-                if ((k%2)&&(i%2)) {\
-                    avg3=AVG_4_PIXELS(data,\
-                                      (width_tm+column_discard_stride),\
-                                      k,i,__ABYTE);\
-                    avg2=AVG_4_PIXELS(data,\
-                                      (width_tm+column_discard_stride),\
-                                      k,i,__RBYTE);\
-                    avg1=AVG_4_PIXELS(data,\
-                                      (width_tm+column_discard_stride),\
-                                      k,i,__GBYTE);\
-                    avg0=AVG_4_PIXELS(data,\
-                                      (width_tm+column_discard_stride),\
-                                      k,i,__BBYTE);\
-                    (yuv)->u[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*\
-                           (yuv)->uv_width]=\
-                    ((yuv)->u[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*\
-                            (yuv)->uv_width]*\
-                    (UCHAR_MAX-avg3)+\
-                    ( (Ur[avg2] + Ug[avg1] + UbVr[avg0]) % \
-                      ( UCHAR_MAX + 1 ) ) * avg3 ) / \
-                        UCHAR_MAX;\
-                    (yuv)->v[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*\
-                           (yuv)->uv_width]=\
-                    ((yuv)->v[x_2+(i-x_offset)/2+((k-y_offset)/2+y_2)*\
-                            (yuv)->uv_width]*\
-                    (UCHAR_MAX-avg3)+\
-                    ( ( UbVr[avg2] + Vg[avg1] + Vb[avg0] ) % \
-                      ( UCHAR_MAX + 1 ) ) * avg3 ) / \
-                        UCHAR_MAX; \
-                }\
-        }\
-    }\
 }
 
 #define MARK_BUFFER_AREA_C( data,\
@@ -268,12 +205,15 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 					 AllPlanes);
 	}
 
-	UPDATE_YUV_BUFFER((&pdata->enc_data->yuv),
-			((unsigned char*)((*image))->data),NULL,
-			(pdata->enc_data->x_offset),(pdata->enc_data->y_offset),
-			(brwin->rrect.width),(brwin->rrect.height),
-			(pdata->args.no_quick_subsample),
-			pdata->specs.depth);
+	rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
+				((unsigned char*)((*image))->data),
+				NULL,
+				pdata->enc_data->x_offset,
+				pdata->enc_data->y_offset,
+				rrect->width,
+				rrect->height,
+				pdata->args.no_quick_subsample,
+				pdata->specs.depth);
 
 	return 0;
 }
@@ -568,11 +508,12 @@ void *rmdGetFrame(ProgData *pdata) {
 							   temp_brwin.rrect.height);
 
 			pthread_mutex_lock(&pdata->yuv_mutex);
-			for(i=0;i<blocknum_x*blocknum_y;i++)
-				yblocks[i]=ublocks[i]=vblocks[i]=0;
+			for(i = 0;i < blocknum_x * blocknum_y; i++)
+				yblocks[i] = ublocks[i] = vblocks[i] = 0;
 
-			UPDATE_YUV_BUFFER(	&pdata->enc_data->yuv,
-						front_buff,back_buff,
+			rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
+						front_buff,
+						back_buff,
 						pdata->enc_data->x_offset,
 						pdata->enc_data->y_offset,
 						temp_brwin.rrect.width,
@@ -602,15 +543,11 @@ void *rmdGetFrame(ProgData *pdata) {
 				(mouse_pos_temp.height>0)) {
 
 					if (pdata->args.xfixes_cursor) {
-						XFIXES_POINTER_TO_YUV(
+						rmdXFixesPointerToYuv(
 							&pdata->enc_data->yuv,
 							((unsigned char*)xcim->pixels),
-							(mouse_pos_temp.x-
-							temp_brwin.rrect.x+
-							pdata->enc_data->x_offset),
-							(mouse_pos_temp.y-
-							temp_brwin.rrect.y+
-							pdata->enc_data->y_offset),
+							mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
+							mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
 							mouse_pos_temp.width,
 							mouse_pos_temp.height,
 							mouse_xoffset,
@@ -618,11 +555,11 @@ void *rmdGetFrame(ProgData *pdata) {
 							xcim->width-mouse_pos_temp.width
 						);
 					} else {
-						DUMMY_POINTER_TO_YUV(
+						rmdDummyPointerToYuv(
 							&pdata->enc_data->yuv,
 							pdata->dummy_pointer,
-							mouse_pos_temp.x- temp_brwin.rrect.x+ pdata->enc_data->x_offset,
-							mouse_pos_temp.y- temp_brwin.rrect.y+ pdata->enc_data->y_offset,
+							mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
+							mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
 							mouse_pos_temp.width,
 							mouse_pos_temp.height,
 							mouse_xoffset,

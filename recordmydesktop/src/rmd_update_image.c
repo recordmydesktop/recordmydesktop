@@ -73,10 +73,12 @@ void rmdUpdateImage(	Display * dpy,
 							temp->rect.height);
 			}
 
-			UPDATE_YUV_BUFFER(
-				yuv,dtap,NULL,
-				temp->rect.x-brwin->rrect.x+enc->x_offset,
-				temp->rect.y-brwin->rrect.y+enc->y_offset,
+			rmdUpdateYuvBuffer(
+				yuv,
+				dtap,
+				NULL,
+				temp->rect.x - brwin->rrect.x + enc->x_offset,
+				temp->rect.y - brwin->rrect.y + enc->y_offset,
 				temp->rect.width,
 				temp->rect.height,
 				no_quick_subsample,
