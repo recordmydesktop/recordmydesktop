@@ -222,19 +222,19 @@ static void rmdBRWinCpy(BRWindow *target, BRWindow *source) {
 
 //recenters the capture area to the mouse
 //without exiting the display bounding box
-static void rmdMoveCaptureArea(	BRWindow *brwin,
+static void rmdMoveCaptureArea(	XRectangle *rect,
 				int cursor_x,
 				int cursor_y,
 				int width,
 				int height) {
-	int t_x=0,t_y=0;
+	int t_x = 0, t_y = 0;
 
-	t_x=cursor_x-brwin->rrect.width/2;
-	t_x=(t_x>>1)<<1;
-	brwin->rrect.x=(t_x<0)?0:((t_x+brwin->rrect.width>width)?  width-brwin->rrect.width:t_x);
-	t_y=cursor_y-brwin->rrect.height/2;
-	t_y=(t_y>>1)<<1;
-	brwin->rrect.y=(t_y<0)?0:((t_y+brwin->rrect.height>height)?  height-brwin->rrect.height:t_y);
+	t_x = cursor_x - rect->width / 2;
+	t_x = (t_x >> 1) << 1;
+	rect->x = (t_x < 0) ? 0 : ((t_x + rect->width > width) ? width - rect->width : t_x);
+	t_y = cursor_y - rect->height / 2;
+	t_y = (t_y >> 1) << 1;
+	rect->y = (t_y < 0 ) ? 0 : ((t_y + rect->height > height) ? height - rect->height : t_y);
 }
 
 /**
@@ -444,7 +444,7 @@ void *rmdGetFrame(ProgData *pdata) {
 			}
 		}
 		if (pdata->args.follow_mouse) {
-			rmdMoveCaptureArea(	&pdata->brwin,
+			rmdMoveCaptureArea(	&pdata->brwin.rrect,
 						mouse_pos_abs.x + pdata->args.xfixes_cursor ? xcim->xhot : 0,
 						mouse_pos_abs.y + pdata->args.xfixes_cursor ? xcim->yhot : 0,
 						pdata->specs.width,
