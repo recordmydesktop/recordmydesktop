@@ -46,41 +46,32 @@
 #include <stdlib.h>
 
 
-#define CLIP_DUMMY_POINTER_AREA(dummy_p_area,brwin,xrect) {\
-    (xrect)->x=((((dummy_p_area).x+\
-                (dummy_p_area).width>=(brwin)->rrect.x)&&\
-                ((dummy_p_area).x<=(brwin)->rrect.x+\
-                (brwin)->rrect.width))?\
-                (((dummy_p_area).x<=(brwin)->rrect.x)?\
-                (brwin)->rrect.x:(dummy_p_area).x):-1);\
-    (xrect)->y=((((dummy_p_area).y+\
-                (dummy_p_area).height>=(brwin)->rrect.y)&&\
-                ((dummy_p_area).y<=(brwin)->rrect.y+\
-                (brwin)->rrect.height))?\
-                (((dummy_p_area).y<=(brwin)->rrect.y)?\
-                (brwin)->rrect.y:(dummy_p_area).y):-1);\
-    (xrect)->width=((dummy_p_area).x<=(brwin)->rrect.x)?\
-                (dummy_p_area).width-\
-                ((brwin)->rrect.x-(dummy_p_area).x):\
-                ((dummy_p_area).x<=(brwin)->rrect.x+\
-                (brwin)->rrect.width)?\
-                ((brwin)->rrect.width-(dummy_p_area).x+\
-                (brwin)->rrect.x<(dummy_p_area).width)?\
-                (brwin)->rrect.width-(dummy_p_area).x+\
-                (brwin)->rrect.x:(dummy_p_area).width:0;\
-    (xrect)->height=((dummy_p_area).y<=(brwin)->rrect.y)?\
-                (dummy_p_area).height-\
-                ((brwin)->rrect.y-(dummy_p_area).y):\
-                ((dummy_p_area).y<=(brwin)->rrect.y+\
-                (brwin)->rrect.height)?\
-                ((brwin)->rrect.height-(dummy_p_area).y+\
-                (brwin)->rrect.y<(dummy_p_area).height)?\
-                (brwin)->rrect.height-(dummy_p_area).y+\
-                (brwin)->rrect.y:(dummy_p_area).height:0;\
-    if ((xrect)->width>(brwin)->rrect.width)\
-        (xrect)->width=(brwin)->rrect.width;\
-    if ((xrect)->height>(brwin)->rrect.height)\
-        (xrect)->height=(brwin)->rrect.height;\
+/* clip_event_area dejavu */
+static void clip_dummy_pointer_area(XRectangle *area, XRectangle *clip, XRectangle *res)
+{
+	res->x =	(((area->x + area->width >= clip->x) &&
+			  (area->x <= clip->x + clip->width)) ?
+			 ((area->x <= clip->x) ? clip->x : area->x) : -1);
+
+	res->y =	(((area->y + area->height >= clip->y) &&
+			  (area->y <= clip->y + clip->height)) ?
+			 ((area->y <= clip->y) ? clip->y : area->y) : -1);
+
+	res->width =	(area->x <= clip->x) ? area->width - (clip->x - area->x) :
+			(area->x <= clip->x + clip->width) ?
+			(clip->width - area->x + clip->x < area->width) ?
+			clip->width - area->x + clip->x : area->width : 0;
+
+	res->height =	(area->y <= clip->y) ? area->height - (clip->y - area->y) :
+			(area->y <= clip->y + clip->height) ?
+			(clip->height - area->y + clip->y < area->height) ?
+			clip->height - area->y + clip->y : area->height : 0;
+
+	if (res->x + res->width > clip->x + clip->width)
+		res->width = clip->x + clip->width - res->x;
+
+	if (res->y + res->height > clip->y + clip->height)
+		res->height = clip->y + clip->height - res->y;
 }
 
 #define MARK_BUFFER_AREA_C(	data,							\
@@ -405,7 +396,7 @@ void *rmdGetFrame(ProgData *pdata) {
 							  (int *)&mouse_pos_rel.x,(int *)&mouse_pos_rel.y,&msk_ret);
 			}
 			
-			CLIP_DUMMY_POINTER_AREA(mouse_pos_abs, &temp_brwin, &mouse_pos_temp);
+			clip_dummy_pointer_area(&mouse_pos_abs, &temp_brwin.rrect, &mouse_pos_temp);
 			if (	mouse_pos_temp.x >=0 &&
 				mouse_pos_temp.y >=0 &&
 				mouse_pos_temp.width > 0 &&
@@ -515,7 +506,7 @@ void *rmdGetFrame(ProgData *pdata) {
 		if (pdata->args.xfixes_cursor || pdata->args.have_dummy_cursor) {
 			int mouse_xoffset, mouse_yoffset;
 			//avoid segfaults
-			CLIP_DUMMY_POINTER_AREA(mouse_pos_abs, &temp_brwin, &mouse_pos_temp);
+			clip_dummy_pointer_area(&mouse_pos_abs, &temp_brwin.rrect, &mouse_pos_temp);
 			mouse_xoffset=mouse_pos_temp.x-mouse_pos_abs.x;
 			mouse_yoffset=mouse_pos_temp.y-mouse_pos_abs.y;
 			if ((mouse_xoffset<0) || (mouse_xoffset>mouse_pos_abs.width))
