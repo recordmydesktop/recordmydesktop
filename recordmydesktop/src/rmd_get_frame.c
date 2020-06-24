@@ -83,53 +83,49 @@
         (xrect)->height=(brwin)->rrect.height;\
 }
 
-#define MARK_BUFFER_AREA_C( data,\
-                            x_tm,\
-                            y_tm,\
-                            width_tm,\
-                            height_tm,\
-                            buffer_width,\
-                            __bit_depth__) {\
-    int k,i;\
-    register u_int##__bit_depth__##_t\
-        *datapi=\
-            ((u_int##__bit_depth__##_t *)data)+y_tm*buffer_width+x_tm;\
-    for(k=0;k<height_tm;k++) {\
-        for(i=0;i<width_tm;i++) {\
-            *datapi+=1;\
-            datapi++;\
-        }\
-        datapi+=buffer_width-width_tm;\
-    }\
+#define MARK_BUFFER_AREA_C(	data,							\
+				x_tm,							\
+				y_tm,							\
+				width_tm,						\
+				height_tm,						\
+				buffer_width,						\
+				__depth__) {						\
+											\
+	register u_int##__depth__##_t *datapi = 					\
+			((u_int##__depth__##_t *)data) + y_tm *buffer_width + x_tm;	\
+											\
+	for(int k = 0; k < height_tm; k++) {						\
+		for(int i = 0; i < width_tm; i++) {					\
+			*datapi += 1;							\
+			datapi++;							\
+		}									\
+		datapi += buffer_width - width_tm;					\
+	}										\
 }
 
-#define MARK_BUFFER_AREA(   data,\
-                            x_tm,\
-                            y_tm,\
-                            width_tm,\
-                            height_tm,\
-                            buffer_width,\
-                            __bit_depth__) {\
-    if ((__bit_depth__==24)||(__bit_depth__==32)) {\
-        MARK_BUFFER_AREA_C( data,\
-                            x_tm,\
-                            y_tm,\
-                            width_tm,\
-                            height_tm,\
-                            buffer_width,\
-                            32)\
-    }\
-    else {\
-        MARK_BUFFER_AREA_C( data,\
-                            x_tm,\
-                            y_tm,\
-                            width_tm,\
-                            height_tm,\
-                            buffer_width,\
-                            16)\
-    }\
-}\
+static void mark_buffer_area(	unsigned char *data,
+				int x_tm, int y_tm,
+				int width_tm, int height_tm,
+				int buffer_width, int depth) {
 
+	if ((depth == 24) || (depth == 32)) {
+		MARK_BUFFER_AREA_C(	data,
+					x_tm,
+					y_tm,
+					width_tm,
+					height_tm,
+					buffer_width,
+					32);
+	} else {
+		MARK_BUFFER_AREA_C(	data,
+					x_tm,
+					y_tm,
+					width_tm,
+					height_tm,
+					buffer_width,
+					16);
+	}
+}
 
 //besides taking the first screenshot, this functions primary purpose is to 
 //initialize the structures and memory.
@@ -432,8 +428,7 @@ void *rmdGetFrame(ProgData *pdata) {
 								(img_sel)?((unsigned char*)image->data):
 								((unsigned char*)image_back->data);
 
-					/* FIXME TODO: why is this a macro? */
-					MARK_BUFFER_AREA(
+					mark_buffer_area(
 						back_buff,
 						mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
 						mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
@@ -569,7 +564,7 @@ void *rmdGetFrame(ProgData *pdata) {
 					unsigned char *front_buff = (!img_sel)?((unsigned char*)image->data):
 								((unsigned char*)image_back->data);
 
-					MARK_BUFFER_AREA(
+					mark_buffer_area(
 						front_buff,
 						mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
 						mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
