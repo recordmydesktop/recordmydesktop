@@ -127,7 +127,7 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 		}
 		pthread_mutex_unlock(&pdata->libogg_mutex);
 
-		pdata->avd-=pdata->periodtime;
+		pdata->avd -= pdata->periodtime;
 	}
 
 	pdata->v_encoding_clean=1;

@@ -152,34 +152,34 @@ typedef struct _ProgArgs{
 	unsigned int jack_nports;
 	char *jack_port_names[RMD_MAX_JACK_PORTS];
 	float jack_ringbuffer_secs;
-}ProgArgs;
+} ProgArgs;
 
 //this struct holds anything related to encoding AND
 //writting out to file.
 typedef struct _EncData{
-	ogg_stream_state m_ogg_ts;  //theora
-	ogg_stream_state m_ogg_vs;  //vorbis
-	ogg_page		 m_ogg_pg;  //this could be avoided since
-								// it is used only while initializing
-	ogg_packet	   m_ogg_pckt1;   //theora stream
-	ogg_packet	   m_ogg_pckt2;   //vorbis stream
+	ogg_stream_state	m_ogg_ts;	//theora
+	ogg_stream_state	m_ogg_vs;	//vorbis
+	ogg_page		m_ogg_pg;	//this could be avoided since
+						// it is used only while initializing
+	ogg_packet		m_ogg_pckt1;	//theora stream
+	ogg_packet		m_ogg_pckt2;	//vorbis stream
 //theora data
-	theora_state	 m_th_st;
-	theora_info	  m_th_inf;
-	theora_comment   m_th_cmmnt;
-	yuv_buffer	   yuv;
+	theora_state		m_th_st;
+	theora_info		m_th_inf;
+	theora_comment		m_th_cmmnt;
+	yuv_buffer		yuv;
 //vorbis data
-	vorbis_info	  m_vo_inf;
-	vorbis_comment   m_vo_cmmnt;
-	vorbis_dsp_state m_vo_dsp;
-	vorbis_block	 m_vo_block;
+	vorbis_info		m_vo_inf;
+	vorbis_comment		m_vo_cmmnt;
+	vorbis_dsp_state	m_vo_dsp;
+	vorbis_block		m_vo_block;
 //these should be 0, since area is quantized
 //before input
-	int			 x_offset,
-					y_offset;
+	int			x_offset,
+				y_offset;
 //our file
 	FILE			*fp;
-}EncData;
+} EncData;
 
 //this struct will hold a few basic
 //information, needed for caching the frames.
@@ -218,19 +218,20 @@ typedef struct _SndBuffer{
 
 #ifdef HAVE_LIBJACK
 typedef struct _JackData{
-	ProgData *pdata;			//pointer to prog data
-	jack_client_t   *client;
-	unsigned int	buffersize, //buffer size for every port in frames.
-					frequency,  //samplerate with which jack server was started.
-					nports;	 //number of ports.
-	float		   ringbuffer_secs;
-	char **port_names;		  //names of ports(as specified in args).
-	jack_port_t **ports;		//connections to thes ports.
-	jack_default_audio_sample_t **portbuf;  //retrieval of audio buffers.
-	pthread_mutex_t *snd_buff_ready_mutex;  //mutex and cond_var
-	pthread_cond_t *sound_data_read;		//in the pdata struct
-	jack_ringbuffer_t *sound_buffer;		//data exchange happens through this
-	int capture_started;		//used to hold recording in the beginning
+	ProgData		*pdata;			//pointer to prog data
+	jack_client_t		*client;
+	unsigned int		buffersize,		//buffer size for every port in frames.
+				frequency,		//samplerate with which jack server was started.
+				nports;			//number of ports.
+	float			ringbuffer_secs;
+	char			**port_names;		//names of ports(as specified in args).
+	jack_port_t		**ports;		//connections to thes ports.
+	jack_default_audio_sample_t
+				**portbuf;		//retrieval of audio buffers.
+	pthread_mutex_t		*snd_buff_ready_mutex;	//mutex and cond_var
+	pthread_cond_t		*sound_data_read;	//in the pdata struct
+	jack_ringbuffer_t	*sound_buffer;		//data exchange happens through this
+	int			capture_started;	//used to hold recording in the beginning
 }JackData;
 #endif
 

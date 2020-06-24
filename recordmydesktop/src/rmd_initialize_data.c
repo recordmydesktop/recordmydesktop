@@ -176,11 +176,11 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	for(i=0; i<(pdata->enc_data->yuv.uv_width*pdata->enc_data->yuv.uv_height); i++)
 		pdata->enc_data->yuv.v[i]=pdata->enc_data->yuv.u[i]=127;
 
-	yblocks=malloc(sizeof(u_int32_t)*(pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH)*
+	yblocks = malloc(sizeof(u_int32_t)*(pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH)*
 				(pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH));
-	ublocks=malloc(sizeof(u_int32_t)*(pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH)*
+	ublocks = malloc(sizeof(u_int32_t)*(pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH)*
 				(pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH));
-	vblocks=malloc(sizeof(u_int32_t)*(pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH)*
+	vblocks = malloc(sizeof(u_int32_t)*(pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH)*
 				(pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH));
 
 	pdata->frametime=(1000000)/pdata->args.fps;

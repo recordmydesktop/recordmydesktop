@@ -249,7 +249,7 @@ static void rmdMoveCaptureArea(	BRWindow *brwin,
 *
 * \param x_offset left x of the recording area
 *
-* \param x_offset upper y of the recording area
+* \param y_offset upper y of the recording area
 *
 * \param blocknum_x Width of image in blocks
 *
@@ -527,7 +527,7 @@ void *rmdGetFrame(ProgData *pdata) {
 		if (pdata->args.xfixes_cursor || pdata->args.have_dummy_cursor) {
 			int mouse_xoffset, mouse_yoffset;
 			//avoid segfaults
-			CLIP_DUMMY_POINTER_AREA(mouse_pos_abs,&temp_brwin, &mouse_pos_temp);
+			CLIP_DUMMY_POINTER_AREA(mouse_pos_abs, &temp_brwin, &mouse_pos_temp);
 			mouse_xoffset=mouse_pos_temp.x-mouse_pos_abs.x;
 			mouse_yoffset=mouse_pos_temp.y-mouse_pos_abs.y;
 			if ((mouse_xoffset<0) || (mouse_xoffset>mouse_pos_abs.width))

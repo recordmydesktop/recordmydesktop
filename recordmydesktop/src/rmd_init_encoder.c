@@ -83,7 +83,7 @@ static int rmdIncrementalNaming(char **name) {
 	return 0;
 }
 
-void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
+void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 	int y0, y1, y2, fname_length;
 	ogg_stream_state m_ogg_skel;
 	ogg_page skel_og_pg;
@@ -91,13 +91,13 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 		   	skel_fba;	//audio fisbone packet
 	const char	*fname;
 
-	(pdata)->enc_data=enc_data_t;
+	pdata->enc_data = enc_data_t;
 
 	fname = pdata->args.filename;
-	fname_length=strlen(fname);
+	fname_length = strlen(fname);
 	if (!(fname_length>4 && !strcasecmp(&fname[fname_length-3], "ogv"))) {
 
-		char *new_name=malloc(fname_length+5);
+		char *new_name = malloc(fname_length + 5);
 		strcpy(new_name,fname);
 		strcat(new_name,".ogv");
 		
@@ -110,34 +110,34 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 		fprintf(stderr, "Output file: %s\n", pdata->args.filename);
 	}
 		
-	enc_data_t->fp=fopen((pdata)->args.filename,"w");
-	if (enc_data_t->fp==NULL) {
+	enc_data_t->fp = fopen((pdata)->args.filename,"w");
+	if (enc_data_t->fp == NULL) {
 		fprintf(stderr,"Cannot open file %s for writting!\n", (pdata)->args.filename);
 		exit(13);
 	}
 
 	//each stream must have a unique 
 	srand(time(NULL));
-	y0=rand()+1;
-	y1=rand()+1;
-	y2=rand()+1;
-	y2+=(y1==y2);
-	y0=(((y0==y1)||(y0==y2))?(y1+y2):y0);
+	y0 = rand() + 1;
+	y1 = rand() + 1;
+	y2 = rand() + 1;
+	y2 += (y1 == y2);
+	y0 = (((y0 == y1) || (y0 == y2)) ? (y1 + y2) : y0);
 
 	//init ogg streams
 	//skeleton first
 	ogg_stream_init(&m_ogg_skel, y0);
 	m_add_fishead_packet(&m_ogg_skel);
-	if (ogg_stream_pageout(&m_ogg_skel,&skel_og_pg)!= 1) {
+	if (ogg_stream_pageout(&m_ogg_skel, &skel_og_pg) != 1) {
 		fprintf (stderr, "Internal Ogg library error.\n");
 		exit (2);
 	}
-	fwrite(skel_og_pg.header,1,skel_og_pg.header_len,enc_data_t->fp);
-	fwrite(skel_og_pg.body,1,skel_og_pg.body_len,enc_data_t->fp);
+	fwrite(skel_og_pg.header, 1, skel_og_pg.header_len, enc_data_t->fp);
+	fwrite(skel_og_pg.body, 1, skel_og_pg.body_len, enc_data_t->fp);
 
-	ogg_stream_init(&enc_data_t->m_ogg_ts,y1);
+	ogg_stream_init(&enc_data_t->m_ogg_ts, y1);
 	if (!pdata->args.nosound)
-		ogg_stream_init(&enc_data_t->m_ogg_vs,y2);
+		ogg_stream_init(&enc_data_t->m_ogg_vs, y2);
 
 	theora_info_init(&enc_data_t->m_th_inf);
 	enc_data_t->m_th_inf.frame_width		= pdata->brwin.rrect.width;
@@ -168,9 +168,6 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 	enc_data_t->m_th_inf.noise_sensitivity		= 1;
 	enc_data_t->m_th_inf.sharpness			= 2;
 
-	theora_encode_init(&enc_data_t->m_th_st,&enc_data_t->m_th_inf);
-
-
 	if (!pdata->args.nosound) {
 		int ret;
 		vorbis_info_init(&enc_data_t->m_vo_inf);
@@ -183,134 +180,141 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 			exit(2);
 		}
 		vorbis_comment_init(&enc_data_t->m_vo_cmmnt);
-		vorbis_analysis_init(&enc_data_t->m_vo_dsp,&enc_data_t->m_vo_inf);
-		vorbis_block_init(&enc_data_t->m_vo_dsp,&enc_data_t->m_vo_block);
+		vorbis_analysis_init(&enc_data_t->m_vo_dsp, &enc_data_t->m_vo_inf);
+		vorbis_block_init(&enc_data_t->m_vo_dsp, &enc_data_t->m_vo_block);
 	}
 
+	if (theora_encode_init(&enc_data_t->m_th_st, &enc_data_t->m_th_inf)) {
+		fprintf(stderr, "Theora encoder initialization failure.\n");
+		exit(2);
+	}
 
-	theora_encode_header(&enc_data_t->m_th_st,&enc_data_t->m_ogg_pckt1);
-	ogg_stream_packetin(&enc_data_t->m_ogg_ts,&enc_data_t->m_ogg_pckt1);
-	if (ogg_stream_pageout(&enc_data_t->m_ogg_ts,&enc_data_t->m_ogg_pg)!=1) {
+	if (theora_encode_header(&enc_data_t->m_th_st, &enc_data_t->m_ogg_pckt1)) {
+		fprintf(stderr, "Theora enocde header failure.\n");
+		exit(2);
+	}
+
+	ogg_stream_packetin(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pckt1);
+	if (ogg_stream_pageout(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pg) != 1) {
 		fprintf(stderr,"Internal Ogg library error.\n");
 		exit(2);
 	}
-	fwrite(enc_data_t->m_ogg_pg.header,1,
+	fwrite(enc_data_t->m_ogg_pg.header, 1,
 		   enc_data_t->m_ogg_pg.header_len,
 		   enc_data_t->fp);
-	fwrite(enc_data_t->m_ogg_pg.body,1,
+	fwrite(enc_data_t->m_ogg_pg.body, 1,
 		   enc_data_t->m_ogg_pg.body_len,
 		   enc_data_t->fp);
 
 	theora_comment_init(&enc_data_t->m_th_cmmnt);
-	theora_comment_add_tag(&enc_data_t->m_th_cmmnt,"recordMyDesktop",VERSION);
-	theora_encode_comment(&enc_data_t->m_th_cmmnt,&enc_data_t->m_ogg_pckt1);
-	ogg_stream_packetin(&enc_data_t->m_ogg_ts,&enc_data_t->m_ogg_pckt1);
-	theora_encode_tables(&enc_data_t->m_th_st,&enc_data_t->m_ogg_pckt1);
-	ogg_stream_packetin(&enc_data_t->m_ogg_ts,&enc_data_t->m_ogg_pckt1);
+	theora_comment_add_tag(&enc_data_t->m_th_cmmnt, "recordMyDesktop", VERSION);
+	theora_encode_comment(&enc_data_t->m_th_cmmnt, &enc_data_t->m_ogg_pckt1);
+	ogg_stream_packetin(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pckt1);
+	theora_encode_tables(&enc_data_t->m_th_st, &enc_data_t->m_ogg_pckt1);
+	ogg_stream_packetin(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pckt1);
 
 	if (!pdata->args.nosound) {
 		ogg_packet header;
 		ogg_packet header_comm;
 		ogg_packet header_code;
 
-		vorbis_analysis_headerout(&enc_data_t->m_vo_dsp,
-								  &enc_data_t->m_vo_cmmnt,
-								  &header,&header_comm,
-								  &header_code);
-		ogg_stream_packetin(&enc_data_t->m_ogg_vs,&header);
-		if (ogg_stream_pageout(&enc_data_t->m_ogg_vs,&enc_data_t->m_ogg_pg)!=1) {
+		vorbis_analysis_headerout(	&enc_data_t->m_vo_dsp,
+						&enc_data_t->m_vo_cmmnt,
+						&header, &header_comm,
+						&header_code);
+		ogg_stream_packetin(&enc_data_t->m_ogg_vs, &header);
+		if (ogg_stream_pageout(&enc_data_t->m_ogg_vs, &enc_data_t->m_ogg_pg) != 1) {
 			fprintf(stderr,"Internal Ogg library error.\n");
 			exit(2);
 		}
 
-		fwrite(enc_data_t->m_ogg_pg.header,1,
+		fwrite(enc_data_t->m_ogg_pg.header, 1,
 			   enc_data_t->m_ogg_pg.header_len,
 			   enc_data_t->fp);
 
-		fwrite(enc_data_t->m_ogg_pg.body,1,
+		fwrite(enc_data_t->m_ogg_pg.body, 1,
 			   enc_data_t->m_ogg_pg.body_len,
 			   enc_data_t->fp);
 
-		ogg_stream_packetin(&enc_data_t->m_ogg_vs,&header_comm);
-		ogg_stream_packetin(&enc_data_t->m_ogg_vs,&header_code);
+		ogg_stream_packetin(&enc_data_t->m_ogg_vs, &header_comm);
+		ogg_stream_packetin(&enc_data_t->m_ogg_vs, &header_code);
 	}
 
 	//fishbone packets go here
-	memset(&skel_fbv,0,sizeof(skel_fbv));
-	skel_fbv.serial_no=enc_data_t->m_ogg_ts.serialno;
-	skel_fbv.nr_header_packet=3;
-	skel_fbv.granule_rate_n=enc_data_t->m_th_inf.fps_numerator;
-	skel_fbv.granule_rate_d=enc_data_t->m_th_inf.fps_denominator;
-	skel_fbv.start_granule=0;
-	skel_fbv.preroll=0;
-	skel_fbv.granule_shift=theora_granule_shift(&enc_data_t->m_th_inf);
+	memset(&skel_fbv, 0, sizeof(skel_fbv));
+	skel_fbv.serial_no = enc_data_t->m_ogg_ts.serialno;
+	skel_fbv.nr_header_packet = 3;
+	skel_fbv.granule_rate_n = enc_data_t->m_th_inf.fps_numerator;
+	skel_fbv.granule_rate_d = enc_data_t->m_th_inf.fps_denominator;
+	skel_fbv.start_granule = 0;
+	skel_fbv.preroll = 0;
+	skel_fbv.granule_shift = theora_granule_shift(&enc_data_t->m_th_inf);
 	add_message_header_field(&skel_fbv, "Content-Type", "video/theora");
 
 	add_fisbone_to_stream(&m_ogg_skel,&skel_fbv);
 
 	if (!pdata->args.nosound) {
 
-		memset(&skel_fba,0,sizeof(skel_fba));
-		skel_fba.serial_no=enc_data_t->m_ogg_vs.serialno;
-		skel_fba.nr_header_packet=3;
-		skel_fba.granule_rate_n=pdata->args.frequency;
-		skel_fba.granule_rate_d=(ogg_int64_t)1;
-		skel_fba.start_granule=0;
-		skel_fba.preroll=2;
-		skel_fba.granule_shift=0;
+		memset(&skel_fba, 0, sizeof(skel_fba));
+		skel_fba.serial_no = enc_data_t->m_ogg_vs.serialno;
+		skel_fba.nr_header_packet = 3;
+		skel_fba.granule_rate_n = pdata->args.frequency;
+		skel_fba.granule_rate_d = (ogg_int64_t)1;
+		skel_fba.start_granule = 0;
+		skel_fba.preroll = 2;
+		skel_fba.granule_shift = 0;
 		add_message_header_field(&skel_fba, "Content-Type", "audio/vorbis");
 
-		add_fisbone_to_stream(&m_ogg_skel,&skel_fba);
+		add_fisbone_to_stream(&m_ogg_skel, &skel_fba);
 	}
 
 	while (1) {
 		int result = ogg_stream_flush(&m_ogg_skel, &skel_og_pg);
-		if (result<0) {
+		if (result < 0) {
 			fprintf (stderr, "Internal Ogg library error.\n");
 			exit(2);
 		}
 
-		if (result==0)
+		if (result == 0)
 			break;
-		fwrite(skel_og_pg.header,1,skel_og_pg.header_len,enc_data_t->fp);
-		fwrite(skel_og_pg.body,1,skel_og_pg.body_len,enc_data_t->fp);
+
+		fwrite(skel_og_pg.header, 1, skel_og_pg.header_len, enc_data_t->fp);
+		fwrite(skel_og_pg.body, 1, skel_og_pg.body_len, enc_data_t->fp);
 	}
 
 	while (1) {
-		int result = ogg_stream_flush(&enc_data_t->m_ogg_ts,
-									  &enc_data_t->m_ogg_pg);
-		if (result<0) {
+		int result = ogg_stream_flush(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pg);
+		if (result < 0) {
 			fprintf(stderr,"Internal Ogg library error.\n");
 			exit(2);
 		}
 
-		if (result==0)
+		if (result == 0)
 			break;
 
-		fwrite(	enc_data_t->m_ogg_pg.header,1,
+		fwrite(	enc_data_t->m_ogg_pg.header, 1,
 			enc_data_t->m_ogg_pg.header_len,
 			enc_data_t->fp);
-		fwrite(	enc_data_t->m_ogg_pg.body,1,
+		fwrite(	enc_data_t->m_ogg_pg.body, 1,
 			enc_data_t->m_ogg_pg.body_len,
 			enc_data_t->fp);
 	}
 
 	if (!pdata->args.nosound) {
 		while (1) {
-			int result=ogg_stream_flush(&enc_data_t->m_ogg_vs,
-										&enc_data_t->m_ogg_pg);
-			if (result<0) {
+			int result = ogg_stream_flush(&enc_data_t->m_ogg_vs, &enc_data_t->m_ogg_pg);
+			if (result < 0) {
 				fprintf(stderr,"Internal Ogg library error.\n");
 				exit(2);
 			}
 
-			if (result==0)
+			if (result == 0)
 				break;
 
-			fwrite(	enc_data_t->m_ogg_pg.header,1,
+			fwrite(	enc_data_t->m_ogg_pg.header, 1,
 				enc_data_t->m_ogg_pg.header_len,
 				enc_data_t->fp);
-			fwrite(	enc_data_t->m_ogg_pg.body,1,
+			fwrite(	enc_data_t->m_ogg_pg.body, 1,
 				enc_data_t->m_ogg_pg.body_len,
 				enc_data_t->fp);
 		}
@@ -318,29 +322,26 @@ void rmdInitEncoder(ProgData *pdata,EncData *enc_data_t,int buffer_ready) {
 
 	//skeleton eos
 	add_eos_packet_to_stream(&m_ogg_skel);
-	if (ogg_stream_flush(&m_ogg_skel,&skel_og_pg)<0) {
+	if (ogg_stream_flush(&m_ogg_skel, &skel_og_pg) < 0) {
 		fprintf(stderr,"Internal Ogg library error.\n");
 		exit(2);
 	}
-	fwrite(skel_og_pg.header,1,skel_og_pg.header_len,enc_data_t->fp);
+	fwrite(skel_og_pg.header, 1, skel_og_pg.header_len,enc_data_t->fp);
 
 	//theora buffer allocation, if any
 	if (!buffer_ready) {
-		enc_data_t->yuv.y=(unsigned char *)malloc(enc_data_t->m_th_inf.height*
-						  enc_data_t->m_th_inf.width);
-		enc_data_t->yuv.u=(unsigned char *)malloc(enc_data_t->m_th_inf.height*
-						  enc_data_t->m_th_inf.width/4);
-		enc_data_t->yuv.v=(unsigned char *)malloc(enc_data_t->m_th_inf.height*
-						  enc_data_t->m_th_inf.width/4);
-		enc_data_t->yuv.y_width=enc_data_t->m_th_inf.width;
-		enc_data_t->yuv.y_height=enc_data_t->m_th_inf.height;
-		enc_data_t->yuv.y_stride=enc_data_t->m_th_inf.width;
+		enc_data_t->yuv.y = malloc(enc_data_t->m_th_inf.height * enc_data_t->m_th_inf.width);
+		enc_data_t->yuv.u = malloc(enc_data_t->m_th_inf.height * enc_data_t->m_th_inf.width / 4);
+		enc_data_t->yuv.v = malloc(enc_data_t->m_th_inf.height * enc_data_t->m_th_inf.width / 4);
+		enc_data_t->yuv.y_width = enc_data_t->m_th_inf.width;
+		enc_data_t->yuv.y_height = enc_data_t->m_th_inf.height;
+		enc_data_t->yuv.y_stride = enc_data_t->m_th_inf.width;
 
-		enc_data_t->yuv.uv_width=enc_data_t->m_th_inf.width/2;
-		enc_data_t->yuv.uv_height=enc_data_t->m_th_inf.height/2;
-		enc_data_t->yuv.uv_stride=enc_data_t->m_th_inf.width/2;
-		enc_data_t->x_offset=enc_data_t->m_th_inf.offset_x;
-		enc_data_t->y_offset=enc_data_t->m_th_inf.offset_y;
+		enc_data_t->yuv.uv_width = enc_data_t->m_th_inf.width / 2;
+		enc_data_t->yuv.uv_height = enc_data_t->m_th_inf.height / 2;
+		enc_data_t->yuv.uv_stride = enc_data_t->m_th_inf.width / 2;
+		enc_data_t->x_offset = enc_data_t->m_th_inf.offset_x;
+		enc_data_t->y_offset = enc_data_t->m_th_inf.offset_y;
 	}
 
 	theora_info_clear(&enc_data_t->m_th_inf);

@@ -102,7 +102,7 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 			}
 #endif
 		}
-		pdata->avd-=pdata->periodtime;
+		pdata->avd -= pdata->periodtime;
 	}
 
 	fclose(pdata->cache_data->afp);
