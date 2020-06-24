@@ -52,34 +52,30 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 		int count=0,i,j;
 		SndBuffer *buff=NULL;
 
-		if (pdata->paused) {
-			pthread_mutex_lock(&pdata->pause_mutex);
+		pthread_mutex_lock(&pdata->pause_mutex);
+		while (pdata->paused)
 			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
-			pthread_mutex_unlock(&pdata->pause_mutex);
-		}
-		if (!pdata->args.use_jack) {
-			if (pdata->sound_buffer==NULL) {
-				pdata->v_enc_thread_waiting=1;
-				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-				pthread_cond_wait(&pdata->sound_data_read,
-								&pdata->snd_buff_ready_mutex);
-				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-				pdata->v_enc_thread_waiting=0;
-			}
+		pthread_mutex_unlock(&pdata->pause_mutex);
 
-			if (pdata->sound_buffer==NULL || !pdata->running)
-				break;
+		if (!pdata->args.use_jack) {
 
 			pthread_mutex_lock(&pdata->sound_buffer_mutex);
-			buff=pdata->sound_buffer;
-			//advance the list
-			pdata->sound_buffer=pdata->sound_buffer->next;
+			while (!pdata->sound_buffer && pdata->running)
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
+
+			buff = pdata->sound_buffer;
+			if (buff) //advance the list
+				pdata->sound_buffer=pdata->sound_buffer->next;
+
 			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
 
-			vorbis_buffer=vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
+			if (!pdata->running)
+				break;
 
-			for (i=0;i<sampread;i++) {
-				for (j=0;j<pdata->args.channels;j++) {
+			vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
+
+			for (i = 0; i < sampread; i++) {
+				for (j=0; j < pdata->args.channels; j++) {
 					vorbis_buffer[j][i]=((buff->data[count+1]<<8)| (0x00ff&(int)buff->data[count]))/ 32768.f;
 					count+=2;
 				}
@@ -88,14 +84,17 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 			free(buff);
 		} else {
 #ifdef HAVE_LIBJACK
-			if ((*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer)>=
-			   (pdata->sound_framesize*pdata->jdata->buffersize)) {
-				(*jack_ringbuffer_read)(pdata->jdata->sound_buffer,
-										  jackbuf,
-										  (pdata->sound_framesize*
-										   pdata->jdata->buffersize));
-				vorbis_buffer=vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp,
-													sampread);
+			if ((*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer) >=
+				(pdata->sound_framesize * pdata->jdata->buffersize)) {
+
+				(*jack_ringbuffer_read)(	pdata->jdata->sound_buffer,
+								jackbuf,
+								(pdata->sound_framesize *
+								pdata->jdata->buffersize)
+							);
+
+				vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
+
 				for (j=0;j<pdata->args.channels;j++) {
 					for (i=0;i<sampread;i++) {
 						vorbis_buffer[j][i]=((float*)jackbuf)[count];
@@ -103,10 +102,9 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 					}
 				}
 			} else {
-				pdata->v_enc_thread_waiting=1;
+				pdata->v_enc_thread_waiting = 1;
 				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-				pthread_cond_wait(&pdata->sound_data_read,
-								&pdata->snd_buff_ready_mutex);
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
 				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
 				pdata->v_enc_thread_waiting=0;
 				continue;
