@@ -60,29 +60,24 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 	while (pdata->running) {
 		SndBuffer	*buff = NULL;
 
-		if (pdata->paused) {
-			pthread_mutex_lock(&pdata->pause_mutex);
+		pthread_mutex_lock(&pdata->pause_mutex);
+		while (pdata->paused)
 			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
-			pthread_mutex_unlock(&pdata->pause_mutex);
-		}
+		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		if (!pdata->args.use_jack) {
-			if (pdata->sound_buffer == NULL) {
-				pdata->v_enc_thread_waiting = 1;
-				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
-				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-				pdata->v_enc_thread_waiting = 0;
-			}
+			pthread_mutex_lock(&pdata->sound_buffer_mutex);
+			while (!pdata->sound_buffer && pdata->running)
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
 
-			if (pdata->sound_buffer == NULL || !pdata->running)
+			buff = pdata->sound_buffer;
+			if (buff)
+				pdata->sound_buffer = pdata->sound_buffer->next;
+			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
+
+			if (!pdata->running)
 				break;
 
-			pthread_mutex_lock(&pdata->sound_buffer_mutex);
-			buff = pdata->sound_buffer;
-			//advance the list
-			pdata->sound_buffer = pdata->sound_buffer->next;
-			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
 			fwrite(buff->data, 1, write_size, pdata->cache_data->afp);
 			free(buff->data);
 			free(buff);
