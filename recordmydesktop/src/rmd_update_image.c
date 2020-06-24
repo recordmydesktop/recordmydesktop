@@ -48,45 +48,42 @@ void rmdUpdateImage(	Display * dpy,
 			int shm_opcode,
 			int no_quick_subsample){
 
-	RectArea *temp;
 	unsigned char *dtap=(unsigned char*)datatemp;
-	temp=*root;
+	RectArea *temp;
 
-	if (temp!=NULL) {
-		do {
-			if (noshmem) {
-				rmdGetZPixmap(	dpy,
+	for (temp = *root; temp; temp = temp->next) {
+		if (noshmem) {
+			rmdGetZPixmap(	dpy,
+					specs->root,
+					datatemp,
+					temp->rect.x,
+					temp->rect.y,
+					temp->rect.width,
+					temp->rect.height);
+		} else {
+			rmdGetZPixmapSHM(	dpy,
 						specs->root,
+						shminfo,
+						shm_opcode,
 						datatemp,
 						temp->rect.x,
 						temp->rect.y,
 						temp->rect.width,
 						temp->rect.height);
-			} else {
-				rmdGetZPixmapSHM(	dpy,
-							specs->root,
-							shminfo,
-							shm_opcode,
-							datatemp,temp->rect.x,
-							temp->rect.y,
-							temp->rect.width,
-							temp->rect.height);
-			}
+		}
 
-			rmdUpdateYuvBuffer(
-				yuv,
-				dtap,
-				NULL,
-				temp->rect.x - brwin->rrect.x + enc->x_offset,
-				temp->rect.y - brwin->rrect.y + enc->y_offset,
-				temp->rect.width,
-				temp->rect.height,
-				no_quick_subsample,
-				specs->depth
-			);
 
-			temp=temp->next;
-		} while (temp!=NULL);
+		rmdUpdateYuvBuffer(
+			yuv,
+			dtap,
+			NULL,
+			temp->rect.x - brwin->rrect.x + enc->x_offset,
+			temp->rect.y - brwin->rrect.y + enc->y_offset,
+			temp->rect.width,
+			temp->rect.height,
+			no_quick_subsample,
+			specs->depth
+		);
 	}
 }
 
