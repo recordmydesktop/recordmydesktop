@@ -50,24 +50,24 @@ int rmdGetZPixmap(	Display *dpy,
 	long nbytes;
 
 	LockDisplay(dpy);
-	GetReq(GetImage,request);
-	request->drawable=root;
-	request->x=x;
-	request->y=y;
-	request->width=width;
-	request->height=height;
-	request->planeMask=AllPlanes;
-	request->format=ZPixmap;
+	GetReq(GetImage, request);
+	request->drawable = root;
+	request->x = x;
+	request->y = y;
+	request->width = width;
+	request->height = height;
+	request->planeMask = AllPlanes;
+	request->format = ZPixmap;
 
-	if (!_XReply(dpy,(xReply *)&reply,0,xFalse) || !reply.length) {
+	if (!_XReply(dpy, (xReply *)&reply, 0, xFalse) || !reply.length) {
 		UnlockDisplay(dpy);
 		SyncHandle();
 
 		return 1;
 	}
 
-	nbytes=(long)reply.length<<2;
-	_XReadPad(dpy,data,nbytes);
+	nbytes = (long)reply.length << 2;
+	_XReadPad(dpy, data, nbytes);
 	UnlockDisplay(dpy);
 	SyncHandle();
 
@@ -85,34 +85,34 @@ int rmdGetZPixmapSHM(	Display *dpy,
 			int height) {
 
 	xShmGetImageReply reply;
-	xShmGetImageReq *request=NULL;
+	xShmGetImageReq *request = NULL;
 	long nbytes;
 
 	LockDisplay(dpy);
-	GetReq(ShmGetImage,request);
+	GetReq(ShmGetImage, request);
 
-	request->reqType=shm_opcode;
-	request->shmReqType=X_ShmGetImage;
-	request->shmseg=shminfo->shmseg;
+	request->reqType = shm_opcode;
+	request->shmReqType = X_ShmGetImage;
+	request->shmseg = shminfo->shmseg;
 
-	request->drawable=root;
-	request->x=x;
-	request->y=y;
-	request->width=width;
-	request->height=height;
-	request->planeMask=AllPlanes;
-	request->format=ZPixmap;
-	request->offset=data-shminfo->shmaddr;
+	request->drawable = root;
+	request->x = x;
+	request->y = y;
+	request->width = width;
+	request->height = height;
+	request->planeMask = AllPlanes;
+	request->format = ZPixmap;
+	request->offset = data - shminfo->shmaddr;
 
-	if ((!_XReply(dpy,(xReply *)&reply,0,xFalse))||(!reply.length)) {
+	if ((!_XReply(dpy, (xReply *)&reply, 0, xFalse)) || !reply.length) {
 		UnlockDisplay(dpy);
 		SyncHandle();
 
 		return 1;
 	}
 
-	nbytes=(long)reply.length << 2;
-	_XReadPad(dpy,data,nbytes);
+	nbytes = (long)reply.length << 2;
+	_XReadPad(dpy, data, nbytes);
 	UnlockDisplay(dpy);
 	SyncHandle();
 
