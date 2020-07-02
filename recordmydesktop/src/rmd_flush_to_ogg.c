@@ -143,7 +143,7 @@ void *rmdFlushToOgg(ProgData *pdata) {
 					while (!pdata->v_encoding_clean)
 						pthread_cond_wait(&pdata->vorbis_lib_clean, &pdata->vorbis_lib_mutex);
 					pthread_mutex_unlock(&pdata->vorbis_lib_mutex);
-					rmdSyncEncodeSoundBuffer(pdata,NULL);
+					rmdSyncEncodeSoundBuffer(pdata, NULL);
 				}
 			}
 		}

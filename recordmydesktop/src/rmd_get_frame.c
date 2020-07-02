@@ -83,7 +83,7 @@ static void clip_dummy_pointer_area(XRectangle *area, XRectangle *clip, XRectang
 				__depth__) {						\
 											\
 	register u_int##__depth__##_t *datapi = 					\
-			((u_int##__depth__##_t *)data) + y_tm *buffer_width + x_tm;	\
+			((u_int##__depth__##_t *)data) + y_tm * buffer_width + x_tm;	\
 											\
 	for(int k = 0; k < height_tm; k++) {						\
 		for(int i = 0; i < width_tm; i++) {					\
@@ -269,18 +269,17 @@ static void rmdBlocksFromList(	RectArea   **root,
 }
 
 void *rmdGetFrame(ProgData *pdata) {
-	int	i=0,
-		blocknum_x=pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH,
-		blocknum_y=pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH;
+	int	blocknum_x = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
+		blocknum_y = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH;
 	unsigned int msk_ret;
-	XRectangle mouse_pos_abs,mouse_pos_rel,mouse_pos_temp;
+	XRectangle mouse_pos_abs, mouse_pos_rel, mouse_pos_temp;
 	BRWindow temp_brwin;
 	Window root_ret, child_ret; //Frame
-	XFixesCursorImage *xcim=NULL;
-	XImage *image=NULL,*image_back=NULL;	//the image that holds
+	XFixesCursorImage *xcim = NULL;
+	XImage *image = NULL, *image_back = NULL;	//the image that holds
 						//the current full screenshot
-	XShmSegmentInfo shminfo,shminfo_back;	//info structure for the image above.
-	int init_img1=0,init_img2=0, img_sel,d_buff;
+	XShmSegmentInfo shminfo, shminfo_back;	//info structure for the image above.
+	int init_img1 = 0, init_img2 = 0, img_sel, d_buff;
 
 	img_sel=d_buff=pdata->args.full_shots;
 
@@ -293,7 +292,7 @@ void *rmdGetFrame(ProgData *pdata) {
 						pdata->args.filename);
 			}
 		} else {
-			rmdPurgeCache(pdata->cache_data,!pdata->args.nosound);
+			rmdPurgeCache(pdata->cache_data, !pdata->args.nosound);
 		}
 
 		exit(init_img1);
@@ -360,13 +359,13 @@ void *rmdGetFrame(ProgData *pdata) {
 
 		//switch back and front buffers (full_shots only)
 		if (d_buff)
-			img_sel=(img_sel)?0:1;
+			img_sel = img_sel ? 0 : 1;
 
 		rmdBRWinCpy(&temp_brwin, &pdata->brwin);
 
 
 		if (	pdata->args.xfixes_cursor ||
-			pdata->args.have_dummy_cursor||
+			pdata->args.have_dummy_cursor ||
 			pdata->args.follow_mouse) {
 
 
@@ -375,30 +374,33 @@ void *rmdGetFrame(ProgData *pdata) {
 			// * Update to new position
 			// * Mark new position as dirty with rmdRectInsert()
 			if (	!pdata->args.full_shots &&
-				mouse_pos_temp.x >=0 &&
-				mouse_pos_temp.y >=0 &&
+				mouse_pos_temp.x >= 0 &&
+				mouse_pos_temp.y >= 0 &&
 				mouse_pos_temp.width > 0 &&
 				mouse_pos_temp.height > 0) {
-				rmdRectInsert(&pdata->rect_root,&mouse_pos_temp);
+				rmdRectInsert(&pdata->rect_root, &mouse_pos_temp);
 			}
 
 			if (pdata->args.xfixes_cursor) {
-				xcim=XFixesGetCursorImage(pdata->dpy);
-				mouse_pos_abs.x=xcim->x-xcim->xhot;
-				mouse_pos_abs.y=xcim->y-xcim->yhot;
-				mouse_pos_abs.width=xcim->width;
-				mouse_pos_abs.height=xcim->height;
+				xcim = XFixesGetCursorImage(pdata->dpy);
+				mouse_pos_abs.x = xcim->x - xcim->xhot;
+				mouse_pos_abs.y = xcim->y - xcim->yhot;
+				mouse_pos_abs.width = xcim->width;
+				mouse_pos_abs.height = xcim->height;
 			} else {
-				XQueryPointer(pdata->dpy,
-							  pdata->specs.root,
-							  &root_ret,&child_ret,
-							  (int *)&mouse_pos_abs.x,(int *)&mouse_pos_abs.y,
-							  (int *)&mouse_pos_rel.x,(int *)&mouse_pos_rel.y,&msk_ret);
+				XQueryPointer(	pdata->dpy,
+						pdata->specs.root,
+						&root_ret,&child_ret,
+						(int *)&mouse_pos_abs.x,
+						(int *)&mouse_pos_abs.y,
+						(int *)&mouse_pos_rel.x,
+						(int *)&mouse_pos_rel.y,
+						&msk_ret);
 			}
 			
 			clip_dummy_pointer_area(&mouse_pos_abs, &temp_brwin.rrect, &mouse_pos_temp);
-			if (	mouse_pos_temp.x >=0 &&
-				mouse_pos_temp.y >=0 &&
+			if (	mouse_pos_temp.x >= 0 &&
+				mouse_pos_temp.y >= 0 &&
 				mouse_pos_temp.width > 0 &&
 				mouse_pos_temp.height > 0) {
 
@@ -487,7 +489,7 @@ void *rmdGetFrame(ProgData *pdata) {
 							   temp_brwin.rrect.height);
 
 			pthread_mutex_lock(&pdata->yuv_mutex);
-			for(i = 0;i < blocknum_x * blocknum_y; i++)
+			for(int i = 0; i < blocknum_x * blocknum_y; i++)
 				yblocks[i] = ublocks[i] = vblocks[i] = 0;
 
 			rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
@@ -570,7 +572,7 @@ void *rmdGetFrame(ProgData *pdata) {
 
 			if (pdata->args.xfixes_cursor) {
 				XFree(xcim);
-				xcim=NULL;
+				xcim = NULL;
 			}
 		}
 

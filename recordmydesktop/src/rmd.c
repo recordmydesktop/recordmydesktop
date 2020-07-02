@@ -68,7 +68,7 @@ int main(int argc, char **argv){
 	if (pdata.args.rescue_path != NULL)
 		exit(rmdRescue(pdata.args.rescue_path));
 
-	if (XInitThreads()==0) {
+	if (XInitThreads() == 0) {
 		fprintf(stderr, "Couldn't initialize thread support!\n");
 		exit(7);
 	}

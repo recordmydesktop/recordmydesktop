@@ -43,14 +43,14 @@
 void *rmdCaptureSound(ProgData *pdata) {
 
 #ifdef HAVE_LIBASOUND
-	int frames=pdata->periodsize;
+	int frames = pdata->periodsize;
 #endif
 	//start capturing only after first frame is taken
 	usleep(pdata->frametime);
 
 	while (pdata->running) {
-		int sret=0;
-		SndBuffer *newbuf,*tmp;
+		int		sret = 0;
+		SndBuffer	*newbuf, *tmp;
 
 		if (pdata->paused) {
 #ifdef HAVE_LIBASOUND
@@ -65,7 +65,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 				pthread_mutex_lock(&pdata->pause_mutex);
 				pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
 				pthread_mutex_unlock(&pdata->pause_mutex);
-				pdata->sound_handle=
+				pdata->sound_handle =
 					rmdOpenDev(pdata->args.device,
 							   &pdata->args.channels,
 							   &pdata->args.frequency,
@@ -75,10 +75,10 @@ void *rmdCaptureSound(ProgData *pdata) {
 							   NULL//let's hope that the device capabilities
 								   //didn't magically change
 							   );
-				if (pdata->sound_handle==NULL) {
-					fprintf(stderr,"Couldn't reopen sound device.Exiting\n");
+				if (pdata->sound_handle == NULL) {
+					fprintf(stderr, "Couldn't reopen sound device.Exiting\n");
 					pdata->running = FALSE;
-					errno=3;
+					errno = 3;
 					pthread_exit(&errno);
 				}
 			}
@@ -87,28 +87,27 @@ void *rmdCaptureSound(ProgData *pdata) {
 			pthread_mutex_lock(&pdata->pause_mutex);
 			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
 			pthread_mutex_unlock(&pdata->pause_mutex);
-			pdata->sound_handle=
+			pdata->sound_handle =
 				rmdOpenDev(pdata->args.device,
 						   pdata->args.channels,
 						   pdata->args.frequency);
-			if (pdata->sound_handle<0) {
-				fprintf(stderr,"Couldn't reopen sound device.Exiting\n");
+			if (pdata->sound_handle < 0) {
+				fprintf(stderr,"Couldn't reopen sound device. Exiting\n");
 				pdata->running = FALSE;
-				errno=3;
+				errno = 3;
 				pthread_exit(&errno);
 			}
 #endif
 		}
 
 		//create new buffer
-		newbuf=(SndBuffer *)malloc(sizeof(SndBuffer));
+		newbuf = (SndBuffer *)malloc(sizeof(SndBuffer));
 #ifdef HAVE_LIBASOUND
-		newbuf->data=(signed char *)malloc(frames*pdata->sound_framesize);
+		newbuf->data = (signed char *)malloc(frames*pdata->sound_framesize);
 #else
-		newbuf->data=(signed char *)malloc(((pdata->args.buffsize<<1)*
-											pdata->args.channels));
+		newbuf->data = (signed char *)malloc(((pdata->args.buffsize<<1) * pdata->args.channels));
 #endif
-		newbuf->next=NULL;
+		newbuf->next = NULL;
 
 		//read data into new buffer
 #ifdef HAVE_LIBASOUND
@@ -126,7 +125,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 							   snd_strerror(temp_sret));
 				snd_pcm_prepare(pdata->sound_handle);
 			} else
-				sret+=temp_sret;
+				sret += temp_sret;
 		}
 #else
 		sret=0;

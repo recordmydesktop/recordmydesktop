@@ -34,10 +34,10 @@
 
 // There seem to be no way of passing user data to the signal handler,
 // so hack around not being able to pass ProgData to them
-static int *pdata_running			 = NULL;
-static int *pdata_paused			  = NULL;
-static int *pdata_aborted			 = NULL;
-static int *pdata_pause_state_changed = NULL;
+static int *pdata_running		= NULL;
+static int *pdata_paused		= NULL;
+static int *pdata_aborted		= NULL;
+static int *pdata_pause_state_changed	= NULL;
 
 
 static void rmdSetPaused(int signum) {
@@ -63,10 +63,10 @@ void rmdRegisterCallbacks(ProgData *pdata) {
 	struct sigaction end_act;
 
 	// Is there some way to pass pdata to the signal handlers?
-	pdata_running			 = &pdata->running;
-	pdata_paused			  = &pdata->paused;
-	pdata_aborted			 = &pdata->aborted;
-	pdata_pause_state_changed = &pdata->pause_state_changed;
+	pdata_running			= &pdata->running;
+	pdata_paused			= &pdata->paused;
+	pdata_aborted			= &pdata->aborted;
+	pdata_pause_state_changed	= &pdata->pause_state_changed;
 	
 	// Setup pause_act
 	sigfillset(&pause_act.sa_mask);

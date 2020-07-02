@@ -55,7 +55,7 @@ void rmdThreads(ProgData *pdata) {
 			flush_to_ogg_t,
 			timer_t;
 
-	if (pdata->args.delay>0) {
+	if (pdata->args.delay > 0) {
 		fprintf(stderr, "Will sleep for %d seconds now.\n", pdata->args.delay);
 		sleep(pdata->args.delay);
 	}
@@ -96,14 +96,14 @@ void rmdThreads(ProgData *pdata) {
 					(void *)pdata);
 	}
 
-	if(pdata->args.encOnTheFly)
+	if (pdata->args.encOnTheFly)
 		pthread_create(	&flush_to_ogg_t,
 				NULL,
 				(void *)rmdFlushToOgg,
 				(void *)pdata);
 
 	rmdRegisterCallbacks(pdata);
-	pdata->timer_alive=1;
+	pdata->timer_alive = 1;
 	pthread_create(	&timer_t,
 			NULL,
 			(void *)rmdTimer,
@@ -112,11 +112,11 @@ void rmdThreads(ProgData *pdata) {
 
 #ifdef HAVE_LIBJACK
 	if (pdata->args.use_jack)
-		pdata->jdata->capture_started=1;
+		pdata->jdata->capture_started = 1;
 #endif
 	//wait all threads to finish
 
-	pthread_join(image_capture_t,NULL);
+	pthread_join(image_capture_t, NULL);
 	fprintf(stderr,"Shutting down.");
 	//if no damage events have been received the thread will get stuck
 	pthread_mutex_lock(&pdata->img_buff_ready_mutex);
@@ -129,9 +129,9 @@ void rmdThreads(ProgData *pdata) {
 	}
 
 	if (pdata->args.encOnTheFly)
-		pthread_join(image_encode_t,NULL);
+		pthread_join(image_encode_t, NULL);
 	else
-		pthread_join(image_cache_t,NULL);
+		pthread_join(image_cache_t, NULL);
 	fprintf(stderr,".");
 
 	if (!pdata->args.nosound) {
@@ -162,6 +162,6 @@ void rmdThreads(ProgData *pdata) {
 	fprintf(stderr,".");
 
 	//Now that we are done with recording we cancel the timer
-	pdata->timer_alive=0;
+	pdata->timer_alive = 0;
 	pthread_join(timer_t,NULL);
 }

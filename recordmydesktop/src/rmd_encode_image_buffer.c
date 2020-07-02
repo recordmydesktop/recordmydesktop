@@ -51,7 +51,6 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		pthread_mutex_lock(&pdata->yuv_mutex);
-
 		if (theora_encode_YUVin(&enc_data->m_th_st, &enc_data->yuv)) {
 			fprintf(stderr,"Encoder not ready!\n");
 			pthread_mutex_unlock(&pdata->yuv_mutex);

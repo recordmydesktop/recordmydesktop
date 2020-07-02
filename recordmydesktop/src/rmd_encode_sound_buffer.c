@@ -47,7 +47,7 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 #endif
 
 	pdata->v_encoding_clean=0;
-	while ((pdata->running)) {
+	while (pdata->running) {
 		float **vorbis_buffer;
 		int count=0,i,j;
 		SndBuffer *buff=NULL;
@@ -64,9 +64,8 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
 
 			buff = pdata->sound_buffer;
-			if (buff) //advance the list
-				pdata->sound_buffer=pdata->sound_buffer->next;
-
+			if (buff)
+				pdata->sound_buffer = buff->next;
 			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
 
 			if (!pdata->running)
@@ -125,11 +124,12 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 		}
 		pthread_mutex_unlock(&pdata->libogg_mutex);
 
+		/* this needs synchronizing */
 		pdata->avd -= pdata->periodtime;
 	}
 
-	pdata->v_encoding_clean=1;
 	pthread_mutex_lock(&pdata->vorbis_lib_mutex);
+	pdata->v_encoding_clean = 1;
 	pthread_cond_signal(&pdata->vorbis_lib_clean);
 	pthread_mutex_unlock(&pdata->vorbis_lib_mutex);
 	pthread_exit(&errno);

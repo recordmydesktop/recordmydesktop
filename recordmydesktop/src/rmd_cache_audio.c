@@ -54,7 +54,7 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 #ifdef HAVE_LIBJACK
 	void	*jackbuf = NULL;
 	if (pdata->args.use_jack)
-		jackbuf=malloc(pdata->sound_framesize * pdata->jdata->buffersize);
+		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 #endif
 
 	while (pdata->running) {
@@ -72,7 +72,7 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 
 			buff = pdata->sound_buffer;
 			if (buff)
-				pdata->sound_buffer = pdata->sound_buffer->next;
+				pdata->sound_buffer = buff->next;
 			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
 
 			if (!pdata->running)

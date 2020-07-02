@@ -157,12 +157,12 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 	t3 = *datapi_next;									\
 	t4 = *(datapi_next + 1);								\
 												\
-	t_val=	((((t1 & 0x00ff0000) +(t2 & 0x00ff0000) +					\
-		  (t3 & 0x00ff0000)+ (t4 & 0x00ff0000)) / 4) & 0x00ff0000) +			\
+	t_val =	((((t1 & 0x00ff0000) + (t2 & 0x00ff0000) +					\
+		  (t3 & 0x00ff0000) + (t4 & 0x00ff0000)) / 4) & 0x00ff0000) +			\
 		((((t1 & 0x0000ff00) + (t2 & 0x0000ff00) +					\
-		  (t3 & 0x0000ff00)+ (t4 & 0x0000ff00)) / 4) & 0x0000ff00) +			\
+		  (t3 & 0x0000ff00) + (t4 & 0x0000ff00)) / 4) & 0x0000ff00) +			\
 		((((t1 & 0x000000ff) + (t2 & 0x000000ff) +					\
-		  (t3 & 0x000000ff)+ (t4 & 0x000000ff)) / 4) & 0x000000ff);			\
+		  (t3 & 0x000000ff) + (t4 & 0x000000ff)) / 4) & 0x000000ff);			\
 }
 
 #define UPDATE_A_UV_PIXEL(	yuv_U,								\
@@ -174,7 +174,7 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				sampling,							\
 				__depth__)							\
 												\
-	if(sampling == __PXL_AVERAGE) {								\
+	if (sampling == __PXL_AVERAGE) {							\
 		CALC_TVAL_AVG_##__depth__(t_val, datapi, datapi_next)				\
 	} else											\
 		t_val = *(datapi);								\
@@ -297,8 +297,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 		datapi_back_next = datapi_back + width_tm;					\
 												\
 		for (int k = 0; k < height_tm; k += 2) {					\
-			for(int i = 0; i < width_tm; i += 2) {					\
-				if(	( (*datapi != *datapi_back) ||				\
+			for (int i = 0; i < width_tm; i += 2) {					\
+				if (	( (*datapi != *datapi_back) ||				\
 					(*(datapi + 1) != *(datapi_back + 1)) ||		\
 					(*datapi_next != *datapi_back_next) ||			\
 					(*(datapi_next + 1) != *(datapi_back_next + 1)))) {	\
