@@ -121,7 +121,7 @@ static void mark_buffer_area(	unsigned char *data,
 //besides taking the first screenshot, this functions primary purpose is to 
 //initialize the structures and memory.
 static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shminfo) {
-	const BRWindow	*brwin = &pdata->brwin;
+	const XRectangle	*rrect = &pdata->brwin.rrect;
 
 	if ((pdata->args.noshared)) {
 		char	*pxl_data;
@@ -132,30 +132,29 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 		 * but just wanted to to move nbytes out to the one place it's
 		 * used.
 		 */
-		nbytes =	(((brwin->rrect.width + 15) >> 4) << 4) *
-				(((brwin->rrect.height + 15) >> 4) << 4) *
+		nbytes =	(((rrect->width + 15) >> 4) << 4) *
+				(((rrect->height + 15) >> 4) << 4) *
 				((pdata->specs.depth == 16) ? 2 : 4);
 
+		pxl_data = (char *)malloc(nbytes);
 
-		pxl_data=(char *)malloc(nbytes);
-
-		(*image)=XCreateImage(	pdata->dpy,
-					pdata->specs.visual,
-					pdata->specs.depth,
-					ZPixmap,
-					0,
-					pxl_data,
-					brwin->rrect.width,
-					brwin->rrect.height,
-					8,
-					0);
-		XInitImage((*image));
+		(*image) = XCreateImage(	pdata->dpy,
+						pdata->specs.visual,
+						pdata->specs.depth,
+						ZPixmap,
+						0,
+						pxl_data,
+						rrect->width,
+						rrect->height,
+						8,
+						0);
+		XInitImage(*image);
 		rmdGetZPixmap(	pdata->dpy,pdata->specs.root,
 				(*image)->data,
-				brwin->rrect.x,
-				brwin->rrect.y,
-				brwin->rrect.width,
-				brwin->rrect.height);
+				rrect->x,
+				rrect->y,
+				rrect->width,
+				rrect->height);
 	} else {
 		(*image) = XShmCreateImage(	pdata->dpy,
 						pdata->specs.visual,
@@ -163,8 +162,8 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 						ZPixmap,
 						NULL,
 						shminfo,
-						brwin->rrect.width,
-						brwin->rrect.height);
+						rrect->width,
+						rrect->height);
 
 		(*shminfo).shmid = shmget(IPC_PRIVATE,
 					(*image)->bytes_per_line *
@@ -184,7 +183,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 			return 12;
 		}
 
-		XShmGetImage(pdata->dpy, pdata->specs.root, (*image), brwin->rrect.x, brwin->rrect.y, AllPlanes);
+		XShmGetImage(pdata->dpy, pdata->specs.root, (*image), rrect->x, rrect->y, AllPlanes);
 	}
 
 	rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
@@ -192,8 +191,8 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 				NULL,
 				pdata->enc_data->x_offset,
 				pdata->enc_data->y_offset,
-				brwin->rrect.width,
-				brwin->rrect.height,
+				rrect->width,
+				rrect->height,
 				pdata->args.no_quick_subsample,
 				pdata->specs.depth);
 
@@ -417,8 +416,8 @@ void *rmdGetFrame(ProgData *pdata) {
 				if (!pdata->args.full_shots) { 
 					rmdRectInsert(&pdata->rect_root, &mouse_pos_temp);
 				} else if (d_buff) {
-					unsigned char *back_buff=
-								(img_sel)?((unsigned char*)image->data):
+					unsigned char *back_buff= img_sel ?
+								((unsigned char*)image->data) :
 								((unsigned char*)image_back->data);
 
 					mark_buffer_area(
@@ -431,6 +430,7 @@ void *rmdGetFrame(ProgData *pdata) {
 				}
 			}
 		}
+
 		if (pdata->args.follow_mouse) {
 			rmdMoveCaptureArea(	&pdata->brwin.rrect,
 						mouse_pos_abs.x + pdata->args.xfixes_cursor ? xcim->xhot : 0,
