@@ -1,3 +1,2 @@
-1)write a TODO
-2)?
-3)Profit!
+* add --unmute option to unmute the sound capture device if required,
+  restoring the mute after finished capturing if it started muted.
