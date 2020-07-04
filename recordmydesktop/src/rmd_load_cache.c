@@ -89,13 +89,13 @@ static int rmdReadZF(void * buffer, size_t size, size_t nmemb, FILE *ucfp, gzFil
 	   (ifp == NULL && ucfp == NULL))
 		return -1;
 	else if (ucfp != NULL) {
-		return (size * fread(buffer, size, nmemb, ucfp));
+		return size * fread(buffer, size, nmemb, ucfp);
 	} else
 		return gzread(ifp, buffer, size * nmemb);
 }
 
 static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp) {
-	int index_entry_size = sizeof(u_int32_t);
+	int	index_entry_size = sizeof(u_int32_t);
 
 	if (frame->header->Ynum > 0) {
 		if (rmdReadZF(	frame->YBlocks,
@@ -170,10 +170,10 @@ void *rmdLoadCache(ProgData *pdata) {
 	CachedFrame	frame;
 	int		nth_cache = 1,
 			audio_end = 0,
-			extra_frames = 0,//total number of duplicated frames
-			missing_frames = 0,//if this is found >0 current run will not load
-							//a frame but it will proccess the previous
-			thread_exit = 0,//0 success, -1 couldn't find files,1 couldn't remove
+			extra_frames = 0,	//total number of duplicated frames
+			missing_frames = 0,	//if this is found >0 current run will not load
+						//a frame but it will proccess the previous
+			thread_exit = 0,	//0 success, -1 couldn't find files,1 couldn't remove
 			blocknum_x = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
 			blocknum_y = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH,
 			blockszy = Y_UNIT_BYTES,//size of y plane block in bytes
@@ -246,9 +246,9 @@ void *rmdLoadCache(ProgData *pdata) {
 				if ( (frame.header->Ynum <= blocknum_x * blocknum_y) &&
 					(frame.header->Unum <= blocknum_x * blocknum_y) &&
 					(frame.header->Vnum <= blocknum_x * blocknum_y) &&
-					(!rmdReadFrame(	&frame,
+					!rmdReadFrame(	&frame,
 							(pdata->args.zerocompression ? ucfp : NULL),
-							(pdata->args.zerocompression ? NULL : ifp)))
+							(pdata->args.zerocompression ? NULL : ifp))
 						) {
 
 						//load the blocks for each buffer

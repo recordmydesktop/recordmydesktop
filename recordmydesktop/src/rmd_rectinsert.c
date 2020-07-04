@@ -490,7 +490,6 @@ void rmdClearList(RectArea **root) {
 		while (temp->next!=NULL) {
 			temp=temp->next;
 			free(temp->prev);
-
 		}
 		free(temp);
 		*root=NULL;

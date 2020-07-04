@@ -157,7 +157,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 				brwin->rrect.width,
 				brwin->rrect.height);
 	} else {
-		(*image)=XShmCreateImage(	pdata->dpy,
+		(*image) = XShmCreateImage(	pdata->dpy,
 						pdata->specs.visual,
 						pdata->specs.depth,
 						ZPixmap,
@@ -167,7 +167,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 						brwin->rrect.height);
 
 		(*shminfo).shmid = shmget(IPC_PRIVATE,
-					(*image)->bytes_per_line*
+					(*image)->bytes_per_line *
 					(*image)->height,
 					IPC_CREAT|0777);
 
@@ -176,10 +176,10 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 			return 12;
 		}
 
-		(*shminfo).shmaddr=(*image)->data=shmat((*shminfo).shmid, NULL,0);
+		(*shminfo).shmaddr = (*image)->data = shmat((*shminfo).shmid, NULL,0);
 		(*shminfo).readOnly = False;
 
-		if (!XShmAttach(pdata->dpy,shminfo)) {
+		if (!XShmAttach(pdata->dpy, shminfo)) {
 			fprintf(stderr,"Failed to attach shared memory to proccess.\n");
 			return 12;
 		}
@@ -281,7 +281,7 @@ void *rmdGetFrame(ProgData *pdata) {
 	XShmSegmentInfo shminfo, shminfo_back;	//info structure for the image above.
 	int init_img1 = 0, init_img2 = 0, img_sel, d_buff;
 
-	img_sel=d_buff=pdata->args.full_shots;
+	img_sel = d_buff = pdata->args.full_shots;
 
 	if ((init_img1 = rmdFirstFrame(pdata,&image,&shminfo) != 0)) {
 		if (pdata->args.encOnTheFly) {
@@ -316,7 +316,7 @@ void *rmdGetFrame(ProgData *pdata) {
 	}
 
 	if (!pdata->args.noframe) {
-		pdata->shaped_w=rmdFrameInit(	pdata->dpy,
+		pdata->shaped_w = rmdFrameInit(	pdata->dpy,
 						pdata->specs.screen,
 						pdata->specs.root,
 						pdata->brwin.rrect.x,
@@ -324,13 +324,13 @@ void *rmdGetFrame(ProgData *pdata) {
 						pdata->brwin.rrect.width,
 						pdata->brwin.rrect.height);
 
-		XSelectInput(pdata->dpy,pdata->shaped_w,ExposureMask);
+		XSelectInput(pdata->dpy, pdata->shaped_w, ExposureMask);
 	}
 
-	mouse_pos_abs.x=mouse_pos_temp.x=0;
-	mouse_pos_abs.y=mouse_pos_temp.y=0;
-	mouse_pos_abs.width=mouse_pos_temp.width=pdata->dummy_p_size;
-	mouse_pos_abs.height=mouse_pos_temp.height=pdata->dummy_p_size;
+	mouse_pos_abs.x = mouse_pos_temp.x = 0;
+	mouse_pos_abs.y = mouse_pos_temp.y = 0;
+	mouse_pos_abs.width = mouse_pos_temp.width = pdata->dummy_p_size;
+	mouse_pos_abs.height = mouse_pos_temp.height = pdata->dummy_p_size;
 	
 	//This is the the place where we call XSelectInput
 	//and arrange so that we listen for damage on all 
@@ -462,31 +462,32 @@ void *rmdGetFrame(ProgData *pdata) {
 			rmdBlocksFromList(	&pdata->rect_root,
 						temp_brwin.rrect.x,
 						temp_brwin.rrect.y,
-						pdata->enc_data->yuv.y_width/Y_UNIT_WIDTH,
-						pdata->enc_data->yuv.y_height/Y_UNIT_WIDTH);
+						pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
+						pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH);
 
 			pthread_mutex_unlock(&pdata->yuv_mutex);
 		} else {
-			unsigned char *front_buff=(!img_sel)?((unsigned char*)image->data):
+			unsigned char *front_buff = !img_sel ?	((unsigned char*)image->data):
 								((unsigned char*)image_back->data);
-			unsigned char *back_buff=(!d_buff)?NULL:((img_sel)?
+			unsigned char *back_buff = !d_buff ? NULL : (img_sel ?
 								((unsigned char*)image->data):
 								((unsigned char*)image_back->data));
 
 			if (!pdata->args.noshared)
-				XShmGetImage(pdata->dpy,pdata->specs.root,
-							((!img_sel)?image:image_back),
-							(temp_brwin.rrect.x),
-							(temp_brwin.rrect.y),AllPlanes);
+				XShmGetImage(	pdata->dpy,
+						pdata->specs.root,
+						((!img_sel) ? image : image_back),
+						temp_brwin.rrect.x,
+						temp_brwin.rrect.y, AllPlanes);
 
 			if (pdata->args.noshared)
-				rmdGetZPixmap( pdata->dpy,
-							   pdata->specs.root,
-							   image->data,
-							   temp_brwin.rrect.x,
-							   temp_brwin.rrect.y,
-							   temp_brwin.rrect.width,
-							   temp_brwin.rrect.height);
+				rmdGetZPixmap(	pdata->dpy,
+						pdata->specs.root,
+						image->data,
+						temp_brwin.rrect.x,
+						temp_brwin.rrect.y,
+						temp_brwin.rrect.width,
+						temp_brwin.rrect.height);
 
 			pthread_mutex_lock(&pdata->yuv_mutex);
 			for(int i = 0; i < blocknum_x * blocknum_y; i++)
@@ -507,21 +508,23 @@ void *rmdGetFrame(ProgData *pdata) {
 
 		if (pdata->args.xfixes_cursor || pdata->args.have_dummy_cursor) {
 			int mouse_xoffset, mouse_yoffset;
+
 			//avoid segfaults
 			clip_dummy_pointer_area(&mouse_pos_abs, &temp_brwin.rrect, &mouse_pos_temp);
-			mouse_xoffset=mouse_pos_temp.x-mouse_pos_abs.x;
-			mouse_yoffset=mouse_pos_temp.y-mouse_pos_abs.y;
-			if ((mouse_xoffset<0) || (mouse_xoffset>mouse_pos_abs.width))
-				mouse_xoffset=0;
+			mouse_xoffset = mouse_pos_temp.x - mouse_pos_abs.x;
+			mouse_yoffset = mouse_pos_temp.y - mouse_pos_abs.y;
 
-			if ((mouse_yoffset<0) || (mouse_yoffset>mouse_pos_abs.height))
-				mouse_yoffset=0;
+			if ((mouse_xoffset < 0) || (mouse_xoffset > mouse_pos_abs.width))
+				mouse_xoffset = 0;
+
+			if ((mouse_yoffset < 0) || (mouse_yoffset > mouse_pos_abs.height))
+				mouse_yoffset = 0;
 
 			//draw the cursor
-			if (	(mouse_pos_temp.x>=0)&&
-				(mouse_pos_temp.y>=0)&&
-				(mouse_pos_temp.width>0)&&
-				(mouse_pos_temp.height>0)) {
+			if (	(mouse_pos_temp.x >= 0) &&
+				(mouse_pos_temp.y >= 0) &&
+				(mouse_pos_temp.width > 0) &&
+				(mouse_pos_temp.height > 0)) {
 
 					if (pdata->args.xfixes_cursor) {
 						rmdXFixesPointerToYuv(
@@ -554,7 +557,8 @@ void *rmdGetFrame(ProgData *pdata) {
 					//on the currently front buffer (which 
 					//will be the back buffer next time it's 
 					//used) 
-					unsigned char *front_buff = (!img_sel)?((unsigned char*)image->data):
+					unsigned char *front_buff = !img_sel ?
+								((unsigned char*)image->data) :
 								((unsigned char*)image_back->data);
 
 					mark_buffer_area(
