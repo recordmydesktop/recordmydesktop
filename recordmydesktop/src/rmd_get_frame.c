@@ -282,7 +282,7 @@ void *rmdGetFrame(ProgData *pdata) {
 
 	img_sel = d_buff = pdata->args.full_shots;
 
-	if ((init_img1 = rmdFirstFrame(pdata,&image,&shminfo) != 0)) {
+	if ((init_img1 = rmdFirstFrame(pdata, &image, &shminfo) != 0)) {
 		if (pdata->args.encOnTheFly) {
 			if (remove(pdata->args.filename)) {
 				perror("Error while removing file:\n");

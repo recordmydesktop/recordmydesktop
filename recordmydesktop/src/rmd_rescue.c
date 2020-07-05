@@ -75,10 +75,10 @@ int rmdRescue(const char *path) {
 	if (rmdReadSpecsFile(&pdata))
 		return 1;
 
-	width=((pdata.brwin.rrect.width + 15) >>4)<<4;
-	height=((pdata.brwin.rrect.height + 15) >>4)<<4;
-	offset_x=((width-pdata.brwin.rrect.width)/2)&~1;
-	offset_y=((height-pdata.brwin.rrect.height)/2)&~1;
+	width = ((pdata.brwin.rrect.width + 15) >> 4) << 4;
+	height = ((pdata.brwin.rrect.height + 15) >> 4) << 4;
+	offset_x = ((width - pdata.brwin.rrect.width) / 2) & ~1;
+	offset_y = ((height - pdata.brwin.rrect.height) / 2) & ~1;
 
 	enc_data.yuv.y=(unsigned char *)malloc(height*width);
 	enc_data.yuv.u=(unsigned char *)malloc(height*width/4);

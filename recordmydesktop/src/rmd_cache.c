@@ -137,10 +137,10 @@ void rmdInitCacheData(ProgData *pdata, EncData *enc_data_t, CacheData *cache_dat
 
 	//we set the buffer only since there's
 	//no need to initialize the encoder from now.
-	width = ((pdata->brwin.rrect.width + 15) >>4)<<4;
-	height = ((pdata->brwin.rrect.height + 15) >>4)<<4;
-	offset_x = ((width-pdata->brwin.rrect.width)/2)&~1;
-	offset_y = ((height-pdata->brwin.rrect.height)/2)&~1;
+	width = ((pdata->brwin.rrect.width + 15) >> 4) << 4;
+	height = ((pdata->brwin.rrect.height + 15) >> 4) << 4;
+	offset_x = ((width - pdata->brwin.rrect.width) / 2) & ~1;
+	offset_y = ((height - pdata->brwin.rrect.height) / 2) & ~1;
 
 	(pdata)->enc_data = enc_data_t;
 
