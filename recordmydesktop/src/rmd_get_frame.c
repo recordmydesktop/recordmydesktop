@@ -124,37 +124,14 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 	const XRectangle	*rrect = &pdata->brwin.rrect;
 
 	if ((pdata->args.noshared)) {
-		char	*pxl_data;
-		size_t	nbytes;
-
-		/* XXX: this was blindly relocated from rmdSetBRWindow(),
-		 * I'm unclear on why there's this alignment crap happening,
-		 * but just wanted to to move nbytes out to the one place it's
-		 * used.
-		 */
-		nbytes =	(((rrect->width + 15) >> 4) << 4) *
-				(((rrect->height + 15) >> 4) << 4) *
-				((pdata->specs.depth == 16) ? 2 : 4);
-
-		pxl_data = (char *)malloc(nbytes);
-
-		(*image) = XCreateImage(	pdata->dpy,
-						pdata->specs.visual,
-						pdata->specs.depth,
-						ZPixmap,
-						0,
-						pxl_data,
-						rrect->width,
-						rrect->height,
-						8,
-						0);
-
-		rmdGetZPixmap(	pdata->dpy,pdata->specs.root,
-				(*image)->data,
-				rrect->x,
-				rrect->y,
-				rrect->width,
-				rrect->height);
+		(*image) = XGetImage(	pdata->dpy,
+					pdata->specs.root,
+					rrect->x,
+					rrect->y,
+					rrect->width,
+					rrect->height,
+					AllPlanes,
+					ZPixmap);
 	} else {
 		(*image) = XShmCreateImage(	pdata->dpy,
 						pdata->specs.visual,
