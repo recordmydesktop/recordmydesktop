@@ -86,7 +86,6 @@ int rmdGetZPixmapSHM(	Display *dpy,
 
 	xShmGetImageReply reply;
 	xShmGetImageReq *request = NULL;
-	long nbytes;
 
 	LockDisplay(dpy);
 	GetReq(ShmGetImage, request);
@@ -111,8 +110,6 @@ int rmdGetZPixmapSHM(	Display *dpy,
 		return 1;
 	}
 
-	nbytes = (long)reply.length << 2;
-	_XReadPad(dpy, data, nbytes);
 	UnlockDisplay(dpy);
 	SyncHandle();
 
