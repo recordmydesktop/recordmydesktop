@@ -148,7 +148,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 						rrect->height,
 						8,
 						0);
-		XInitImage(*image);
+
 		rmdGetZPixmap(	pdata->dpy,pdata->specs.root,
 				(*image)->data,
 				rrect->x,
