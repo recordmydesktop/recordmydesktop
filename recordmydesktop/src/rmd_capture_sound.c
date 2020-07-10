@@ -144,22 +144,17 @@ void *rmdCaptureSound(ProgData *pdata) {
 #endif
 		//queue the new buffer
 		pthread_mutex_lock(&pdata->sound_buffer_mutex);
-		tmp=pdata->sound_buffer;
-		if (pdata->sound_buffer==NULL)
-				pdata->sound_buffer=newbuf;
+		tmp = pdata->sound_buffer;
+		if (!tmp)
+				pdata->sound_buffer = newbuf;
 		else {
-			while (tmp->next!=NULL)
-				tmp=tmp->next;
+			while (tmp->next != NULL)
+				tmp = tmp->next;
 
-			tmp->next=newbuf;
+			tmp->next = newbuf;
 		}
-		pthread_mutex_unlock(&pdata->sound_buffer_mutex);
-
-
-		//signal that there are data to be proccessed
-		pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
 		pthread_cond_signal(&pdata->sound_data_read);
-		pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
+		pthread_mutex_unlock(&pdata->sound_buffer_mutex);
 	}
 #ifdef HAVE_LIBASOUND
 	snd_pcm_close(pdata->sound_handle);
