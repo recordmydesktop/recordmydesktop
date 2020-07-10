@@ -42,20 +42,18 @@ void rmdUpdateImage(	Display * dpy,
 			RectArea **root,
 			BRWindow *brwin,
 			EncData *enc,
-			char *datatemp,
+			Image *image,
 			int noshmem,
-			XShmSegmentInfo *shminfo,
 			int shm_opcode,
 			int no_quick_subsample){
 
-	unsigned char *dtap=(unsigned char*)datatemp;
 	RectArea *temp;
 
 	for (temp = *root; temp; temp = temp->next) {
 		if (noshmem) {
 			rmdGetZPixmap(	dpy,
 					specs->root,
-					datatemp,
+					image->ximage->data,
 					temp->rect.x,
 					temp->rect.y,
 					temp->rect.width,
@@ -63,19 +61,17 @@ void rmdUpdateImage(	Display * dpy,
 		} else {
 			rmdGetZPixmapSHM(	dpy,
 						specs->root,
-						shminfo,
+						&image->shm_info,
 						shm_opcode,
-						datatemp,
+						image->ximage->data,
 						temp->rect.x,
 						temp->rect.y,
 						temp->rect.width,
 						temp->rect.height);
 		}
-
-
 		rmdUpdateYuvBuffer(
 			yuv,
-			dtap,
+			(unsigned char *)image->ximage->data,
 			NULL,
 			temp->rect.x - brwin->rrect.x + enc->x_offset,
 			temp->rect.y - brwin->rrect.y + enc->y_offset,

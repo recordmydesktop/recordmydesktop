@@ -31,6 +31,7 @@
 #include <pthread.h>
 #include <zlib.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
 #include <theora/theora.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
@@ -87,6 +88,11 @@ typedef int boolean;
 
 // Forward declarations 
 typedef struct _ProgData ProgData;
+
+typedef struct _Image {
+	XImage		*ximage;
+	XShmSegmentInfo	shm_info;
+}Image;
 
 typedef struct _DisplaySpecs{   //this struct holds some basic information
 	int screen;				 //about the display,needed mostly for

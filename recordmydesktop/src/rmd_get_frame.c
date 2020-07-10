@@ -120,51 +120,56 @@ static void mark_buffer_area(	unsigned char *data,
 
 //besides taking the first screenshot, this functions primary purpose is to 
 //initialize the structures and memory.
-static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shminfo) {
+static int rmdFirstFrame(ProgData *pdata, Image *image) {
 	const XRectangle	*rrect = &pdata->brwin.rrect;
 
-	if ((pdata->args.noshared)) {
-		(*image) = XGetImage(	pdata->dpy,
-					pdata->specs.root,
-					rrect->x,
-					rrect->y,
-					rrect->width,
-					rrect->height,
-					AllPlanes,
-					ZPixmap);
+	if (pdata->args.noshared) {
+		image->ximage = XGetImage(	pdata->dpy,
+						pdata->specs.root,
+						rrect->x,
+						rrect->y,
+						rrect->width,
+						rrect->height,
+						AllPlanes,
+						ZPixmap);
 	} else {
-		(*image) = XShmCreateImage(	pdata->dpy,
+		image->ximage = XShmCreateImage(pdata->dpy,
 						pdata->specs.visual,
 						pdata->specs.depth,
 						ZPixmap,
 						NULL,
-						shminfo,
+						&image->shm_info,
 						rrect->width,
 						rrect->height);
 
-		(*shminfo).shmid = shmget(IPC_PRIVATE,
-					(*image)->bytes_per_line *
-					(*image)->height,
-					IPC_CREAT|0777);
+		image->shm_info.shmid = shmget(	IPC_PRIVATE,
+						image->ximage->bytes_per_line *
+						image->ximage->height,
+						IPC_CREAT|0777);
 
-		if ((*shminfo).shmid == -1) {
+		if (image->shm_info.shmid == -1) {
 			fprintf(stderr, "Failed to obtain Shared Memory segment!\n");
 			return 12;
 		}
 
-		(*shminfo).shmaddr = (*image)->data = shmat((*shminfo).shmid, NULL,0);
-		(*shminfo).readOnly = False;
+		image->shm_info.shmaddr = image->ximage->data = shmat(image->shm_info.shmid, NULL, 0);
+		image->shm_info.readOnly = False;
 
-		if (!XShmAttach(pdata->dpy, shminfo)) {
+		if (!XShmAttach(pdata->dpy, &image->shm_info)) {
 			fprintf(stderr, "Failed to attach shared memory to proccess.\n");
 			return 12;
 		}
 
-		XShmGetImage(pdata->dpy, pdata->specs.root, (*image), rrect->x, rrect->y, AllPlanes);
+		XShmGetImage(	pdata->dpy,
+				pdata->specs.root,
+				image->ximage,
+				rrect->x,
+				rrect->y,
+				AllPlanes);
 	}
 
 	rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
-				((unsigned char*)((*image))->data),
+				(unsigned char *)image->ximage->data,
 				NULL,
 				pdata->enc_data->x_offset,
 				pdata->enc_data->y_offset,
@@ -252,14 +257,13 @@ void *rmdGetFrame(ProgData *pdata) {
 	BRWindow temp_brwin;
 	Window root_ret, child_ret; //Frame
 	XFixesCursorImage *xcim = NULL;
-	XImage *image = NULL, *image_back = NULL;	//the image that holds
+	Image image = {}, image_back = {};	//the image that holds
 						//the current full screenshot
-	XShmSegmentInfo shminfo, shminfo_back;	//info structure for the image above.
 	int init_img1 = 0, init_img2 = 0, img_sel, d_buff;
 
 	img_sel = d_buff = pdata->args.full_shots;
 
-	if ((init_img1 = rmdFirstFrame(pdata, &image, &shminfo) != 0)) {
+	if ((init_img1 = rmdFirstFrame(pdata, &image) != 0)) {
 		if (pdata->args.encOnTheFly) {
 			if (remove(pdata->args.filename)) {
 				perror("Error while removing file:\n");
@@ -275,7 +279,7 @@ void *rmdGetFrame(ProgData *pdata) {
 	}
 
 	if (d_buff) {
-		if ((init_img2 = rmdFirstFrame(pdata, &image_back, &shminfo_back) != 0)) {
+		if ((init_img2 = rmdFirstFrame(pdata, &image_back) != 0)) {
 			if (pdata->args.encOnTheFly) {
 				if (remove(pdata->args.filename)) {
 					perror("Error while removing file:\n");
@@ -394,8 +398,8 @@ void *rmdGetFrame(ProgData *pdata) {
 					rmdRectInsert(&pdata->rect_root, &mouse_pos_temp);
 				} else if (d_buff) {
 					unsigned char *back_buff= img_sel ?
-								((unsigned char*)image->data) :
-								((unsigned char*)image_back->data);
+								((unsigned char*)image.ximage->data) :
+								((unsigned char*)image_back.ximage->data);
 
 					mark_buffer_area(
 						back_buff,
@@ -430,9 +434,8 @@ void *rmdGetFrame(ProgData *pdata) {
 					&pdata->rect_root,
 					&temp_brwin,
 					pdata->enc_data,
-					image->data,
+					&image,
 					pdata->args.noshared,
-					&shminfo,
 					pdata->shm_opcode,
 					pdata->args.no_quick_subsample);
 
@@ -444,27 +447,28 @@ void *rmdGetFrame(ProgData *pdata) {
 
 			pthread_mutex_unlock(&pdata->yuv_mutex);
 		} else {
-			unsigned char *front_buff = !img_sel ?	((unsigned char*)image->data):
-								((unsigned char*)image_back->data);
+			unsigned char *front_buff = !img_sel ?	((unsigned char*)image.ximage->data):
+								((unsigned char*)image_back.ximage->data);
 			unsigned char *back_buff = !d_buff ? NULL : (img_sel ?
-								((unsigned char*)image->data):
-								((unsigned char*)image_back->data));
+								((unsigned char*)image.ximage->data):
+								((unsigned char*)image_back.ximage->data));
 
-			if (!pdata->args.noshared)
-				XShmGetImage(	pdata->dpy,
-						pdata->specs.root,
-						((!img_sel) ? image : image_back),
-						temp_brwin.rrect.x,
-						temp_brwin.rrect.y, AllPlanes);
-
-			if (pdata->args.noshared)
+			if (pdata->args.noshared) {
 				rmdGetZPixmap(	pdata->dpy,
 						pdata->specs.root,
-						image->data,
+						image.ximage->data,
 						temp_brwin.rrect.x,
 						temp_brwin.rrect.y,
 						temp_brwin.rrect.width,
 						temp_brwin.rrect.height);
+			} else {
+				XShmGetImage(	pdata->dpy,
+						pdata->specs.root,
+						((!img_sel) ? image.ximage : image_back.ximage),
+						temp_brwin.rrect.x,
+						temp_brwin.rrect.y,
+						AllPlanes);
+			}
 
 			pthread_mutex_lock(&pdata->yuv_mutex);
 			for(int i = 0; i < blocknum_x * blocknum_y; i++)
@@ -535,8 +539,8 @@ void *rmdGetFrame(ProgData *pdata) {
 					//will be the back buffer next time it's 
 					//used) 
 					unsigned char *front_buff = !img_sel ?
-								((unsigned char*)image->data) :
-								((unsigned char*)image_back->data);
+								((unsigned char*)image.ximage->data) :
+								((unsigned char*)image_back.ximage->data);
 
 					mark_buffer_area(
 						front_buff,
@@ -576,13 +580,13 @@ void *rmdGetFrame(ProgData *pdata) {
 	pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
 
 	if (!pdata->args.noshared) {
-		XShmDetach (pdata->dpy, &shminfo);
-		shmdt (shminfo.shmaddr);
-		shmctl (shminfo.shmid, IPC_RMID, 0);
+		XShmDetach(pdata->dpy, &image.shm_info);
+		shmdt(image.shm_info.shmaddr);
+		shmctl(image.shm_info.shmid, IPC_RMID, 0);
 		if (d_buff) {
-			XShmDetach (pdata->dpy, &shminfo_back);
-			shmdt (shminfo_back.shmaddr);
-			shmctl (shminfo_back.shmid, IPC_RMID, 0);
+			XShmDetach(pdata->dpy, &image_back.shm_info);
+			shmdt(image_back.shm_info.shmaddr);
+			shmctl(image_back.shm_info.shmid, IPC_RMID, 0);
 		}
 	}
 

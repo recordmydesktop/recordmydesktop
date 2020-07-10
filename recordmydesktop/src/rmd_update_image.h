@@ -61,9 +61,8 @@ void rmdUpdateImage(Display * dpy,
                     RectArea **root,
                     BRWindow *brwin,
                     EncData *enc,
-                    char *datatemp,
+                    Image *image,
                     int noshmem,
-                    XShmSegmentInfo *shminfo,
                     int shm_opcode,
                     int no_quick_subsample);
 
