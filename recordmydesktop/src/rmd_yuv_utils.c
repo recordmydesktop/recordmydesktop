@@ -205,12 +205,13 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 					*_vg = Vg, *_vb = Vb;					\
 	register u_int##__depth__##_t	*datapi = (u_int##__depth__##_t *)data,			\
 					*datapi_next = NULL;					\
+	int				w_odd = width_tm % 2, h_odd = height_tm % 2;		\
 												\
 	if (sampling == __PXL_AVERAGE)								\
 		datapi_next = datapi + width_tm;						\
 												\
-	for (int k = 0; k < height_tm; k += 2) {						\
-		for (int i = 0; i < width_tm; i += 2) {						\
+	for (int k = 0; k < height_tm - h_odd; k += 2) {					\
+		for (int i = 0; i < width_tm - w_odd; i += 2) {					\
 			UPDATE_A_UV_PIXEL(	yuv_U,						\
 						yuv_V,						\
 						t_val,						\
@@ -227,12 +228,12 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 			yuv_V++;								\
 		}										\
 												\
-		yuv_U += ((yuv)->y_stride - width_tm) >> 1;					\
-		yuv_V += ((yuv)->y_stride - width_tm) >> 1;					\
+		yuv_U += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;			\
+		yuv_V += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;			\
 												\
-		datapi += width_tm;								\
+		datapi += width_tm + w_odd;							\
 		if (sampling == __PXL_AVERAGE)							\
-			datapi_next += width_tm;						\
+			datapi_next += width_tm + w_odd;					\
 	}											\
 }
 
@@ -290,13 +291,14 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 					*datapi_next = NULL,					\
 					*datapi_back = (u_int##__depth__##_t *)data_back,	\
 					*datapi_back_next = NULL;				\
+	int				w_odd = width_tm % 2, h_odd = height_tm % 2;		\
 												\
 	if (sampling == __PXL_AVERAGE) {							\
 		datapi_next = datapi + width_tm;						\
 		datapi_back_next = datapi_back + width_tm;					\
 												\
-		for (int k = 0; k < height_tm; k += 2) {					\
-			for (int i = 0; i < width_tm; i += 2) {					\
+		for (int k = 0; k < height_tm - h_odd; k += 2) {				\
+			for (int i = 0; i < width_tm - w_odd; i += 2) {				\
 				if (	(*datapi != *datapi_back ||				\
 					(*(datapi + 1) != *(datapi_back + 1)) ||		\
 					(*datapi_next != *datapi_back_next) ||			\
@@ -324,17 +326,17 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				yuv_V++;							\
 			}									\
 												\
-			yuv_U += ((yuv)->y_stride - width_tm) >> 1;				\
-			yuv_V += ((yuv)->y_stride - width_tm) >> 1;				\
+			yuv_U += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
+			yuv_V += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
 												\
-			datapi += width_tm;							\
-			datapi_back += width_tm;						\
-			datapi_next += width_tm;						\
-			datapi_back_next += width_tm;						\
+			datapi += width_tm + w_odd;						\
+			datapi_back += width_tm + w_odd;					\
+			datapi_next += width_tm + w_odd;					\
+			datapi_back_next += width_tm + w_odd;					\
 		}										\
 	} else {										\
-		for (int k = 0; k < height_tm; k += 2) {					\
-			for (int i = 0; i < width_tm; i += 2) {					\
+		for (int k = 0; k < height_tm - h_odd; k += 2) {				\
+			for (int i = 0; i < width_tm - w_odd; i += 2) {				\
 				if ((*datapi != *datapi_back)) {				\
 					UPDATE_A_UV_PIXEL(	yuv_U,				\
 								yuv_V,				\
@@ -356,11 +358,11 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				yuv_V++;							\
 			}									\
 												\
-			yuv_U += ((yuv)->y_stride - width_tm) >> 1;				\
-			yuv_V += ((yuv)->y_stride - width_tm) >> 1;				\
+			yuv_U += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
+			yuv_V += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
 												\
-			datapi += width_tm;							\
-			datapi_back += width_tm;						\
+			datapi += width_tm + w_odd;						\
+			datapi_back += width_tm + w_odd;					\
 		}										\
 	}											\
 }
