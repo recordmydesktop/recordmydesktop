@@ -387,8 +387,7 @@ int rmdRectInsert(RectArea **root,XRectangle *xrect) {
 								total_insertions--;
 								temp->next->prev=temp->prev;
 								temp->prev->next=temp->next;
-								total_insertions+=rmdRectInsert(&temp->next,
-																xrect);
+								total_insertions+=rmdRectInsert(&temp->next, xrect);
 							}
 							free(temp);
 						}

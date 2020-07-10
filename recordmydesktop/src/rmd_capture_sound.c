@@ -87,10 +87,9 @@ void *rmdCaptureSound(ProgData *pdata) {
 			pthread_mutex_lock(&pdata->pause_mutex);
 			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
 			pthread_mutex_unlock(&pdata->pause_mutex);
-			pdata->sound_handle =
-				rmdOpenDev(pdata->args.device,
-						   pdata->args.channels,
-						   pdata->args.frequency);
+			pdata->sound_handle = rmdOpenDev(	pdata->args.device,
+								pdata->args.channels,
+								pdata->args.frequency);
 			if (pdata->sound_handle < 0) {
 				fprintf(stderr,"Couldn't reopen sound device. Exiting\n");
 				pdata->running = FALSE;
@@ -103,47 +102,45 @@ void *rmdCaptureSound(ProgData *pdata) {
 		//create new buffer
 		newbuf = (SndBuffer *)malloc(sizeof(SndBuffer));
 #ifdef HAVE_LIBASOUND
-		newbuf->data = (signed char *)malloc(frames*pdata->sound_framesize);
+		newbuf->data = (signed char *)malloc(frames * pdata->sound_framesize);
 #else
-		newbuf->data = (signed char *)malloc(((pdata->args.buffsize<<1) * pdata->args.channels));
+		newbuf->data = (signed char *)malloc((pdata->args.buffsize << 1) * pdata->args.channels);
 #endif
 		newbuf->next = NULL;
 
 		//read data into new buffer
 #ifdef HAVE_LIBASOUND
 		while (sret<frames) {
-			int temp_sret=snd_pcm_readi(pdata->sound_handle,
-								newbuf->data+pdata->sound_framesize*sret,
-								frames-sret);
-			if (temp_sret==-EPIPE) {
-				fprintf(stderr,"%s: Overrun occurred.\n",
-							   snd_strerror(temp_sret));
+			int temp_sret = snd_pcm_readi(	pdata->sound_handle,
+							newbuf->data + pdata->sound_framesize * sret,
+							frames-sret);
+			if (temp_sret == -EPIPE) {
+				fprintf(stderr,	"%s: Overrun occurred.\n",
+						snd_strerror(temp_sret));
 				snd_pcm_prepare(pdata->sound_handle);
-			} else if (temp_sret<0) {
-				fprintf(stderr,"An error occured while reading sound data:\n"
-							   " %s\n",
-							   snd_strerror(temp_sret));
+			} else if (temp_sret < 0) {
+				fprintf(stderr,	"An error occured while reading sound data:\n"
+						" %s\n",
+						snd_strerror(temp_sret));
 				snd_pcm_prepare(pdata->sound_handle);
 			} else
 				sret += temp_sret;
 		}
 #else
-		sret=0;
+		sret = 0;
 		//oss recording loop
 		do {
-			int temp_sret=read(pdata->sound_handle,
-							   &newbuf->data[sret],
-							   ((pdata->args.buffsize<<1)*
-								pdata->args.channels)-sret);
-			if (temp_sret<0) {
-				fprintf(stderr,"An error occured while reading from soundcard"
-							   "%s\n"
-							   "Error description:\n"
-							   "%s\n",pdata->args.device,strerror(errno));
+			int temp_sret = read(	pdata->sound_handle,
+						&newbuf->data[sret],
+						(pdata->args.buffsize << 1) *
+						pdata->args.channels)-sret;
+			if (temp_sret < 0) {
+				fprintf(stderr,	"An error occured while reading from soundcard"
+						"%s\nError description:\n%s\n",
+						pdata->args.device, strerror(errno));
 			} else
-				sret+=temp_sret;
-		} while (sret<((pdata->args.buffsize<<1)*
-					 pdata->args.channels));
+				sret += temp_sret;
+		} while (sret < (pdata->args.buffsize << 1) * pdata->args.channels);
 #endif
 		//queue the new buffer
 		pthread_mutex_lock(&pdata->sound_buffer_mutex);

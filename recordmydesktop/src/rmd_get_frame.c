@@ -148,7 +148,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 					IPC_CREAT|0777);
 
 		if ((*shminfo).shmid == -1) {
-			fprintf(stderr,"Failed to obtain Shared Memory segment!\n");
+			fprintf(stderr, "Failed to obtain Shared Memory segment!\n");
 			return 12;
 		}
 
@@ -156,7 +156,7 @@ static int rmdFirstFrame(ProgData *pdata, XImage **image, XShmSegmentInfo *shmin
 		(*shminfo).readOnly = False;
 
 		if (!XShmAttach(pdata->dpy, shminfo)) {
-			fprintf(stderr,"Failed to attach shared memory to proccess.\n");
+			fprintf(stderr, "Failed to attach shared memory to proccess.\n");
 			return 12;
 		}
 
@@ -264,7 +264,7 @@ void *rmdGetFrame(ProgData *pdata) {
 			if (remove(pdata->args.filename)) {
 				perror("Error while removing file:\n");
 			} else {
-				fprintf(stderr,	"SIGABRT received,file %s removed\n",
+				fprintf(stderr,	"SIGABRT received, file %s removed\n",
 						pdata->args.filename);
 			}
 		} else {
@@ -280,7 +280,7 @@ void *rmdGetFrame(ProgData *pdata) {
 				if (remove(pdata->args.filename)) {
 					perror("Error while removing file:\n");
 				} else{
-					fprintf(stderr,	"SIGABRT received,file %s removed\n",
+					fprintf(stderr,	"SIGABRT received, file %s removed\n",
 							pdata->args.filename);
 				}
 			} else {

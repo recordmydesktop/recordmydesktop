@@ -202,6 +202,5 @@ void rmdEventLoop(ProgData *pdata) {
 					inserts += rmdRectInsert(&pdata->rect_root,&xrect);
 			}
 		}
-
 	}
 }
