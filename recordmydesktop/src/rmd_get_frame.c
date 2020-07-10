@@ -366,7 +366,7 @@ void *rmdGetFrame(ProgData *pdata) {
 			} else {
 				XQueryPointer(	pdata->dpy,
 						pdata->specs.root,
-						&root_ret,&child_ret,
+						&root_ret, &child_ret,
 						(int *)&mouse_pos_abs.x,
 						(int *)&mouse_pos_abs.y,
 						(int *)&mouse_pos_rel.x,

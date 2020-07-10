@@ -132,20 +132,20 @@ void rmdInitEventsPolling(ProgData *pdata) {
 
 
 void rmdEventLoop(ProgData *pdata) {
-	int inserts=0;
+	int inserts = 0;
 
 	XEvent event;
 
 	while (XPending(pdata->dpy)) {
 		XNextEvent(pdata->dpy,&event);
 		if (event.type == KeyPress) {
-			XKeyEvent *e=(XKeyEvent *)(&event);
+			XKeyEvent *e = (XKeyEvent *)(&event);
 			if (e->keycode == pdata->pause_key.key) {
-				int i=0;
-				int found=0;
-				for (i=0;i<pdata->pause_key.modnum;i++) {
-					if (pdata->pause_key.mask[i]==e->state) {
-						found=1;
+				int i = 0;
+				int found = 0;
+				for (i=0; i < pdata->pause_key.modnum; i++) {
+					if (pdata->pause_key.mask[i] == e->state) {
+						found = 1;
 						break;
 					}
 				}
@@ -155,11 +155,11 @@ void rmdEventLoop(ProgData *pdata) {
 				}
 			}
 			if (e->keycode == pdata->stop_key.key) {
-				int i=0;
-				int found=0;
-				for (i=0;i<pdata->stop_key.modnum;i++) {
-					if (pdata->stop_key.mask[i]==e->state) {
-						found=1;
+				int i = 0;
+				int found = 0;
+				for (i = 0; i < pdata->stop_key.modnum; i++) {
+					if (pdata->stop_key.mask[i] == e->state) {
+						found = 1;
 						break;
 					}
 				}
@@ -170,7 +170,7 @@ void rmdEventLoop(ProgData *pdata) {
 			}
 		} else if (event.type == Expose) {
 			
-			if (event.xexpose.count!=0)
+			if (event.xexpose.count != 0)
 				continue;
 			else if (!pdata->args.noframe) {
 				rmdDrawFrame(	pdata->dpy,
@@ -178,7 +178,6 @@ void rmdEventLoop(ProgData *pdata) {
 						pdata->shaped_w,
 						pdata->brwin.rrect.width,
 						pdata->brwin.rrect.height);
-				
 			}
 
 		} else if (!pdata->args.full_shots) {
@@ -190,7 +189,7 @@ void rmdEventLoop(ProgData *pdata) {
 								event.xcreatewindow.window,
 								&attribs)) {
 
-					if (!attribs.override_redirect&& attribs.depth==pdata->specs.depth)
+					if (!attribs.override_redirect && attribs.depth == pdata->specs.depth)
 						XDamageCreate(	pdata->dpy,
 								event.xcreatewindow.window,
 								XDamageReportRawRectangles);

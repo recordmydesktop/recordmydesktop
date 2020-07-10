@@ -56,10 +56,10 @@
 * \retval -10 Grouping the two rects is possible
 *
 */
-static int rmdCollideRects(XRectangle *xrect1,
-						   XRectangle *xrect2,
-						   XRectangle xrect_return[],
-						   int *nrects) {
+static int rmdCollideRects(	const XRectangle *xrect1,
+				const XRectangle *xrect2,
+				XRectangle xrect_return[],
+				int *nrects) {
 	if ((xrect1->x>=xrect2->x)&&
 		(xrect1->x+xrect1->width<=xrect2->x+xrect2->width)&&
 		(xrect1->y>=xrect2->y)&&
