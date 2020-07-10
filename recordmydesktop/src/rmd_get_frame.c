@@ -154,6 +154,7 @@ static int rmdFirstFrame(ProgData *pdata, Image *image) {
 
 		image->shm_info.shmaddr = image->ximage->data = shmat(image->shm_info.shmid, NULL, 0);
 		image->shm_info.readOnly = False;
+		shmctl(image->shm_info.shmid, IPC_RMID, NULL);
 
 		if (!XShmAttach(pdata->dpy, &image->shm_info)) {
 			fprintf(stderr, "Failed to attach shared memory to proccess.\n");
@@ -582,11 +583,9 @@ void *rmdGetFrame(ProgData *pdata) {
 	if (!pdata->args.noshared) {
 		XShmDetach(pdata->dpy, &image.shm_info);
 		shmdt(image.shm_info.shmaddr);
-		shmctl(image.shm_info.shmid, IPC_RMID, 0);
 		if (d_buff) {
 			XShmDetach(pdata->dpy, &image_back.shm_info);
 			shmdt(image_back.shm_info.shmaddr);
-			shmctl(image_back.shm_info.shmid, IPC_RMID, 0);
 		}
 	}
 
