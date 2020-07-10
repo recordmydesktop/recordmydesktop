@@ -88,7 +88,6 @@ void rmdMakeMatrices (void) {
 	}
 }
 
-
 static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 {
 	return ((yv/blocksize) * (widthv/blocksize) + (xv/blocksize));
@@ -101,26 +100,27 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 #define UPDATE_Y_PLANE(	data,									\
 			x_tm,									\
 			y_tm,									\
-			height_tm,								\
 			width_tm,								\
+			height_tm,								\
 			yuv,									\
-			__depth__){								\
+			__depth__) {								\
 												\
-	register u_int##__depth__##_t	t_val;							\
-	register unsigned char		*yuv_Y = (yuv)->y + x_tm + y_tm * (yuv)->y_width,	\
+	register unsigned char		*yuv_Y = (yuv)->y + x_tm + y_tm * (yuv)->y_stride,	\
 					*_yr = Yr, *_yg = Yg, *_yb = Yb;			\
 	register u_int##__depth__##_t	*datapi = (u_int##__depth__##_t *)data;			\
 												\
-	for(int k = 0; k < height_tm; k++) {							\
-		for(int i = 0; i < width_tm; i++) {						\
-			t_val = *datapi;							\
+	for (int k = 0; k < height_tm; k++) {							\
+		for (int i = 0; i < width_tm; i++) {						\
+			register u_int##__depth__##_t	t_val = *datapi;			\
+												\
 			*yuv_Y =	_yr[__RVALUE_##__depth__(t_val)] +			\
 					_yg[__GVALUE_##__depth__(t_val)] +			\
 					_yb[__BVALUE_##__depth__(t_val)];			\
 			datapi++;								\
 			yuv_Y++;								\
 		}										\
-		yuv_Y += (yuv)->y_width - width_tm;						\
+												\
+		yuv_Y += (yuv)->y_stride - width_tm; 						\
 	}											\
 }
 
@@ -187,12 +187,11 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 			_vg[__GVALUE_##__depth__(t_val)] +					\
 			_vb[__BVALUE_##__depth__(t_val)];
 
-
 #define UPDATE_UV_PLANES(	data,								\
 				x_tm,								\
 				y_tm,								\
-				height_tm,							\
 				width_tm,							\
+				height_tm,							\
 				yuv,								\
 				sampling,							\
 				__depth__) {							\
@@ -207,11 +206,11 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 	register u_int##__depth__##_t	*datapi = (u_int##__depth__##_t *)data,			\
 					*datapi_next = NULL;					\
 												\
-	if(sampling == __PXL_AVERAGE)								\
+	if (sampling == __PXL_AVERAGE)								\
 		datapi_next = datapi + width_tm;						\
 												\
-	for(int k = 0; k < height_tm; k += 2) {							\
-		for(int i = 0; i < width_tm; i += 2) {						\
+	for (int k = 0; k < height_tm; k += 2) {						\
+		for (int i = 0; i < width_tm; i += 2) {						\
 			UPDATE_A_UV_PIXEL(	yuv_U,						\
 						yuv_V,						\
 						t_val,						\
@@ -222,18 +221,18 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 						__depth__);					\
 												\
 			datapi += 2;								\
-			if(sampling==__PXL_AVERAGE)						\
+			if (sampling == __PXL_AVERAGE)						\
 				datapi_next += 2;						\
 			yuv_U++;								\
 			yuv_V++;								\
 		}										\
 												\
-		yuv_U += ((yuv)->y_width-width_tm) / 2;						\
-		yuv_V += ((yuv)->y_width-width_tm) / 2;						\
-		datapi += width_tm;								\
+		yuv_U += ((yuv)->y_stride - width_tm) >> 1;					\
+		yuv_V += ((yuv)->y_stride - width_tm) >> 1;					\
 												\
-		if(sampling==__PXL_AVERAGE)							\
-			datapi_next+=width_tm;							\
+		datapi += width_tm;								\
+		if (sampling == __PXL_AVERAGE)							\
+			datapi_next += width_tm;						\
 	}											\
 }
 
@@ -241,31 +240,31 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				data_back,							\
 				x_tm,								\
 				y_tm,								\
-				height_tm,							\
 				width_tm,							\
+				height_tm,							\
 				yuv,								\
 				__depth__) {							\
 												\
 	register u_int##__depth__##_t	t_val;							\
-	register unsigned char		*yuv_Y = (yuv)->y + x_tm + y_tm * (yuv)->y_width,	\
+	register unsigned char		*yuv_Y = (yuv)->y + x_tm + y_tm * (yuv)->y_stride,	\
 					*_yr = Yr, *_yg = Yg, *_yb = Yb;			\
 	register u_int##__depth__##_t	*datapi = (u_int##__depth__##_t *)data,			\
 					*datapi_back = (u_int##__depth__##_t *)data_back;	\
 												\
-	for(int k = 0; k < height_tm; k++) {							\
-		for(int i = 0; i < width_tm; i++) {						\
-			if(*datapi != *datapi_back) {						\
+	for (int k = 0; k < height_tm; k++) {							\
+		for (int i = 0; i < width_tm; i++) {						\
+			if (*datapi != *datapi_back) {						\
 				t_val = *datapi;						\
-				*yuv_Y = _yr[__RVALUE_##__depth__(t_val)] +			\
-				_yg[__GVALUE_##__depth__(t_val)] +				\
-				_yb[__BVALUE_##__depth__(t_val)];				\
+				*yuv_Y =	_yr[__RVALUE_##__depth__(t_val)] +		\
+						_yg[__GVALUE_##__depth__(t_val)] +		\
+						_yb[__BVALUE_##__depth__(t_val)];		\
 				yblocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;		\
 			}									\
 			datapi++;								\
 			datapi_back++;								\
 			yuv_Y++;								\
 		}										\
-		yuv_Y += (yuv)->y_width-width_tm;						\
+		yuv_Y += (yuv)->y_stride - width_tm;						\
 	}											\
 }
 
@@ -273,8 +272,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				data_back,							\
 				x_tm,								\
 				y_tm,								\
-				height_tm,							\
 				width_tm,							\
+				height_tm,							\
 				yuv,								\
 				sampling,							\
 				__depth__) {							\
@@ -298,7 +297,7 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 												\
 		for (int k = 0; k < height_tm; k += 2) {					\
 			for (int i = 0; i < width_tm; i += 2) {					\
-				if (	( (*datapi != *datapi_back) ||				\
+				if (	(*datapi != *datapi_back ||				\
 					(*(datapi + 1) != *(datapi_back + 1)) ||		\
 					(*datapi_next != *datapi_back_next) ||			\
 					(*(datapi_next + 1) != *(datapi_back_next + 1)))) {	\
@@ -318,23 +317,20 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 												\
 				datapi += 2;							\
 				datapi_back += 2;						\
-				if (sampling == __PXL_AVERAGE) {				\
-					datapi_next += 2;					\
-					datapi_back_next += 2;					\
-				}								\
+				datapi_next += 2;						\
+				datapi_back_next += 2;						\
+												\
 				yuv_U++;							\
 				yuv_V++;							\
 			}									\
 												\
-			yuv_U += ((yuv)->y_width - width_tm) / 2;				\
-			yuv_V += ((yuv)->y_width - width_tm) / 2;				\
+			yuv_U += ((yuv)->y_stride - width_tm) >> 1;				\
+			yuv_V += ((yuv)->y_stride - width_tm) >> 1;				\
+												\
 			datapi += width_tm;							\
 			datapi_back += width_tm;						\
-												\
-			if (sampling == __PXL_AVERAGE) {					\
-				datapi_next += width_tm;					\
-				datapi_back_next += width_tm;					\
-			}									\
+			datapi_next += width_tm;						\
+			datapi_back_next += width_tm;						\
 		}										\
 	} else {										\
 		for (int k = 0; k < height_tm; k += 2) {					\
@@ -345,34 +341,29 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 								t_val,				\
 								datapi,				\
 								datapi_next,			\
-								_ur,_ug,_ubvr,_vg,_vb,		\
+								_ur, _ug, _ubvr, _vg, _vb,	\
 								sampling,			\
 								__depth__);			\
 												\
 					ublocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;	\
 					vblocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;	\
 				}								\
+												\
 				datapi += 2;							\
 				datapi_back += 2;						\
-				if (sampling == __PXL_AVERAGE) {				\
-					datapi_next += 2;					\
-					datapi_back_next += 2;					\
-				}								\
+												\
 				yuv_U++;							\
 				yuv_V++;							\
 			}									\
-			yuv_U += ((yuv)->y_width-width_tm)/2;					\
-			yuv_V += ((yuv)->y_width-width_tm)/2;					\
+												\
+			yuv_U += ((yuv)->y_stride - width_tm) >> 1;				\
+			yuv_V += ((yuv)->y_stride - width_tm) >> 1;				\
+												\
 			datapi += width_tm;							\
 			datapi_back += width_tm;						\
-			if (sampling == __PXL_AVERAGE) {					\
-				datapi_next += width_tm;					\
-				datapi_back_next += width_tm;					\
-			}									\
 		}										\
 	}											\
 }
-
 
 void rmdUpdateYuvBuffer(	yuv_buffer *yuv,
 				unsigned char *data,
@@ -381,40 +372,39 @@ void rmdUpdateYuvBuffer(	yuv_buffer *yuv,
 				int y_tm,
 				int width_tm,
 				int height_tm,
-				int sampling_type,
-				int color_depth) {
+				int sampling,
+				int depth) {
 
 	if (data_back == NULL) {
-		switch (color_depth) {
+		switch (depth) {
 		case 24:
 		case 32:
-			UPDATE_Y_PLANE(data, x_tm, y_tm, height_tm, width_tm, yuv, 32);
-			UPDATE_UV_PLANES(data, x_tm, y_tm, height_tm, width_tm, yuv, sampling_type, 32);
+			UPDATE_Y_PLANE(data, x_tm, y_tm, width_tm, height_tm, yuv, 32);
+			UPDATE_UV_PLANES(data, x_tm, y_tm, width_tm, height_tm, yuv, sampling, 32);
 			break;
 		case 16:
-			UPDATE_Y_PLANE(data, x_tm, y_tm, height_tm, width_tm, yuv, 16);
-			UPDATE_UV_PLANES(data, x_tm, y_tm, height_tm, width_tm, yuv, sampling_type, 16);
+			UPDATE_Y_PLANE(data, x_tm, y_tm, width_tm, height_tm, yuv, 16);
+			UPDATE_UV_PLANES(data, x_tm, y_tm, width_tm, height_tm, yuv, sampling, 16);
 			break;
 		default:
 			assert(0);
 		}
 	} else {
-		switch (color_depth) {
+		switch (depth) {
 		case 24:
 		case 32:
-			UPDATE_Y_PLANE_DBUF(data, data_back, x_tm, y_tm, height_tm, width_tm, yuv, 32);
-			UPDATE_UV_PLANES_DBUF(data, data_back, x_tm, y_tm, height_tm, width_tm, yuv, sampling_type, 32);
+			UPDATE_Y_PLANE_DBUF(data, data_back, x_tm, y_tm, width_tm, height_tm, yuv, 32);
+			UPDATE_UV_PLANES_DBUF(data, data_back, x_tm, y_tm, width_tm, height_tm, yuv, sampling, 32);
 			break;
 		case 16:
-			UPDATE_Y_PLANE_DBUF(data, data_back, x_tm, y_tm, height_tm, width_tm, yuv, 16);
-			UPDATE_UV_PLANES_DBUF(data, data_back, x_tm, y_tm, height_tm, width_tm, yuv, sampling_type, 16);
+			UPDATE_Y_PLANE_DBUF(data, data_back, x_tm, y_tm, width_tm, height_tm, yuv, 16);
+			UPDATE_UV_PLANES_DBUF(data, data_back, x_tm, y_tm, width_tm, height_tm, yuv, sampling, 16);
 			break;
 		default:
 			assert(0);
 		}
 	}
 }
-
 
 void rmdDummyPointerToYuv(	yuv_buffer *yuv,
 				unsigned char *data_tm,
