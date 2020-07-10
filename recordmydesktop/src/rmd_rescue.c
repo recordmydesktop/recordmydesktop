@@ -99,12 +99,12 @@ int rmdRescue(const char *path) {
 	for (i=0;i<(enc_data.yuv.uv_width*enc_data.yuv.uv_height);i++)
 		enc_data.yuv.v[i]=enc_data.yuv.u[i]=127;
 
-	yblocks=malloc(sizeof(u_int32_t)*(enc_data.yuv.y_width/Y_UNIT_WIDTH)*
-				   (enc_data.yuv.y_height/Y_UNIT_WIDTH));
-	ublocks=malloc(sizeof(u_int32_t)*(enc_data.yuv.y_width/Y_UNIT_WIDTH)*
-				   (enc_data.yuv.y_height/Y_UNIT_WIDTH));
-	vblocks=malloc(sizeof(u_int32_t)*(enc_data.yuv.y_width/Y_UNIT_WIDTH)*
-				   (enc_data.yuv.y_height/Y_UNIT_WIDTH));
+	yblocks = malloc(sizeof(*yblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
+				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
+	ublocks = malloc(sizeof(*ublocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
+				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
+	vblocks = malloc(sizeof(*vblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
+				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
 
 	pdata.frametime=(1000000)/pdata.args.fps;
 

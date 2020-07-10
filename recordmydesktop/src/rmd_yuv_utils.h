@@ -39,9 +39,9 @@ extern unsigned char Yr[256], Yg[256], Yb[256],
 
 
 // We keep these global for now. FIXME: Isolate them.
-extern u_int32_t *yblocks,	/* XXX FIXME why is this u_int32_t when it seems to be simple bool flags? */
-                 *ublocks,
-                 *vblocks;
+extern unsigned char	*yblocks,
+			*ublocks,
+			*vblocks;
 
 
 /**

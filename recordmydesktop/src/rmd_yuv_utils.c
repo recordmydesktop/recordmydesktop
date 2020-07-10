@@ -38,7 +38,7 @@ unsigned char	Yr[256], Yg[256], Yb[256],
 // FIXME: These globals are modified in other source files! We keep
 // thsee here for now. These are the cache blocks. They need to be
 // accesible in the dbuf macros
-u_int32_t	*yblocks,
+unsigned char	*yblocks,
 		*ublocks,
 		*vblocks;
 
