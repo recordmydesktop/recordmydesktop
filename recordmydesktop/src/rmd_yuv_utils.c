@@ -258,7 +258,7 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				*yuv_Y =	_yr[__RVALUE_##__depth__(t_val)] +		\
 						_yg[__GVALUE_##__depth__(t_val)] +		\
 						_yb[__BVALUE_##__depth__(t_val)];		\
-				yblocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;		\
+				yblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;\
 			}									\
 			datapi++;								\
 			datapi_back++;								\
@@ -311,8 +311,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 								sampling,			\
 								__depth__);			\
 												\
-					ublocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;	\
-					vblocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;	\
+					ublocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
+					vblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
 				}								\
 												\
 				datapi += 2;							\
@@ -345,8 +345,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 								sampling,			\
 								__depth__);			\
 												\
-					ublocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;	\
-					vblocks[blocknum(i, k, width_tm, Y_UNIT_WIDTH)] = 1;	\
+					ublocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
+					vblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
 				}								\
 												\
 				datapi += 2;							\
