@@ -277,49 +277,33 @@ static int rmdCollideRects(	const XRectangle *xrect1,
 	}
 }
 
-int rmdRectInsert(RectArea **root,XRectangle *xrect) {
+int rmdRectInsert(RectArea **root, const XRectangle *xrect) {
 
-	int total_insertions=0;
-	RectArea *temp=NULL,*newnode=(RectArea *)malloc(sizeof(RectArea));
-	//align
-	//we do need to know boundaries
-	xrect->width+=(xrect->width%2)|(xrect->x%2);
-	xrect->height+=(xrect->height%2)|(xrect->y%2);
-	xrect->width+=(xrect->width%2);
-	xrect->height+=(xrect->height%2);
-	xrect->x-=xrect->x%2;
-	xrect->y-=xrect->y%2;
-//	 fprintf(stderr," %d %d %d %d\n",xrect->x,
+	int		total_insertions = 0;
+	RectArea	*temp = NULL, *newnode = (RectArea *)malloc(sizeof(RectArea));
 
-	newnode->rect.x=xrect->x;
-	newnode->rect.y=xrect->y;
-	newnode->rect.width=xrect->width;
-	newnode->rect.height=xrect->height;
-	newnode->prev=newnode->next=NULL;
-	if (*root==NULL) {
-		*root=newnode;
-		total_insertions=1;
+	newnode->rect.x = xrect->x;
+	newnode->rect.y = xrect->y;
+	newnode->rect.width = xrect->width;
+	newnode->rect.height = xrect->height;
+	newnode->prev = newnode->next = NULL;
+
+	if (*root == NULL) {
+		*root = newnode;
+		total_insertions = 1;
 	} else {
-		XRectangle xrect_return[2];
+		XRectangle	xrect_return[2];
+		int		nrects = 0, insert_ok = 1, i = 0;
 
-		int nrects=0,insert_ok=1,i=0;
-		temp=*root;
-		while (insert_ok) {   //if something is broken list does not procceed
-							//(except on -1 collres case)
+		temp = *root;
+
+		while (insert_ok) {	//if something is broken list does not procceed
+					//(except on -1 collres case)
+
 			int collres = rmdCollideRects(&temp->rect, xrect, &xrect_return[0], &nrects);
 			if ((!collres))
-				insert_ok=1;
+				insert_ok = 1;
 			else {
-				for(i=0;i<nrects;i++) {
-					xrect_return[i].width += (xrect_return[i].width % 2) |
-											 (xrect_return[i].x % 2);
-					xrect_return[i].height += (xrect_return[i].height % 2) |
-											  (xrect_return[i].y % 2);
-					xrect_return[i].width += (xrect_return[i].width % 2);
-					xrect_return[i].height += (xrect_return[i].height % 2);
-					xrect_return[i].x -= xrect_return[i].x % 2;
-					xrect_return[i].y -= xrect_return[i].y % 2;
-				}
 				insert_ok=0;
 				switch (collres) {
 					case 1://remove current node,reinsert new one
