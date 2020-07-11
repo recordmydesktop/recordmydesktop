@@ -37,20 +37,19 @@
 
 
 void *rmdEncodeSoundBuffer(ProgData *pdata) {
-	int sampread=pdata->periodsize;
+	int	sampread = pdata->periodsize;
 #ifdef HAVE_LIBJACK
-	void *jackbuf=NULL;
+	void	*jackbuf = NULL;
 
 	if (pdata->args.use_jack) {
-		jackbuf=malloc(pdata->sound_framesize*pdata->jdata->buffersize);
+		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 	}
 #endif
 
-	pdata->v_encoding_clean=0;
+	pdata->v_encoding_clean = 0;
 	while (pdata->running) {
-		float **vorbis_buffer;
-		int count=0,i,j;
-		SndBuffer *buff=NULL;
+		float		**vorbis_buffer;
+		SndBuffer	*buff = NULL;
 
 		pthread_mutex_lock(&pdata->pause_mutex);
 		while (pdata->paused)
@@ -58,7 +57,6 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		if (!pdata->args.use_jack) {
-
 			pthread_mutex_lock(&pdata->sound_buffer_mutex);
 			while (!pdata->sound_buffer && pdata->running)
 				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
@@ -73,17 +71,19 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 
 			vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
 
-			for (i = 0; i < sampread; i++) {
-				for (j=0; j < pdata->args.channels; j++) {
-					vorbis_buffer[j][i]=((buff->data[count+1]<<8)| (0x00ff&(int)buff->data[count]))/ 32768.f;
-					count+=2;
+			for (int i = 0, count = 0; i < sampread; i++) {
+				for (int j = 0; j < pdata->args.channels; j++) {
+					vorbis_buffer[j][i] =	((buff->data[count + 1] << 8) |
+								(0x00ff & (int)buff->data[count])) /
+								32768.f;
+					count += 2;
 				}
 			}
 			free(buff->data);
 			free(buff);
 		} else {
 #ifdef HAVE_LIBJACK
-			if ((*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer) >=
+			if (	(*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer) >=
 				(pdata->sound_framesize * pdata->jdata->buffersize)) {
 
 				(*jack_ringbuffer_read)(	pdata->jdata->sound_buffer,
@@ -94,9 +94,9 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 
 				vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
 
-				for (j=0;j<pdata->args.channels;j++) {
-					for (i=0;i<sampread;i++) {
-						vorbis_buffer[j][i]=((float*)jackbuf)[count];
+				for (int j = 0, count = 0; j < pdata->args.channels; j++) {
+					for (int i = 0; i < sampread; i++) {
+						vorbis_buffer[j][i] = ((float*)jackbuf)[count];
 						count++;
 					}
 				}
@@ -111,12 +111,12 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 			}
 #endif
 		}
-		vorbis_analysis_wrote(&pdata->enc_data->m_vo_dsp,sampread);
+		vorbis_analysis_wrote(&pdata->enc_data->m_vo_dsp, sampread);
 
 		pthread_mutex_lock(&pdata->libogg_mutex);
-		while (vorbis_analysis_blockout(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_vo_block)==1) {
+		while (vorbis_analysis_blockout(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_vo_block) == 1) {
 
-			vorbis_analysis(&pdata->enc_data->m_vo_block,NULL);
+			vorbis_analysis(&pdata->enc_data->m_vo_block, NULL);
 			vorbis_bitrate_addblock(&pdata->enc_data->m_vo_block);
 
 			while (vorbis_bitrate_flushpacket(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_ogg_pckt2)) {
@@ -136,30 +136,29 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 	pthread_exit(&errno);
 }
 
-void rmdSyncEncodeSoundBuffer(ProgData *pdata,signed char *buff) {
-	float **vorbis_buffer;
-	int count=0,i,j;
-	int sampread=(buff!=NULL)?pdata->periodsize:0;
-
-	vorbis_buffer=vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp,sampread);
+void rmdSyncEncodeSoundBuffer(ProgData *pdata, signed char *buff) {
+	int	sampread = (buff != NULL) ? pdata->periodsize : 0;
+	float	**vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
 
 	if (!pdata->args.use_jack) {
-		for (i=0;i<sampread;i++) {
-			for (j=0;j<pdata->args.channels;j++) {
-				vorbis_buffer[j][i]=((buff[count+1]<<8)| (0x00ff&(int)buff[count]))/ 32768.f;
-				count+=2;
+		for (int i = 0, count = 0; i < sampread; i++) {
+			for (int j = 0; j < pdata->args.channels; j++) {
+				vorbis_buffer[j][i] =	((buff[count + 1] << 8) |
+							(0x00ff & (int)buff[count]))
+							/ 32768.f;
+				count += 2;
 			}
 		}
 	} else {
-		for (j=0;j<pdata->args.channels;j++) {
-			for (i=0;i<sampread;i++) {
-				vorbis_buffer[j][i]=((float*)buff)[count];
+		for (int j = 0, count = 0; j < pdata->args.channels; j++) {
+			for (int i = 0; i < sampread; i++) {
+				vorbis_buffer[j][i] = ((float *)buff)[count];
 				count++;
 			}
 		}
 	}
 
-	vorbis_analysis_wrote(&pdata->enc_data->m_vo_dsp,sampread);
+	vorbis_analysis_wrote(&pdata->enc_data->m_vo_dsp, sampread);
 
 	pthread_mutex_lock(&pdata->libogg_mutex);
 	while (vorbis_analysis_blockout(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_vo_block)==1) {
@@ -175,5 +174,5 @@ void rmdSyncEncodeSoundBuffer(ProgData *pdata,signed char *buff) {
 	if (!pdata->running)
 		pdata->enc_data->m_ogg_vs.e_o_s=1;
 
-	pdata->avd-=pdata->periodtime;
+	pdata->avd -= pdata->periodtime;
 }
