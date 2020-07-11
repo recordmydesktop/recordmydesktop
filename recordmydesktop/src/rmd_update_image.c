@@ -35,6 +35,8 @@
 #include <X11/extensions/shmproto.h>
 #include <X11/extensions/XShm.h>
 
+#include <assert.h>
+
 
 void rmdUpdateImage(	Display * dpy,
 			yuv_buffer *yuv,
@@ -50,6 +52,15 @@ void rmdUpdateImage(	Display * dpy,
 	RectArea *temp;
 
 	for (temp = *root; temp; temp = temp->next) {
+
+		/* sanity check the clipping, nothing on the reclist
+		 * should go outside rrect
+		 */
+		assert(temp->rect.x >= brwin->rrect.x);
+		assert(temp->rect.y >= brwin->rrect.y);
+		assert(temp->rect.x + temp->rect.width <= brwin->rrect.x + brwin->rrect.width);
+		assert(temp->rect.y + temp->rect.height <= brwin->rrect.y + brwin->rrect.height);
+
 		if (noshmem) {
 			rmdGetZPixmap(	dpy,
 					specs->root,
