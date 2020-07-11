@@ -97,6 +97,43 @@ static int clip_event_area(XDamageNotifyEvent *e, XRectangle *cliprect, XRectang
 }
 
 
+/* Try align xrect to even boundaries relative to cliprect,
+ * this is done for the UV routines which operate at 2x2 rgb pixel granularity.
+ */
+static void uv_align(XRectangle *cliprect, XRectangle *xrect) {
+	XRectangle	rel;
+
+	rel.x = xrect->x - cliprect->x;
+	rel.y = xrect->y - cliprect->y;
+
+	if (rel.x % 2) {
+		rel.x -= 1;
+		rel.width = xrect->width + 1;
+	} else {
+		rel.width = xrect->width;
+	}
+
+	if (rel.y % 2) {
+		rel.y -= 1;
+		rel.height = xrect->height + 1;
+	} else {
+		rel.height = xrect->height;
+	}
+
+	/* XXX: note when cliprect prevents an even width, we can't do anything
+	 * about it.  rmd could force even-sized recording windows to prevent
+	 * this, but that would be kind of annoying.  For now it's assumed
+	 * the UV routines will handle the exception - which might temporarily
+	 * mean they just lop the odd row/column off the edge.
+	 */
+	if (rel.width % 2  && rel.width + rel.x < cliprect->x + cliprect->width)
+		rel.width++;
+
+	if (rel.height % 2 && rel.height + rel.y < cliprect->y + cliprect->height)
+		rel.height++;
+}
+
+
 void rmdInitEventsPolling(ProgData *pdata) {
 	Window root_return,
 		   parent_return,
@@ -198,8 +235,10 @@ void rmdEventLoop(ProgData *pdata) {
 				XDamageNotifyEvent	*e = (XDamageNotifyEvent *)&event;
 				XRectangle		xrect;
 
-				if (clip_event_area(e, &pdata->brwin.rrect, &xrect))
-					inserts += rmdRectInsert(&pdata->rect_root,&xrect);
+				if (clip_event_area(e, &pdata->brwin.rrect, &xrect)) {
+					uv_align(&pdata->brwin.rrect, &xrect);
+					inserts += rmdRectInsert(&pdata->rect_root, &xrect);
+				}
 			}
 		}
 	}
