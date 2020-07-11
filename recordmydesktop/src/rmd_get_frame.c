@@ -325,6 +325,7 @@ void *rmdGetFrame(ProgData *pdata) {
 	rmdInitEventsPolling(pdata);
 
 	while (pdata->running) {
+		unsigned	time_frameno;
 
 		//if we are left behind we must not wait.
 		//also before actually pausing we must make sure the streams
@@ -334,7 +335,7 @@ void *rmdGetFrame(ProgData *pdata) {
 			pdata->capture_frameno >= pdata->time_frameno)
 				pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
 
-		pdata->capture_frameno = pdata->time_frameno;
+		time_frameno = pdata->time_frameno;
 		pthread_mutex_unlock(&pdata->time_mutex);
 
 		//read all events and construct list with damage 
@@ -569,20 +570,15 @@ void *rmdGetFrame(ProgData *pdata) {
 		if (!pdata->args.full_shots)
 			rmdClearList(&pdata->rect_root);
 
-
+		/* notify the encoder of the new frame */
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-		pdata->th_enc_thread_waiting = 0;
-		pthread_cond_signal(&pdata->image_buffer_ready);
+		pdata->capture_frameno = time_frameno;
+		pthread_cond_broadcast(&pdata->image_buffer_ready);
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
 	}
 
 	if (!pdata->args.noframe)
-		XDestroyWindow(pdata->dpy,pdata->shaped_w);
-
-	pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-	pdata->th_enc_thread_waiting = 0;
-	pthread_cond_signal(&pdata->image_buffer_ready);
-	pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
+		XDestroyWindow(pdata->dpy, pdata->shaped_w);
 
 	if (!pdata->args.noshared) {
 		XShmDetach(pdata->dpy, &image.shm_info);
