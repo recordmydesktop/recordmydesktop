@@ -42,26 +42,25 @@ int rmdRegisterShortcut(	Display *dpy,
 				const char *shortcut,
 				HotKey *hotkey) {
 
-	int keycode=0, i, j ;
-	KeySym key=0;
-	unsigned int modifier_mask=0, numlock_mask=0;
-	char *keystr=NULL;
-	XModifierKeymap *modmap;
+	int		keycode = 0, i, j;
+	KeySym		key = 0;
+	unsigned int	modifier_mask = 0, numlock_mask = 0;
+	char		*keystr = NULL;
 
-	if (strstr(shortcut,"Shift"))
-		modifier_mask = modifier_mask|ShiftMask;
-	if (strstr(shortcut,"Control"))
-		modifier_mask = modifier_mask|ControlMask;
-	if (strstr(shortcut,"Mod1"))
-		modifier_mask = modifier_mask|Mod1Mask;
-	if (strstr(shortcut,"Mod2"))
-		modifier_mask = modifier_mask|Mod2Mask;
-	if (strstr(shortcut,"Mod3"))
-		modifier_mask = modifier_mask|Mod3Mask;
-	if (strstr(shortcut,"Mod4"))
-		modifier_mask = modifier_mask|Mod4Mask;
-	if (strstr(shortcut,"Mod5"))
-		modifier_mask = modifier_mask|Mod5Mask;
+	if (strstr(shortcut, "Shift"))
+		modifier_mask = modifier_mask | ShiftMask;
+	if (strstr(shortcut, "Control"))
+		modifier_mask = modifier_mask | ControlMask;
+	if (strstr(shortcut, "Mod1"))
+		modifier_mask = modifier_mask | Mod1Mask;
+	if (strstr(shortcut, "Mod2"))
+		modifier_mask = modifier_mask | Mod2Mask;
+	if (strstr(shortcut, "Mod3"))
+		modifier_mask = modifier_mask | Mod3Mask;
+	if (strstr(shortcut, "Mod4"))
+		modifier_mask = modifier_mask | Mod4Mask;
+	if (strstr(shortcut, "Mod5"))
+		modifier_mask = modifier_mask | Mod5Mask;
 	
 	//we register the shortcut on the root
 	//window, which means on every keypress event,
@@ -69,12 +68,12 @@ int rmdRegisterShortcut(	Display *dpy,
 	//modifier.
 	if (modifier_mask == 0)
 		return 1;
-	if ((keystr=rindex(shortcut,'+'))!=NULL) {
+	if ((keystr = rindex(shortcut, '+')) != NULL) {
 		keystr++;
-		if ((key=XStringToKeysym(keystr))==NoSymbol)
+		if ((key = XStringToKeysym(keystr)) == NoSymbol)
 			return 1;
 		else
-			keycode=XKeysymToKeycode(dpy,key);
+			keycode = XKeysymToKeycode(dpy, key);
 	} else
 		return 1;
 
@@ -82,18 +81,20 @@ int rmdRegisterShortcut(	Display *dpy,
 	/* Key grabbing stuff taken from tilda who took it from yeahconsole 
 	 * who took it from evilwm */
 
-	modmap = XGetModifierMapping(dpy);
-	for (i=0;i<8;i++) {
-		for (j=0;j<modmap->max_keypermod;j++) {
-			if (modmap->modifiermap[i*modmap->max_keypermod+j]==
-			   XKeysymToKeycode(dpy,XK_Num_Lock))
-				numlock_mask=(1<<i);
+	{
+		KeyCode		numlock = XKeysymToKeycode(dpy, XK_Num_Lock);
+		XModifierKeymap	*modmap = XGetModifierMapping(dpy);
+		for (i = 0; i < 8; i++) {
+			for (j = 0; j < modmap->max_keypermod; j++) {
+				if (modmap->modifiermap[i * modmap->max_keypermod + j] == numlock)
+					numlock_mask = (1 << i);
+			}
 		}
+		XFreeModifiermap(modmap);
 	}
-	XFreeModifiermap(modmap);
 
-	hotkey->modnum=0;
-	hotkey->key=keycode;
+	hotkey->modnum = 0;
+	hotkey->key = keycode;
 
 	XGrabKey(	dpy,
 			keycode,
@@ -102,7 +103,7 @@ int rmdRegisterShortcut(	Display *dpy,
 			True,
 			GrabModeAsync,
 			GrabModeAsync);
-	hotkey->mask[0]=modifier_mask;
+	hotkey->mask[0] = modifier_mask;
 	hotkey->modnum++;
 
 	XGrabKey(	dpy,
@@ -112,11 +113,10 @@ int rmdRegisterShortcut(	Display *dpy,
 			True,
 			GrabModeAsync,
 			GrabModeAsync);
-	hotkey->mask[1]=LockMask | modifier_mask;
+	hotkey->mask[1] = LockMask | modifier_mask;
 	hotkey->modnum++;
 
 	if (numlock_mask) {
-
 		XGrabKey(	dpy,
 				keycode,
 				numlock_mask | modifier_mask,
@@ -124,7 +124,7 @@ int rmdRegisterShortcut(	Display *dpy,
 				True,
 				GrabModeAsync,
 				GrabModeAsync);
-		hotkey->mask[2]=numlock_mask | modifier_mask;
+		hotkey->mask[2] = numlock_mask | modifier_mask;
 		hotkey->modnum++;
 
 		XGrabKey(	dpy,
@@ -134,9 +134,8 @@ int rmdRegisterShortcut(	Display *dpy,
 				True,
 				GrabModeAsync,
 				GrabModeAsync);
-		hotkey->mask[3]=numlock_mask | LockMask | modifier_mask;
+		hotkey->mask[3] = numlock_mask | LockMask | modifier_mask;
 		hotkey->modnum++;
-
 	}
 
 	return 0;
