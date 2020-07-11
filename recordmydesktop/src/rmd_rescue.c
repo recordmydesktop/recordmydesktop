@@ -41,36 +41,33 @@
 
 
 int rmdRescue(const char *path) {
-	
-	int i=0, offset_x, offset_y;
-	unsigned short  width, height;
-
-	ProgData pdata;
-	EncData enc_data;
-	CacheData cache_data;
+	int		offset_x, offset_y;
+	unsigned short	width, height;
+	ProgData	pdata;
+	EncData		enc_data;
+	CacheData	cache_data;
 
 	rmdSetupDefaultArgs(&pdata.args);
 
-	pdata.enc_data=&enc_data;
-	pdata.cache_data=&cache_data;
+	pdata.enc_data = &enc_data;
+	pdata.cache_data = &cache_data;
 
 	//projname
-	cache_data.projname=malloc(strlen(path)+2);
-	strcpy(cache_data.projname,path);
-	strcat(cache_data.projname,"/");//having two of these doesn't hurt...
+	cache_data.projname = malloc(strlen(path) + 2);
+	strcpy(cache_data.projname, path);
+	strcat(cache_data.projname, "/");//having two of these doesn't hurt...
 	//image data
-	cache_data.imgdata=malloc(strlen(cache_data.projname)+11);
-	strcpy(cache_data.imgdata,cache_data.projname);
-	strcat(cache_data.imgdata,"img.out");
+	cache_data.imgdata = malloc(strlen(cache_data.projname) + 11);
+	strcpy(cache_data.imgdata, cache_data.projname);
+	strcat(cache_data.imgdata, "img.out");
 	//audio data
-	cache_data.audiodata=malloc(strlen(cache_data.projname)+10);
-	strcpy(cache_data.audiodata,cache_data.projname);
-	strcat(cache_data.audiodata,"audio.pcm");
+	cache_data.audiodata = malloc(strlen(cache_data.projname) + 10);
+	strcpy(cache_data.audiodata, cache_data.projname);
+	strcat(cache_data.audiodata, "audio.pcm");
 	//specsfile
-	cache_data.specsfile=malloc(strlen(cache_data.projname)+10);
-	strcpy(cache_data.specsfile,cache_data.projname);
-	strcat(cache_data.specsfile,"specs.txt");
-	
+	cache_data.specsfile = malloc(strlen(cache_data.projname) + 10);
+	strcpy(cache_data.specsfile, cache_data.projname);
+	strcat(cache_data.specsfile, "specs.txt");
 
 	if (rmdReadSpecsFile(&pdata))
 		return 1;
@@ -80,24 +77,26 @@ int rmdRescue(const char *path) {
 	offset_x = ((width - pdata.brwin.rrect.width) / 2) & ~1;
 	offset_y = ((height - pdata.brwin.rrect.height) / 2) & ~1;
 
-	enc_data.yuv.y=(unsigned char *)malloc(height*width);
-	enc_data.yuv.u=(unsigned char *)malloc(height*width/4);
-	enc_data.yuv.v=(unsigned char *)malloc(height*width/4);
-	enc_data.yuv.y_width=width;
-	enc_data.yuv.y_height=height;
-	enc_data.yuv.y_stride=width;
+	enc_data.yuv.y = (unsigned char *)malloc(height * width);
+	enc_data.yuv.u = (unsigned char *)malloc(height * width / 4);
+	enc_data.yuv.v = (unsigned char *)malloc(height * width / 4);
+	enc_data.yuv.y_width = width;
+	enc_data.yuv.y_height = height;
+	enc_data.yuv.y_stride = width;
 
-	enc_data.yuv.uv_width=width/2;
-	enc_data.yuv.uv_height=height/2;
-	enc_data.yuv.uv_stride=width/2;
 	enc_data.x_offset=offset_x;
 	enc_data.y_offset=offset_y;
+	enc_data.yuv.uv_width = width / 2;
+	enc_data.yuv.uv_height = height / 2;
+	enc_data.yuv.uv_stride = width / 2;
+	enc_data.x_offset = offset_x;
+	enc_data.y_offset = offset_y;
 
-	for (i=0;i<(enc_data.yuv.y_width*enc_data.yuv.y_height);i++)
-		enc_data.yuv.y[i]=0;
+	for (int i = 0; i < (enc_data.yuv.y_width * enc_data.yuv.y_height); i++)
+		enc_data.yuv.y[i] = 0;
 
-	for (i=0;i<(enc_data.yuv.uv_width*enc_data.yuv.uv_height);i++)
-		enc_data.yuv.v[i]=enc_data.yuv.u[i]=127;
+	for (int i = 0; i < (enc_data.yuv.uv_width * enc_data.yuv.uv_height); i++)
+		enc_data.yuv.v[i] = enc_data.yuv.u[i] = 127;
 
 	yblocks = malloc(sizeof(*yblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
 				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
@@ -106,26 +105,26 @@ int rmdRescue(const char *path) {
 	vblocks = malloc(sizeof(*vblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
 				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
 
-	pdata.frametime=(1000000)/pdata.args.fps;
+	pdata.frametime = 1000000 / pdata.args.fps;
 
-	pthread_mutex_init(&pdata.theora_lib_mutex,NULL);
-	pthread_mutex_init(&pdata.vorbis_lib_mutex,NULL);
-	pthread_mutex_init(&pdata.libogg_mutex,NULL);
-	pthread_cond_init(&pdata.theora_lib_clean,NULL);
-	pthread_cond_init(&pdata.vorbis_lib_clean,NULL);
-	pdata.th_encoding_clean=pdata.v_encoding_clean=1;
-	pdata.avd=0;
-	pdata.sound_buffer=NULL;
+	pthread_mutex_init(&pdata.theora_lib_mutex, NULL);
+	pthread_mutex_init(&pdata.vorbis_lib_mutex, NULL);
+	pthread_mutex_init(&pdata.libogg_mutex, NULL);
+	pthread_cond_init(&pdata.theora_lib_clean, NULL);
+	pthread_cond_init(&pdata.vorbis_lib_clean, NULL);
+	pdata.th_encoding_clean = pdata.v_encoding_clean = 1;
+	pdata.avd = 0;
+	pdata.sound_buffer = NULL;
 	pdata.running = TRUE;
 	pdata.aborted = FALSE;
 
 	rmdRegisterCallbacks(&pdata);
-	fprintf(stderr,"Restoring %s!!!\n",path);
+	fprintf(stderr, "Restoring %s!!!\n", path);
 	
 	rmdEncodeCache(&pdata);
 
-	fprintf(stderr,"Done!!!\n");
-	fprintf(stderr,"Goodbye!\n");
+	fprintf(stderr, "Done!!!\n");
+	fprintf(stderr, "Goodbye!\n");
 	rmdCleanUp();
 	
 	return 0;
