@@ -172,8 +172,8 @@ static int rmdFirstFrame(ProgData *pdata, Image *image) {
 	rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
 				(unsigned char *)image->ximage->data,
 				NULL,
-				pdata->enc_data->x_offset,
-				pdata->enc_data->y_offset,
+				0,
+				0,
 				rrect->width,
 				rrect->height,
 				pdata->args.no_quick_subsample,
@@ -411,8 +411,8 @@ void *rmdGetFrame(ProgData *pdata) {
 
 					mark_buffer_area(
 						back_buff,
-						mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
-						mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
+						mouse_pos_temp.x - temp_brwin.rrect.x,
+						mouse_pos_temp.y - temp_brwin.rrect.y,
 						mouse_pos_temp.width, mouse_pos_temp.height, temp_brwin.rrect.width,
 						pdata->specs.depth
 					);
@@ -483,8 +483,8 @@ void *rmdGetFrame(ProgData *pdata) {
 			rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
 						front_buff,
 						back_buff,
-						pdata->enc_data->x_offset,
-						pdata->enc_data->y_offset,
+						0,
+						0,
 						temp_brwin.rrect.width,
 						temp_brwin.rrect.height,
 						pdata->args.no_quick_subsample,
@@ -517,8 +517,8 @@ void *rmdGetFrame(ProgData *pdata) {
 						rmdXFixesPointerToYuv(
 							&pdata->enc_data->yuv,
 							((unsigned char*)xcim->pixels),
-							mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
-							mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
+							mouse_pos_temp.x - temp_brwin.rrect.x,
+							mouse_pos_temp.y - temp_brwin.rrect.y,
 							mouse_pos_temp.width,
 							mouse_pos_temp.height,
 							mouse_xoffset,
@@ -529,8 +529,8 @@ void *rmdGetFrame(ProgData *pdata) {
 						rmdDummyPointerToYuv(
 							&pdata->enc_data->yuv,
 							pdata->dummy_pointer,
-							mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
-							mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
+							mouse_pos_temp.x - temp_brwin.rrect.x,
+							mouse_pos_temp.y - temp_brwin.rrect.y,
 							mouse_pos_temp.width,
 							mouse_pos_temp.height,
 							mouse_xoffset,
@@ -550,8 +550,8 @@ void *rmdGetFrame(ProgData *pdata) {
 
 					mark_buffer_area(
 						front_buff,
-						mouse_pos_temp.x - temp_brwin.rrect.x + pdata->enc_data->x_offset,
-						mouse_pos_temp.y - temp_brwin.rrect.y + pdata->enc_data->y_offset,
+						mouse_pos_temp.x - temp_brwin.rrect.x,
+						mouse_pos_temp.y - temp_brwin.rrect.y,
 						mouse_pos_temp.width,
 						mouse_pos_temp.height,
 						temp_brwin.rrect.width,

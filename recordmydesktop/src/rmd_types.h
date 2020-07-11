@@ -179,10 +179,6 @@ typedef struct _EncData{
 	vorbis_comment		m_vo_cmmnt;
 	vorbis_dsp_state	m_vo_dsp;
 	vorbis_block		m_vo_block;
-//these should be 0, since area is quantized
-//before input
-	int			x_offset,
-				y_offset;
 //our file
 	FILE			*fp;
 } EncData;

@@ -132,15 +132,13 @@ int rmdPurgeCache(CacheData *cache_data_t, int sound) {
 }
 
 void rmdInitCacheData(ProgData *pdata, EncData *enc_data_t, CacheData *cache_data_t) {
-	int	width, height, offset_x, offset_y, pid;
+	int	width, height, pid;
 	char	pidbuf[8];
 
 	//we set the buffer only since there's
 	//no need to initialize the encoder from now.
 	width = ((pdata->brwin.rrect.width + 15) >> 4) << 4;
 	height = ((pdata->brwin.rrect.height + 15) >> 4) << 4;
-	offset_x = ((width - pdata->brwin.rrect.width) / 2) & ~1;
-	offset_y = ((height - pdata->brwin.rrect.height) / 2) & ~1;
 
 	(pdata)->enc_data = enc_data_t;
 
@@ -154,8 +152,6 @@ void rmdInitCacheData(ProgData *pdata, EncData *enc_data_t, CacheData *cache_dat
 	enc_data_t->yuv.uv_width = width / 2;
 	enc_data_t->yuv.uv_height = height / 2;
 	enc_data_t->yuv.uv_stride = width / 2;
-	enc_data_t->x_offset = offset_x;
-	enc_data_t->y_offset = offset_y;
 
 	//now we set the cache files
 	(pdata)->cache_data = cache_data_t;

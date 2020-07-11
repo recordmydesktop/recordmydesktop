@@ -41,7 +41,6 @@
 
 
 int rmdRescue(const char *path) {
-	int		offset_x, offset_y;
 	unsigned short	width, height;
 	ProgData	pdata;
 	EncData		enc_data;
@@ -74,23 +73,17 @@ int rmdRescue(const char *path) {
 
 	width = ((pdata.brwin.rrect.width + 15) >> 4) << 4;
 	height = ((pdata.brwin.rrect.height + 15) >> 4) << 4;
-	offset_x = ((width - pdata.brwin.rrect.width) / 2) & ~1;
-	offset_y = ((height - pdata.brwin.rrect.height) / 2) & ~1;
 
-	enc_data.yuv.y = (unsigned char *)malloc(height * width);
-	enc_data.yuv.u = (unsigned char *)malloc(height * width / 4);
-	enc_data.yuv.v = (unsigned char *)malloc(height * width / 4);
+	enc_data.yuv.y = malloc(height * width);
+	enc_data.yuv.u = malloc(height * width / 4);
+	enc_data.yuv.v = malloc(height * width / 4);
 	enc_data.yuv.y_width = width;
 	enc_data.yuv.y_height = height;
 	enc_data.yuv.y_stride = width;
 
-	enc_data.x_offset=offset_x;
-	enc_data.y_offset=offset_y;
 	enc_data.yuv.uv_width = width / 2;
 	enc_data.yuv.uv_height = height / 2;
 	enc_data.yuv.uv_stride = width / 2;
-	enc_data.x_offset = offset_x;
-	enc_data.y_offset = offset_y;
 
 	for (int i = 0; i < (enc_data.yuv.y_width * enc_data.yuv.y_height); i++)
 		enc_data.yuv.y[i] = 0;

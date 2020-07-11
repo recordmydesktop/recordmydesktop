@@ -84,8 +84,8 @@ void rmdUpdateImage(	Display * dpy,
 			yuv,
 			(unsigned char *)image->ximage->data,
 			NULL,
-			temp->rect.x - brwin->rrect.x + enc->x_offset,
-			temp->rect.y - brwin->rrect.y + enc->y_offset,
+			temp->rect.x - brwin->rrect.x,
+			temp->rect.y - brwin->rrect.y,
 			temp->rect.width,
 			temp->rect.height,
 			no_quick_subsample,
@@ -93,4 +93,3 @@ void rmdUpdateImage(	Display * dpy,
 		);
 	}
 }
-
