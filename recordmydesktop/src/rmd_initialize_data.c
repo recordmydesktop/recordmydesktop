@@ -59,9 +59,8 @@ static void rmdFixBufferSize(u_int32_t *buffsize) {
 }
 
 int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data) {
-	int i;
+	fprintf(stderr, "Initializing...\n");
 
-	fprintf(stderr,"Initializing...\n");
 	rmdMakeMatrices();
 	if (pdata->args.have_dummy_cursor) {
 		pdata->dummy_pointer = rmdMakeDummyPointer(	pdata->dpy,
@@ -70,29 +69,30 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 								pdata->args.cursor_color,
 								0,
 								&pdata->npxl);
-		pdata->dummy_p_size=16;
+		pdata->dummy_p_size = 16;
 	} else
-		pdata->dummy_p_size=0;
+		pdata->dummy_p_size = 0;
 
-	pdata->rect_root=NULL;
-	pthread_mutex_init(&pdata->sound_buffer_mutex,NULL);
-	pthread_mutex_init(&pdata->snd_buff_ready_mutex,NULL);
-	pthread_mutex_init(&pdata->img_buff_ready_mutex,NULL);
-	pthread_mutex_init(&pdata->theora_lib_mutex,NULL);
-	pthread_mutex_init(&pdata->vorbis_lib_mutex,NULL);
-	pthread_mutex_init(&pdata->libogg_mutex,NULL);
-	pthread_mutex_init(&pdata->yuv_mutex,NULL);
+	pthread_mutex_init(&pdata->sound_buffer_mutex, NULL);
+	pthread_mutex_init(&pdata->snd_buff_ready_mutex, NULL);
+	pthread_mutex_init(&pdata->img_buff_ready_mutex, NULL);
+	pthread_mutex_init(&pdata->theora_lib_mutex, NULL);
+	pthread_mutex_init(&pdata->vorbis_lib_mutex, NULL);
+	pthread_mutex_init(&pdata->libogg_mutex, NULL);
+	pthread_mutex_init(&pdata->yuv_mutex, NULL);
 	pthread_mutex_init(&pdata->pause_mutex, NULL);
 	pthread_mutex_init(&pdata->time_mutex, NULL);
-	pthread_cond_init(&pdata->time_cond,NULL);
-	pthread_cond_init(&pdata->pause_cond,NULL);
-	pthread_cond_init(&pdata->image_buffer_ready,NULL);
-	pthread_cond_init(&pdata->sound_data_read,NULL);
-	pthread_cond_init(&pdata->theora_lib_clean,NULL);
-	pthread_cond_init(&pdata->vorbis_lib_clean,NULL);
-	pdata->th_encoding_clean=pdata->v_encoding_clean=1;
-	pdata->avd=0;
-	pdata->sound_buffer=NULL;
+	pthread_cond_init(&pdata->time_cond, NULL);
+	pthread_cond_init(&pdata->pause_cond, NULL);
+	pthread_cond_init(&pdata->image_buffer_ready, NULL);
+	pthread_cond_init(&pdata->sound_data_read, NULL);
+	pthread_cond_init(&pdata->theora_lib_clean, NULL);
+	pthread_cond_init(&pdata->vorbis_lib_clean, NULL);
+
+	pdata->th_encoding_clean = pdata->v_encoding_clean = 1;
+	pdata->rect_root		= NULL;
+	pdata->avd			= 0;
+	pdata->sound_buffer		= NULL;
 	pdata->running			= TRUE;
 	pdata->paused			= FALSE;
 	pdata->aborted			= FALSE;
@@ -157,7 +157,6 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 							  pdata->args.frequency;
 			pdata->sound_framesize=sizeof(jack_default_audio_sample_t)*
 								   pdata->jdata->nports;
-
 #else
 			fprintf(stderr,"Should not be here!\n");
 			exit(-1);
@@ -165,15 +164,15 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 		}
 	}
 
-	if(pdata->args.encOnTheFly)
+	if (pdata->args.encOnTheFly)
 		rmdInitEncoder(pdata, enc_data, 0);
 	else
 		rmdInitCacheData(pdata, enc_data, cache_data);
 
-	for(i = 0; i < pdata->enc_data->yuv.y_width * pdata->enc_data->yuv.y_height; i++)
+	for (int i = 0; i < pdata->enc_data->yuv.y_width * pdata->enc_data->yuv.y_height; i++)
 		pdata->enc_data->yuv.y[i] = 0;
 
-	for(i = 0; i < pdata->enc_data->yuv.uv_width * pdata->enc_data->yuv.uv_height; i++)
+	for (int i = 0; i < pdata->enc_data->yuv.uv_width * pdata->enc_data->yuv.uv_height; i++)
 		pdata->enc_data->yuv.v[i] = pdata->enc_data->yuv.u[i] = 127;
 
 	yblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
@@ -183,7 +182,8 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	vblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
 				(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
 
-	pdata->frametime=(1000000)/pdata->args.fps;
+	pdata->frametime = 1000000 / pdata->args.fps;
+
 	return 0;
 
 }
@@ -222,7 +222,7 @@ void rmdSetupDefaultArgs(ProgArgs *args) {
 	args->s_quality			= 10;
 
 	if (getenv("DISPLAY") != NULL) {
-		args->display = (char *) malloc(strlen(getenv("DISPLAY")) + 1);
+		args->display = malloc(strlen(getenv("DISPLAY")) + 1);
 		strcpy(args->display, getenv("DISPLAY"));
 	} else {
 		args->display = NULL;
@@ -230,19 +230,19 @@ void rmdSetupDefaultArgs(ProgArgs *args) {
 
 	memset(args->jack_port_names, 0, sizeof(args->jack_port_names));
 
-	args->device = (char *) malloc(strlen(DEFAULT_AUDIO_DEVICE) + 1);
+	args->device = malloc(strlen(DEFAULT_AUDIO_DEVICE) + 1);
 	strcpy(args->device, DEFAULT_AUDIO_DEVICE);
 
-	args->workdir = (char *) malloc(5);
+	args->workdir = malloc(5);
 	strcpy(args->workdir, "/tmp");
 
-	args->pause_shortcut = (char *) malloc(15);
+	args->pause_shortcut = malloc(15);
 	strcpy(args->pause_shortcut, "Control+Mod1+p");
 
-	args->stop_shortcut = (char *) malloc(15);
+	args->stop_shortcut = malloc(15);
 	strcpy(args->stop_shortcut, "Control+Mod1+s");
 
-	args->filename = (char *) malloc(8);
+	args->filename = malloc(8);
 	strcpy(args->filename, "out.ogv");
 }
 
