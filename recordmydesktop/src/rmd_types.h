@@ -310,8 +310,6 @@ struct _ProgData {
 		dummy_p_size,	   //dummy pointer size,initially 16x16,always square
 		th_encoding_clean,	  //thread exit inidcator
 		v_encoding_clean,	   //  >>  >>
-		v_enc_thread_waiting,   //these indicate a wait
-		th_enc_thread_waiting,  //condition on the cond vars.
 		timer_alive,		//determines loop of timer thread
 		hard_pause,		 //if sound device doesn't support pause
 							//we have to close and reopen

@@ -123,12 +123,12 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 
 		ynum = unum = vnum = 0;
 
-		pthread_mutex_lock(&pdata->time_mutex);
+		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
 		while (pdata->running && capture_frameno >= pdata->capture_frameno)
-			pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
+			pthread_cond_wait(&pdata->image_buffer_ready, &pdata->img_buff_ready_mutex);
 
 		capture_frameno = pdata->capture_frameno;
-		pthread_mutex_unlock(&pdata->time_mutex);
+		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
 
 		pthread_mutex_lock(&pdata->pause_mutex);
 		while (pdata->paused)

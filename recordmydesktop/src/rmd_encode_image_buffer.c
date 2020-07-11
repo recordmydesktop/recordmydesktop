@@ -33,16 +33,17 @@
 
 
 void *rmdEncodeImageBuffer(ProgData *pdata) {
+	unsigned int	encode_frameno = 0;
+
 	pdata->th_encoding_clean = 0;
 
 	while (pdata->running) {
 		EncData	*enc_data = pdata->enc_data;
 
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
-		pdata->th_enc_thread_waiting = 1;
-		while (pdata->th_enc_thread_waiting)
+		while (pdata->running && encode_frameno >= pdata->capture_frameno)
 			pthread_cond_wait(&pdata->image_buffer_ready, &pdata->img_buff_ready_mutex);
-			/* whoever signals us to run sets waiting=0 */
+		encode_frameno = pdata->capture_frameno;
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
 
 		pthread_mutex_lock(&pdata->pause_mutex);

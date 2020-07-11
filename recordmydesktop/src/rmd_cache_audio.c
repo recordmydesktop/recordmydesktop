@@ -87,11 +87,12 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 				(*jack_ringbuffer_read)(pdata->jdata->sound_buffer, jackbuf, write_size);
 				fwrite(jackbuf, 1, write_size, pdata->cache_data->afp);
 			} else {
-				pdata->v_enc_thread_waiting=1;
+				/* FIXME TODO this needs redoing... */
+				//pdata->v_enc_thread_waiting=1;
 				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
 				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
 				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-				pdata->v_enc_thread_waiting=0;
+				//pdata->v_enc_thread_waiting=0;
 
 				continue;
 			}

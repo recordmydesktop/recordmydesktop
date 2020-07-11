@@ -101,11 +101,12 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 					}
 				}
 			} else {
-				pdata->v_enc_thread_waiting = 1;
+			/* FIXME TODO this needs redoing, I don't have JACK ATM so I can't build/test it for now */
+			//	pdata->v_enc_thread_waiting = 1;
 				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
 				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
 				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-				pdata->v_enc_thread_waiting=0;
+			//	pdata->v_enc_thread_waiting=0;
 				continue;
 			}
 #endif
