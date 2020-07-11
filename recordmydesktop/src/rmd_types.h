@@ -110,7 +110,7 @@ typedef struct _RectArea{   //an area that has been damaged gets stored
 
 typedef struct _BRWindow{ //'basic recorded window' specs
 	XRectangle winrect;	//window attributes
-	XRectangle rrect;	//part of window that is recorded (rounded to alignment)
+	XRectangle rrect;	//recorded window rect in screen space coordinates
 	Window windowid;	//id
 }BRWindow;
 
