@@ -206,6 +206,14 @@ static void rmdMoveCaptureArea(	XRectangle *rect,
 	rect->y = (t_y < 0 ) ? 0 : ((t_y + rect->height > height) ? height - rect->height : t_y);
 }
 
+
+static void rmdBlocksReset(unsigned int blocks_w, unsigned int blocks_h) {
+	memset(yblocks, 0, blocks_w * blocks_h * sizeof(*yblocks));
+	memset(ublocks, 0, blocks_w * blocks_h * sizeof(*ublocks));
+	memset(vblocks, 0, blocks_w * blocks_h * sizeof(*vblocks));
+}
+
+
 /**
 *   Extract cache blocks from damage list
 *
@@ -225,9 +233,7 @@ static void rmdBlocksFromList(	RectArea   **root,
 				unsigned int blocknum_x,
 				unsigned int blocknum_y) {
 
-	memset(yblocks, 0, blocknum_x * blocknum_y * sizeof(*yblocks));
-	memset(ublocks, 0, blocknum_x * blocknum_y * sizeof(*ublocks));
-	memset(vblocks, 0, blocknum_x * blocknum_y * sizeof(*vblocks));
+	rmdBlocksReset(blocknum_x, blocknum_y);
 
 	for (RectArea *temp = *root; temp; temp = temp->next) {
 		int	row_start, row_end, column_start, column_end;
@@ -472,9 +478,7 @@ void *rmdGetFrame(ProgData *pdata) {
 			}
 
 			pthread_mutex_lock(&pdata->yuv_mutex);
-			for(int i = 0; i < blocknum_x * blocknum_y; i++)
-				yblocks[i] = ublocks[i] = vblocks[i] = 0;
-
+			rmdBlocksReset(blocknum_x, blocknum_y);
 			rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
 						front_buff,
 						back_buff,
