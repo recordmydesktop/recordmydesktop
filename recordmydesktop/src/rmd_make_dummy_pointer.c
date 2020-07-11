@@ -40,12 +40,11 @@ unsigned char *rmdMakeDummyPointer(	Display *display,
 					int type,
 					unsigned char *npxl) {
 
-	unsigned long bpixel = XBlackPixel(display, specs->screen);
-	unsigned long wpixel = XWhitePixel(display, specs->screen);
-	int i,k,o='.';
-	unsigned long   b=(color)?'w':'b',
-					w=(color)?'b':'w';
-	char pmask[1][16][16]={{
+	unsigned long	bpixel = XBlackPixel(display, specs->screen);
+	unsigned long	wpixel = XWhitePixel(display, specs->screen);
+	int		i, k, o = '.';
+	unsigned long	b = color ? 'w' : 'b', w = color ? 'b' : 'w';
+	char		pmask[1][16][16] = {{
 		{w,w,o,o,o,o,o,o,o,o,o,o,o,o,o,o},
 		{w,b,w,o,o,o,o,o,o,o,o,o,o,o,o,o},
 		{w,b,b,w,o,o,o,o,o,o,o,o,o,o,o,o},
@@ -63,31 +62,31 @@ unsigned char *rmdMakeDummyPointer(	Display *display,
 		{o,o,o,o,o,w,b,b,w,o,o,o,o,o,o,o},
 		{o,o,o,o,o,o,w,w,o,o,o,o,o,o,o,o}}
 	};
-	unsigned char *ret=malloc(size*sizeof(char[size*4]));
-	unsigned char wp[4]={ (wpixel ^ 0xff000000) >> 24,
-						  (wpixel ^ 0x00ff0000) >> 16,
-						  (wpixel ^ 0x0000ff00) >> 8,
-						  (wpixel ^ 0x000000ff) };
-	unsigned char bp[4]={ (bpixel ^ 0xff000000) >> 24,
-						  (bpixel ^ 0x00ff0000) >> 16,
-						  (bpixel ^ 0x0000ff00) >> 8,
-						  (bpixel ^ 0x000000ff) };
+	unsigned char	*ret = malloc(size * sizeof(char[size * 4]));
+	unsigned char	wp[4] = {
+		(wpixel ^ 0xff000000) >> 24,
+		(wpixel ^ 0x00ff0000) >> 16,
+		(wpixel ^ 0x0000ff00) >> 8,
+		(wpixel ^ 0x000000ff)
+	};
+	unsigned char	bp[4] = {
+		(bpixel ^ 0xff000000) >> 24,
+		(bpixel ^ 0x00ff0000) >> 16,
+		(bpixel ^ 0x0000ff00) >> 8,
+		(bpixel ^ 0x000000ff)
+	};
 
-	*npxl=((wp[0]-1)!=bp[0])?wp[0]-100:wp[0]-102;
-	for (i=0;i<size;i++) {
-		for (k=0;k<size;k++) {
-			ret[(i*size+k)*4+__ABYTE]=(pmask[type][i][k]=='w')?
-									  wp[0]:(pmask[type][i][k]=='b')?
-									  bp[0]:*npxl;
-			ret[(i*size+k)*4+__RBYTE]=(pmask[type][i][k]=='w')?
-									   wp[1]:(pmask[type][i][k]=='b')?
-									   bp[1]:*npxl;
-			ret[(i*size+k)*4+__GBYTE]=(pmask[type][i][k]=='w')?
-									   wp[2]:(pmask[type][i][k]=='b')?
-									   bp[2]:*npxl;
-			ret[(i*size+k)*4+__BBYTE]=(pmask[type][i][k]=='w')?
-									   wp[3]:(pmask[type][i][k]=='b')?
-									   bp[3]:*npxl;
+	*npxl = ((wp[0] - 1) != bp[0]) ? wp[0] - 100 : wp[0] - 102;
+	for (i = 0; i < size; i++) {
+		for (k = 0; k < size; k++) {
+			ret[(i * size + k) * 4 + __ABYTE] = (pmask[type][i][k] == 'w') ? 
+				wp[0]:(pmask[type][i][k] == 'b') ? bp[0] : *npxl;
+			ret[(i * size + k) * 4 + __RBYTE] = (pmask[type][i][k] == 'w') ? 
+				wp[1]:(pmask[type][i][k] == 'b') ? bp[1] : *npxl;
+			ret[(i * size + k) * 4 + __GBYTE] = (pmask[type][i][k] == 'w') ? 
+				wp[2]:(pmask[type][i][k] == 'b') ? bp[2] : *npxl;
+			ret[(i * size + k) * 4 + __BBYTE] = (pmask[type][i][k] == 'w') ? 
+				wp[3]:(pmask[type][i][k] == 'b') ? bp[3] : *npxl;
 		}
 	}
 
