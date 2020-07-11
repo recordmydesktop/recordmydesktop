@@ -132,8 +132,8 @@ int rmdPurgeCache(CacheData *cache_data_t, int sound) {
 }
 
 void rmdInitCacheData(ProgData *pdata, EncData *enc_data_t, CacheData *cache_data_t) {
-	int width, height, offset_x, offset_y, pid;
-	char pidbuf[8];
+	int	width, height, offset_x, offset_y, pid;
+	char	pidbuf[8];
 
 	//we set the buffer only since there's
 	//no need to initialize the encoder from now.
@@ -144,16 +144,16 @@ void rmdInitCacheData(ProgData *pdata, EncData *enc_data_t, CacheData *cache_dat
 
 	(pdata)->enc_data = enc_data_t;
 
-	enc_data_t->yuv.y = (unsigned char *)malloc(height*width);
-	enc_data_t->yuv.u = (unsigned char *)malloc(height*width/4);
-	enc_data_t->yuv.v = (unsigned char *)malloc(height*width/4);
+	enc_data_t->yuv.y = (unsigned char *)malloc(height * width);
+	enc_data_t->yuv.u = (unsigned char *)malloc(height * width / 4);
+	enc_data_t->yuv.v = (unsigned char *)malloc(height * width / 4);
 	enc_data_t->yuv.y_width = width;
 	enc_data_t->yuv.y_height = height;
 	enc_data_t->yuv.y_stride = width;
 
-	enc_data_t->yuv.uv_width = width/2;
-	enc_data_t->yuv.uv_height = height/2;
-	enc_data_t->yuv.uv_stride = width/2;
+	enc_data_t->yuv.uv_width = width / 2;
+	enc_data_t->yuv.uv_height = height / 2;
+	enc_data_t->yuv.uv_stride = width / 2;
 	enc_data_t->x_offset = offset_x;
 	enc_data_t->y_offset = offset_y;
 
@@ -220,5 +220,3 @@ void rmdInitCacheData(ProgData *pdata, EncData *enc_data_t, CacheData *cache_dat
 		exit(13);
 	}
 }
-
-
