@@ -76,7 +76,7 @@ void *rmdFlushToOgg(ProgData *pdata) {
 			v_st_fin = (pdata->args.nosound);
 
 	while (!(th_st_fin && v_st_fin)) {
-		int audio_or_video=0;
+		int audio_or_video = 0;
 
 		if (pdata->running) {
 			pthread_mutex_lock(&pdata->libogg_mutex);
@@ -164,14 +164,14 @@ void *rmdFlushToOgg(ProgData *pdata) {
 		}
 
 		if (!audioflag) {
-			audio_or_video=1;
+			audio_or_video = 1;
 		} else if (!videoflag) {
-			audio_or_video=0;
+			audio_or_video = 0;
 		} else {
 			if (audiotime < videotime)
-				audio_or_video=0;
+				audio_or_video = 0;
 			else
-				audio_or_video=1;
+				audio_or_video = 1;
 		}
 
 		if (audio_or_video == 1) {
@@ -228,8 +228,8 @@ void *rmdFlushToOgg(ProgData *pdata) {
 
 	fprintf(stderr,	"\r   \nDone.\nWritten %.0f bytes\n"
 			"(%.0f of which were video data and %.0f audio data)\n\n",
-			video_bytesout+audio_bytesout,
-			video_bytesout,audio_bytesout);
+			video_bytesout + audio_bytesout,
+			video_bytesout, audio_bytesout);
 
 	pthread_exit(&errno);
 }

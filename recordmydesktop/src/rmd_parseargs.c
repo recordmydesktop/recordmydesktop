@@ -177,12 +177,12 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return) {
 
 		{ "buffer-size", '\0',
 		  POPT_ARG_INT, &arg_return->buffsize, 0,
-		  "A positive number denoting the desired sound buffer size (in frames,when using ALSA or OSS)",
+		  "A positive number denoting the desired sound buffer size (in frames, when using ALSA or OSS)",
 		  "N" },
 
 		{ "ring-buffer-size", '\0',
 		  POPT_ARG_FLOAT, &arg_return->jack_ringbuffer_secs, 0,
-		  "A float number denoting the desired ring buffer size (in seconds,when using JACK only).",
+		  "A float number denoting the desired ring buffer size (in seconds, when using JACK only).",
 		  "N" },
 
 		{ "device", '\0',
@@ -268,7 +268,7 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return) {
 
 		{ "delay", '\0',
 		  POPT_ARG_STRING, &arg_return->delay, RMD_ARG_DELAY,
-		  "Number of secs(default),minutes or hours before capture starts(number can be float)",
+		  "Number of secs(default), minutes or hours before capture starts(number can be float)",
 		  "n[H|h|M|m]" },
 
 		{ "overwrite", '\0',
@@ -488,7 +488,7 @@ static void rmdPrintAndExit(	poptContext con,
 				const void *data)
 {
 	if (strcmp(opt->longName, "version") == 0) {
-		fprintf(stderr,"recordMyDesktop v%s\n\n",VERSION);
+		fprintf(stderr, "recordMyDesktop v%s\n\n", VERSION);
 	} else if (strcmp(opt->longName, "help") == 0) {
 		poptPrintHelp(con, stdout, 0);
 		fprintf(stdout,

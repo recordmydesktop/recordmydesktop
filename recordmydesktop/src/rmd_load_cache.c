@@ -237,10 +237,10 @@ void *rmdLoadCache(ProgData *pdata) {
 				missing_frames += frame.header->current_total -
 								(extra_frames + frame.header->frameno);
 				if (pdata->frames_total) {
-					fprintf(stdout, "\r[%d%%] ",
+					fprintf(stdout,	"\r[%d%%] ",
 							((frame.header->frameno + extra_frames) * 100) / pdata->frames_total);
 				} else
-					fprintf(stdout,"\r[%d frames rendered] ",
+					fprintf(stdout,	"\r[%d frames rendered] ",
 							(frame.header->frameno + extra_frames));
 				fflush(stdout);
 				if ( (frame.header->Ynum <= blocknum_x * blocknum_y) &&
@@ -320,7 +320,7 @@ void *rmdLoadCache(ProgData *pdata) {
 	pdata->v_encoding_clean = 1;
 	pthread_cond_signal(&pdata->vorbis_lib_clean);
 	pthread_mutex_unlock(&pdata->vorbis_lib_mutex);
-	fprintf(stdout,"\n");
+	fprintf(stdout, "\n");
 
 	// Clear frame
 	free(frame.YData);

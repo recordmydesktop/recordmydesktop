@@ -43,19 +43,19 @@
 
 #ifdef HAVE_LIBASOUND
 static void rmdFixBufferSize(snd_pcm_uframes_t *buffsize) {
-	snd_pcm_uframes_t buffsize_t=*buffsize,
+	snd_pcm_uframes_t buffsize_t = *buffsize,
 #else
 static void rmdFixBufferSize(u_int32_t *buffsize) {
-	u_int32_t buffsize_t=*buffsize,
+	u_int32_t buffsize_t = *buffsize,
 #endif
-	buffsize_ret=1;
+	buffsize_ret = 1;
 
-	while (buffsize_t>1) {
-		buffsize_t>>=1;
-		buffsize_ret<<=1;
+	while (buffsize_t > 1) {
+		buffsize_t >>= 1;
+		buffsize_ret <<= 1;
 	}
-	fprintf(stderr,"Buffer size adjusted to %d from %d frames.\n",
-				   (int)buffsize_ret,(int)*buffsize);
+	fprintf(stderr,	"Buffer size adjusted to %d from %d frames.\n",
+			(int)buffsize_ret, (int)*buffsize);
 }
 
 int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data) {
@@ -106,59 +106,59 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 		if (!pdata->args.use_jack) {
 			rmdFixBufferSize(&pdata->args.buffsize);
 #ifdef HAVE_LIBASOUND
-			pdata->sound_handle=rmdOpenDev(pdata->args.device,
-										   &pdata->args.channels,
-										   &pdata->args.frequency,
-										   &pdata->args.buffsize,
-										   &pdata->periodsize,
-										   &pdata->periodtime,
-										   &pdata->hard_pause);
-			pdata->sound_framesize=((snd_pcm_format_width(
-									 SND_PCM_FORMAT_S16_LE))/8)*
-									 pdata->args.channels;
+			pdata->sound_handle=rmdOpenDev(	pdata->args.device,
+							&pdata->args.channels,
+							&pdata->args.frequency,
+							&pdata->args.buffsize,
+							&pdata->periodsize,
+							&pdata->periodtime,
+							&pdata->hard_pause);
 
-			if (pdata->sound_handle==NULL) {
+			pdata->sound_framesize=(snd_pcm_format_width(SND_PCM_FORMAT_S16_LE) / 8 *
+						pdata->args.channels);
+
+			if (pdata->sound_handle == NULL) {
 #else
-				pdata->sound_handle=rmdOpenDev(	pdata->args.device,
-								pdata->args.channels,
-								pdata->args.frequency);
+				pdata->sound_handle = rmdOpenDev(	pdata->args.device,
+									pdata->args.channels,
+									pdata->args.frequency);
 
-				pdata->periodtime=(1000000*pdata->args.buffsize)/
-							((pdata->args.channels<<1)*pdata->args.frequency);
+				pdata->periodtime =	(1000000 * pdata->args.buffsize) /
+							((pdata->args.channels<<1) * pdata->args.frequency);
 			//when using OSS periodsize serves as an alias of buffsize
-			pdata->periodsize=pdata->args.buffsize;
-			pdata->sound_framesize=pdata->args.channels<<1;
+			pdata->periodsize = pdata->args.buffsize;
+			pdata->sound_framesize = pdata->args.channels<<1;
 			if (pdata->sound_handle<0) {
 #endif
-				fprintf(stderr,"Error while opening/configuring soundcard %s\n"
-							"Try running with the --no-sound or specify a "
-							"correct device.\n",
-							pdata->args.device);
+				fprintf(stderr,	"Error while opening/configuring soundcard %s\n"
+						"Try running with the --no-sound or specify a "
+						"correct device.\n",
+						pdata->args.device);
 				return 3;
 			}
 		} else {
 #ifdef HAVE_LIBJACK
-			int jack_error=0;
-			pdata->jdata->port_names=pdata->args.jack_port_names;
-			pdata->jdata->nports=pdata->args.jack_nports;
-			pdata->jdata->ringbuffer_secs=pdata->args.jack_ringbuffer_secs;
-			pdata->jdata->snd_buff_ready_mutex=&pdata->snd_buff_ready_mutex;
-			pdata->jdata->sound_data_read=&pdata->sound_data_read;
-			pdata->jdata->capture_started=0;
+			int jack_error = 0;
+			pdata->jdata->port_names = pdata->args.jack_port_names;
+			pdata->jdata->nports = pdata->args.jack_nports;
+			pdata->jdata->ringbuffer_secs = pdata->args.jack_ringbuffer_secs;
+			pdata->jdata->snd_buff_ready_mutex = &pdata->snd_buff_ready_mutex;
+			pdata->jdata->sound_data_read = &pdata->sound_data_read;
+			pdata->jdata->capture_started = 0;
 
-			if ((jack_error=rmdStartJackClient(pdata->jdata))!=0)
+			if ((jack_error = rmdStartJackClient(pdata->jdata))!=0)
 				return jack_error;
 
-			pdata->args.buffsize=pdata->jdata->buffersize;
-			pdata->periodsize=pdata->args.buffsize;
-			pdata->args.frequency=pdata->jdata->frequency;
-			pdata->args.channels=pdata->jdata->nports;
-			pdata->periodtime=(1000000*pdata->args.buffsize)/
-							  pdata->args.frequency;
-			pdata->sound_framesize=sizeof(jack_default_audio_sample_t)*
-								   pdata->jdata->nports;
+			pdata->args.buffsize = pdata->jdata->buffersize;
+			pdata->periodsize = pdata->args.buffsize;
+			pdata->args.frequency = pdata->jdata->frequency;
+			pdata->args.channels = pdata->jdata->nports;
+			pdata->periodtime =	1000000 * pdata->args.buffsize /
+						pdata->args.frequency;
+			pdata->sound_framesize =	sizeof(jack_default_audio_sample_t) *
+							pdata->jdata->nports;
 #else
-			fprintf(stderr,"Should not be here!\n");
+			fprintf(stderr, "Should not be here!\n");
 			exit(-1);
 #endif
 		}

@@ -141,7 +141,7 @@ void rmdInitEventsPolling(ProgData *pdata) {
 	unsigned int i,
 				 nchildren;
 
-	XSelectInput (pdata->dpy,pdata->specs.root, SubstructureNotifyMask);
+	XSelectInput (pdata->dpy, pdata->specs.root, SubstructureNotifyMask);
 
 	if (!pdata->args.full_shots) {
 		XQueryTree (	pdata->dpy,
@@ -153,8 +153,8 @@ void rmdInitEventsPolling(ProgData *pdata) {
 
 		for (i = 0; i < nchildren; i++) {
 			XWindowAttributes attribs;
-			if (XGetWindowAttributes (pdata->dpy,children[i],&attribs)) {
-				if (!attribs.override_redirect && attribs.depth==pdata->specs.depth)
+			if (XGetWindowAttributes (pdata->dpy, children[i], &attribs)) {
+				if (!attribs.override_redirect && attribs.depth == pdata->specs.depth)
 					XDamageCreate(	pdata->dpy,
 							children[i],
 							XDamageReportRawRectangles);
@@ -174,13 +174,13 @@ void rmdEventLoop(ProgData *pdata) {
 	XEvent event;
 
 	while (XPending(pdata->dpy)) {
-		XNextEvent(pdata->dpy,&event);
+		XNextEvent(pdata->dpy, &event);
 		if (event.type == KeyPress) {
 			XKeyEvent *e = (XKeyEvent *)(&event);
 			if (e->keycode == pdata->pause_key.key) {
 				int i = 0;
 				int found = 0;
-				for (i=0; i < pdata->pause_key.modnum; i++) {
+				for (i = 0; i < pdata->pause_key.modnum; i++) {
 					if (pdata->pause_key.mask[i] == e->state) {
 						found = 1;
 						break;

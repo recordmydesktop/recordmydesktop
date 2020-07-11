@@ -41,41 +41,41 @@
 static void m_add_fishead_packet(ogg_stream_state *m_ogg_state) {
 	fishead_packet	skel_fp;
 
-	skel_fp.ptime_n=skel_fp.btime_n=0;
-	skel_fp.ptime_d=skel_fp.btime_d=1000;
+	skel_fp.ptime_n = skel_fp.btime_n = 0;
+	skel_fp.ptime_d = skel_fp.btime_d = 1000;
 
-	add_fishead_to_stream(m_ogg_state,&skel_fp);
+	add_fishead_to_stream(m_ogg_state, &skel_fp);
 }
 
 
 static int rmdIncrementalNaming(char **name) {
 	struct stat buff;
 	char *base_name__;
-	int i=0, fname_length=strlen(*name)-4;
+	int i = 0, fname_length = strlen(*name)-4;
 
-	base_name__=malloc(fname_length+1);
-	strncpy(base_name__,*name,fname_length);
-	base_name__[fname_length]='\0';
+	base_name__ = malloc(fname_length+1);
+	strncpy(base_name__, *name, fname_length);
+	base_name__[fname_length] = '\0';
 
 	//this will go on an endless loop if you have 65536?
 	//files with the same name
 	//or it will crash and die.anyone interested in trying ?
-	while (stat(*name,&buff)==0) {
+	while (stat(*name, &buff)==0) {
 		//create new name
-		char *tname=malloc(strlen(*name)+10);
+		char *tname = malloc(strlen(*name)+10);
 		char numbuf[8];
 
-		strcpy(tname,base_name__);
-		strcat(tname,"-");
+		strcpy(tname, base_name__);
+		strcat(tname, "-");
 		i++;
 		snprintf( numbuf, 8, "%d", i );
-		strcat(tname,numbuf);
-		strcat(tname,".ogv");
+		strcat(tname, numbuf);
+		strcat(tname, ".ogv");
 		//save new name
 
 		free(*name);
-		*name=malloc(strlen(tname)+1);
-		strcpy(*name,tname);
+		*name = malloc(strlen(tname)+1);
+		strcpy(*name, tname);
 		free(tname);
 	}
 
@@ -98,11 +98,11 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 	if (!(fname_length>4 && !strcasecmp(&fname[fname_length-3], "ogv"))) {
 
 		char *new_name = malloc(fname_length + 5);
-		strcpy(new_name,fname);
-		strcat(new_name,".ogv");
+		strcpy(new_name, fname);
+		strcat(new_name, ".ogv");
 		
 		free(pdata->args.filename);
-		pdata->args.filename=new_name;
+		pdata->args.filename = new_name;
 	}
 
 	if (!pdata->args.overwrite) {
@@ -110,9 +110,9 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 		fprintf(stderr, "Output file: %s\n", pdata->args.filename);
 	}
 		
-	enc_data_t->fp = fopen((pdata)->args.filename,"w");
+	enc_data_t->fp = fopen((pdata)->args.filename, "w");
 	if (enc_data_t->fp == NULL) {
-		fprintf(stderr,"Cannot open file %s for writting!\n", (pdata)->args.filename);
+		fprintf(stderr, "Cannot open file %s for writting!\n", (pdata)->args.filename);
 		exit(13);
 	}
 
@@ -176,7 +176,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 						pdata->args.frequency,
 						(float)pdata->args.s_quality*0.1);
 		if (ret) {
-			fprintf(stderr,"Error while setting up vorbis stream quality!\n");
+			fprintf(stderr, "Error while setting up vorbis stream quality!\n");
 			exit(2);
 		}
 		vorbis_comment_init(&enc_data_t->m_vo_cmmnt);
@@ -196,7 +196,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 
 	ogg_stream_packetin(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pckt1);
 	if (ogg_stream_pageout(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pg) != 1) {
-		fprintf(stderr,"Internal Ogg library error.\n");
+		fprintf(stderr, "Internal Ogg library error.\n");
 		exit(2);
 	}
 	fwrite(enc_data_t->m_ogg_pg.header, 1,
@@ -224,7 +224,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 						&header_code);
 		ogg_stream_packetin(&enc_data_t->m_ogg_vs, &header);
 		if (ogg_stream_pageout(&enc_data_t->m_ogg_vs, &enc_data_t->m_ogg_pg) != 1) {
-			fprintf(stderr,"Internal Ogg library error.\n");
+			fprintf(stderr, "Internal Ogg library error.\n");
 			exit(2);
 		}
 
@@ -251,7 +251,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 	skel_fbv.granule_shift = theora_granule_shift(&enc_data_t->m_th_inf);
 	add_message_header_field(&skel_fbv, "Content-Type", "video/theora");
 
-	add_fisbone_to_stream(&m_ogg_skel,&skel_fbv);
+	add_fisbone_to_stream(&m_ogg_skel, &skel_fbv);
 
 	if (!pdata->args.nosound) {
 
@@ -285,7 +285,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 	while (1) {
 		int result = ogg_stream_flush(&enc_data_t->m_ogg_ts, &enc_data_t->m_ogg_pg);
 		if (result < 0) {
-			fprintf(stderr,"Internal Ogg library error.\n");
+			fprintf(stderr, "Internal Ogg library error.\n");
 			exit(2);
 		}
 
@@ -304,7 +304,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 		while (1) {
 			int result = ogg_stream_flush(&enc_data_t->m_ogg_vs, &enc_data_t->m_ogg_pg);
 			if (result < 0) {
-				fprintf(stderr,"Internal Ogg library error.\n");
+				fprintf(stderr, "Internal Ogg library error.\n");
 				exit(2);
 			}
 
@@ -323,10 +323,10 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
 	//skeleton eos
 	add_eos_packet_to_stream(&m_ogg_skel);
 	if (ogg_stream_flush(&m_ogg_skel, &skel_og_pg) < 0) {
-		fprintf(stderr,"Internal Ogg library error.\n");
+		fprintf(stderr, "Internal Ogg library error.\n");
 		exit(2);
 	}
-	fwrite(skel_og_pg.header, 1, skel_og_pg.header_len,enc_data_t->fp);
+	fwrite(skel_og_pg.header, 1, skel_og_pg.header_len, enc_data_t->fp);
 
 	//theora buffer allocation, if any
 	if (!buffer_ready) {

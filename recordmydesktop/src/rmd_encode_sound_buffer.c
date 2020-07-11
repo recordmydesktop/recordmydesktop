@@ -41,9 +41,8 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 #ifdef HAVE_LIBJACK
 	void	*jackbuf = NULL;
 
-	if (pdata->args.use_jack) {
+	if (pdata->args.use_jack)
 		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
-	}
 #endif
 
 	pdata->v_encoding_clean = 0;
@@ -161,9 +160,9 @@ void rmdSyncEncodeSoundBuffer(ProgData *pdata, signed char *buff) {
 	vorbis_analysis_wrote(&pdata->enc_data->m_vo_dsp, sampread);
 
 	pthread_mutex_lock(&pdata->libogg_mutex);
-	while (vorbis_analysis_blockout(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_vo_block)==1) {
+	while (vorbis_analysis_blockout(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_vo_block) == 1) {
 
-		vorbis_analysis(&pdata->enc_data->m_vo_block,NULL);
+		vorbis_analysis(&pdata->enc_data->m_vo_block, NULL);
 		vorbis_bitrate_addblock(&pdata->enc_data->m_vo_block);
 
 		while (vorbis_bitrate_flushpacket(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_ogg_pckt2)) 
@@ -172,7 +171,7 @@ void rmdSyncEncodeSoundBuffer(ProgData *pdata, signed char *buff) {
 	pthread_mutex_unlock(&pdata->libogg_mutex);
 
 	if (!pdata->running)
-		pdata->enc_data->m_ogg_vs.e_o_s=1;
+		pdata->enc_data->m_ogg_vs.e_o_s = 1;
 
 	pdata->avd -= pdata->periodtime;
 }

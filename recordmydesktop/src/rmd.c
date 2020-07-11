@@ -112,8 +112,8 @@ int main(int argc, char **argv){
 			"To disable this check run with --no-wm-check\n"
 			"(though that is not advised, since it will "
 			"probably produce faulty results).\n\n");
-			pdata.args.full_shots=1;
-			pdata.args.noshared=0;
+			pdata.args.full_shots = 1;
+			pdata.args.noshared = 0;
 	}
 
 	rmdQueryExtensions(	pdata.dpy,
@@ -159,11 +159,11 @@ int main(int argc, char **argv){
 		if (!pdata.aborted)
 			rmdEncodeCache(&pdata);
 
-		fprintf(stderr,"Cleanning up cache...\n");
-		if (rmdPurgeCache(pdata.cache_data,!pdata.args.nosound))
-			fprintf(stderr,"Some error occured while cleaning up cache!\n");
+		fprintf(stderr, "Cleanning up cache...\n");
+		if (rmdPurgeCache(pdata.cache_data, !pdata.args.nosound))
+			fprintf(stderr, "Some error occured while cleaning up cache!\n");
 
-		fprintf(stderr,"Done!!!\n");
+		fprintf(stderr, "Done!!!\n");
 	}
 
 	if (pdata.aborted && pdata.args.encOnTheFly) {
@@ -171,12 +171,12 @@ int main(int argc, char **argv){
 			perror("Error while removing file:\n");
 			return 1;
 		} else {
-			fprintf(stderr,	"SIGABRT received,file %s removed\n",
+			fprintf(stderr,	"SIGABRT received, file %s removed\n",
 					pdata.args.filename);
 			return 0;
 		}
 	} else
-		fprintf(stderr,"Goodbye!\n");
+		fprintf(stderr, "Goodbye!\n");
 
 	rmdCleanUp();
 

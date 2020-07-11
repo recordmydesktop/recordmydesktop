@@ -48,7 +48,9 @@ void rmdQueryExtensions(	Display *dpy,
 		shape_event_base,
 		shape_error_base;
 
-	if ((!(args->full_shots))&&(!XDamageQueryExtension( dpy, damage_event, damage_error))) {
+	if (	!args->full_shots &&
+		!XDamageQueryExtension(dpy, damage_event, damage_error)) {
+
 		fprintf(stderr,	"XDamage extension not found!!!\n"
 				"Try again using the --full-shots option, though\n"
 				"enabling XDamage is highly recommended,\n"
@@ -56,31 +58,31 @@ void rmdQueryExtensions(	Display *dpy,
 		exit(4);
 	}
 
-	if ((!args->noshared)&&(!XQueryExtension(	dpy,
-							"MIT-SHM",
-							shm_opcode,
-							&shm_event_base,
-							&shm_error_base))) {
-		args->noshared=1;
-		fprintf(stderr,"Shared Memory extension not present!\n"
-					   "Try again using the --no-shared option\n");
+	if (	!args->noshared &&
+		!XQueryExtension(dpy, "MIT-SHM", shm_opcode, &shm_event_base, &shm_error_base)) {
+
+		args->noshared = 1;
+		fprintf(stderr,	"Shared Memory extension not present!\n"
+				"Try again using the --no-shared option\n");
 		exit(5);
 	}
 
-	if ((args->xfixes_cursor)&&
-	   (XFixesQueryExtension(dpy,&xf_event_basep,&xf_error_basep)==False)) {
-		args->xfixes_cursor=0;
-		fprintf(stderr,"Xfixes extension not present!\n"
-					   "Please run with the -dummy-cursor or"
-					   " --no-cursor option.\n");
+	if (	args->xfixes_cursor &&
+		XFixesQueryExtension(dpy, &xf_event_basep, &xf_error_basep) == False) {
+
+		args->xfixes_cursor = 0;
+		fprintf(stderr,	"Xfixes extension not present!\n"
+				"Please run with the -dummy-cursor or"
+				" --no-cursor option.\n");
 		exit(6);
 	}
 
-	if ((!args->noframe)&&
-	   (!XShapeQueryExtension(dpy,&shape_event_base,&shape_error_base))) {
-		fprintf(stderr,"XShape Not Found!!!\n"
-					   "Frame won't be available.\n");
+	if (	!args->noframe &&
+		!XShapeQueryExtension(dpy, &shape_event_base, &shape_error_base)) {
 
-		args->noframe=1;
+		fprintf(stderr,	"XShape Not Found!!!\n"
+				"Frame won't be available.\n");
+
+		args->noframe = 1;
 	}
 }

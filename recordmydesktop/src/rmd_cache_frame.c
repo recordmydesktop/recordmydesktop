@@ -65,7 +65,7 @@ static int rmdFlushBlock(
 		if (ucfp == NULL)
 			gzwrite(fp, (void *)out_buffer, out_buffer_bytes);
 		else
-			fwrite((void *)out_buffer, 1, out_buffer_bytes,ucfp);
+			fwrite((void *)out_buffer, 1, out_buffer_bytes, ucfp);
 
 		bytes_written = out_buffer_bytes;
 		out_buffer_bytes = 0;
@@ -256,8 +256,8 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 
 		if (nbytes > CACHE_FILE_SIZE_LIMIT) {
 			if (rmdSwapCacheFilesWrite(pdata->cache_data->imgdata, nth_cache, &fp, &ucfp)) {
-				fprintf(stderr,"New cache file could not be created.\n"
-							   "Ending recording...\n");
+				fprintf(stderr,	"New cache file could not be created.\n"
+						"Ending recording...\n");
 				fflush(stderr);
 				raise(SIGINT);  //if for some reason we cannot make a new file
 						//we have to stop. If we are out of space,

@@ -55,11 +55,11 @@ void *rmdCaptureSound(ProgData *pdata) {
 		if (pdata->paused) {
 #ifdef HAVE_LIBASOUND
 			if (!pdata->hard_pause) {
-				snd_pcm_pause(pdata->sound_handle,1);
+				snd_pcm_pause(pdata->sound_handle, 1);
 				pthread_mutex_lock(&pdata->pause_mutex);
 				pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
 				pthread_mutex_unlock(&pdata->pause_mutex);
-				snd_pcm_pause(pdata->sound_handle,0);
+				snd_pcm_pause(pdata->sound_handle, 0);
 			} else {//device doesn't support pause(is this the norm?mine doesn't)
 				snd_pcm_close(pdata->sound_handle);
 				pthread_mutex_lock(&pdata->pause_mutex);
@@ -91,7 +91,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 								pdata->args.channels,
 								pdata->args.frequency);
 			if (pdata->sound_handle < 0) {
-				fprintf(stderr,"Couldn't reopen sound device. Exiting\n");
+				fprintf(stderr, "Couldn't reopen sound device. Exiting\n");
 				pdata->running = FALSE;
 				errno = 3;
 				pthread_exit(&errno);

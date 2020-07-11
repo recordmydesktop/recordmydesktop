@@ -47,29 +47,29 @@ void rmdDrawFrame(	Display *dpy,
 	GC gc;
 	XGCValues gcv;
 	XColor white, white_e, black, black_e;
-	unsigned long gcmask=GCForeground;
+	unsigned long gcmask = GCForeground;
 
-	XAllocNamedColor(dpy,DefaultColormap(dpy, screen),"white", &white, &white_e);
-	XAllocNamedColor(dpy,DefaultColormap(dpy, screen),"black", &black, &black_e);
+	XAllocNamedColor(dpy, DefaultColormap(dpy, screen), "white", &white, &white_e);
+	XAllocNamedColor(dpy, DefaultColormap(dpy, screen), "black", &black, &black_e);
 
 	gcv.foreground = black.pixel;
-	gc = XCreateGC(dpy,win, gcmask,&gcv);
+	gc = XCreateGC(dpy, win, gcmask, &gcv);
 	XFillRectangle(	dpy,
 			win,
 			gc,
 			OUTLINE_WIDTH,
 			OUTLINE_WIDTH,
-			width+(BORDER_WIDTH-OUTLINE_WIDTH)*2,
-			height+(BORDER_WIDTH-OUTLINE_WIDTH)*2);
+			width + (BORDER_WIDTH-OUTLINE_WIDTH) * 2,
+			height + (BORDER_WIDTH-OUTLINE_WIDTH) * 2);
 	gcv.foreground = white.pixel;
-	XChangeGC(dpy,gc,gcmask,&gcv);
+	XChangeGC(dpy, gc, gcmask, &gcv);
 	XFillRectangle(	dpy,
 			win,
 			gc,
 			BORDER_WIDTH-OUTLINE_WIDTH,
 			BORDER_WIDTH-OUTLINE_WIDTH,
-			width+OUTLINE_WIDTH*2,
-			height+OUTLINE_WIDTH*2);
+			width + OUTLINE_WIDTH * 2,
+			height + OUTLINE_WIDTH * 2);
 
 	XFreeGC(dpy, gc);
 
@@ -81,7 +81,7 @@ void rmdMoveFrame(	Display *dpy,
 			int y) {
 
 	XMoveWindow(dpy, win, x-BORDER_WIDTH, y-BORDER_WIDTH);
-//	XSync(pdata->dpy,False);
+//	XSync(pdata->dpy, False);
 }
 
 Window rmdFrameInit(	Display *dpy,
@@ -95,23 +95,23 @@ Window rmdFrameInit(	Display *dpy,
 	XSetWindowAttributes attribs;
 	XColor white, white_e;
 	Window win;
-	unsigned long valuemask=CWBackPixmap|CWBackPixel|
+	unsigned long valuemask = CWBackPixmap|CWBackPixel|
 							CWSaveUnder|CWOverrideRedirect|CWColormap;
 
-	XAllocNamedColor(dpy,DefaultColormap(dpy, screen),"white", &white, &white_e);
+	XAllocNamedColor(dpy, DefaultColormap(dpy, screen), "white", &white, &white_e);
 
-	attribs.background_pixmap=None;
-	attribs.background_pixel=white.pixel;
-	attribs.save_under=True;
-	attribs.override_redirect=True;
-	attribs.colormap=DefaultColormap(dpy,screen);
+	attribs.background_pixmap = None;
+	attribs.background_pixel = white.pixel;
+	attribs.save_under = True;
+	attribs.override_redirect = True;
+	attribs.colormap = DefaultColormap(dpy, screen);
 
 	win = XCreateWindow(	dpy,
 				root,
-				x-BORDER_WIDTH,
-				y-BORDER_WIDTH,
-				width+BORDER_WIDTH*2,
-				height+BORDER_WIDTH*2,
+				x - BORDER_WIDTH,
+				y - BORDER_WIDTH,
+				width + BORDER_WIDTH * 2,
+				height + BORDER_WIDTH * 2,
 				0,
 				CopyFromParent,
 				InputOutput,
@@ -120,9 +120,9 @@ Window rmdFrameInit(	Display *dpy,
 				&attribs);
 
 	XRectangle rect;
-	rect.x=rect.y=BORDER_WIDTH;
-	rect.width=width;
-	rect.height=height;
+	rect.x = rect.y = BORDER_WIDTH;
+	rect.width = width;
+	rect.height = height;
 
 	XShapeCombineRectangles(	dpy,
 					win,
@@ -136,7 +136,7 @@ Window rmdFrameInit(	Display *dpy,
 
 	XMapWindow(dpy, win);
 
-	rmdDrawFrame(dpy,screen,win,width,height);
+	rmdDrawFrame(dpy, screen, win, width, height);
 
 	return win;
 }
