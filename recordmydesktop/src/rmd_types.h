@@ -230,7 +230,7 @@ typedef struct _JackData{
 	jack_port_t		**ports;		//connections to thes ports.
 	jack_default_audio_sample_t
 				**portbuf;		//retrieval of audio buffers.
-	pthread_mutex_t		*snd_buff_ready_mutex;	//mutex and cond_var
+	pthread_mutex_t		*sound_buffer_mutex;	//mutex and cond_var
 	pthread_cond_t		*sound_data_read;	//in the pdata struct
 	jack_ringbuffer_t	*sound_buffer;		//data exchange happens through this
 	int			capture_started;	//used to hold recording in the beginning
@@ -266,7 +266,6 @@ struct _ProgData {
 	Display *dpy;		   //curtrent display
 /** Mutexes*/
 	pthread_mutex_t sound_buffer_mutex,
-			snd_buff_ready_mutex,
 			img_buff_ready_mutex,
 			theora_lib_mutex,	//serializes access to th_encoding_clean w/theora_lib_clean
 			vorbis_lib_mutex,	//serializes acces to v_encoding_clean w/vorbis_lib_clean

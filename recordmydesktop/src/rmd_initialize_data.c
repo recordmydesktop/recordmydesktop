@@ -74,7 +74,6 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 		pdata->dummy_p_size = 0;
 
 	pthread_mutex_init(&pdata->sound_buffer_mutex, NULL);
-	pthread_mutex_init(&pdata->snd_buff_ready_mutex, NULL);
 	pthread_mutex_init(&pdata->img_buff_ready_mutex, NULL);
 	pthread_mutex_init(&pdata->theora_lib_mutex, NULL);
 	pthread_mutex_init(&pdata->vorbis_lib_mutex, NULL);
@@ -142,7 +141,7 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 			pdata->jdata->port_names = pdata->args.jack_port_names;
 			pdata->jdata->nports = pdata->args.jack_nports;
 			pdata->jdata->ringbuffer_secs = pdata->args.jack_ringbuffer_secs;
-			pdata->jdata->snd_buff_ready_mutex = &pdata->snd_buff_ready_mutex;
+			pdata->jdata->sound_buffer_mutex = &pdata->sound_buffer_mutex;
 			pdata->jdata->sound_data_read = &pdata->sound_data_read;
 			pdata->jdata->capture_started = 0;
 

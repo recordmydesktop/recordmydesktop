@@ -55,25 +55,19 @@ static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t) {
 	for(int i = 0; i < jdata->nports; i++)
 		jdata->portbuf[i] = jack_port_get_buffer(jdata->ports[i], nframes);
 
+
+	pthread_mutex_lock(jdata->sound_buffer_mutex);
 //vorbis analysis buffer wants uninterleaved data
 //so we are simply placing the buffers for every channel
 //sequentially on the ringbuffer
 	for(int i = 0; i < jdata->nports; i++)
-		(*jack_ringbuffer_write)(	jdata->sound_buffer,
-						(void *)(jdata->portbuf[i]),
-						nframes *
-						sizeof(jack_default_audio_sample_t));
-/*FIXME */
-//This is not safe.
-//cond_var signaling must move away from signal handlers
-//alltogether (rmdJackCapture, SetExpired, SetPaused).
-//Better would be a set of pipes for each of these.
-//The callback should write on the pipe and the main thread
-//should perform a select over the fd's, signaling afterwards the
-//appropriate cond_var.
-	pthread_mutex_lock(jdata->snd_buff_ready_mutex);
+		jack_ringbuffer_write(	jdata->sound_buffer,
+					(void *)(jdata->portbuf[i]),
+					nframes *
+					sizeof(jack_default_audio_sample_t));
+
 	pthread_cond_signal(jdata->sound_data_read);
-	pthread_mutex_unlock(jdata->snd_buff_ready_mutex);
+	pthread_mutex_unlock(jdata->sound_buffer_mutex);
 
 	return 0;
 }
@@ -148,7 +142,7 @@ int rmdStartJackClient(JackData *jdata) {
 	snprintf( pidbuf, 8, "%d", pid );
 	strcat(rmd_client_name, pidbuf);
 
-	if ((jdata->client = (*jack_client_new)(rmd_client_name)) == 0) {
+	if ((jdata->client = jack_client_new(rmd_client_name)) == 0) {
 		fprintf(stderr,	"Could not create new client!\n"
 				"Make sure that Jack server is running!\n");
 		return 15;
@@ -172,7 +166,7 @@ int rmdStartJackClient(JackData *jdata) {
 				jdata->frequency*
 				sizeof(jack_default_audio_sample_t)*
 				jdata->nports);
-	jdata->sound_buffer = (*jack_ringbuffer_create)((int)(ring_buffer_size+0.5));//round up
+	jdata->sound_buffer = jack_ringbuffer_create((int)(ring_buffer_size+0.5));//round up
 	jack_set_process_callback(jdata->client, rmdJackCapture, jdata);
 	jack_on_shutdown(jdata->client, rmdJackShutdown, jdata);
 
@@ -192,7 +186,7 @@ int rmdStartJackClient(JackData *jdata) {
 int rmdStopJackClient(JackData *jdata) {
 	int ret = 0;
 
-	(*jack_ringbuffer_free)(jdata->sound_buffer);
+	jack_ringbuffer_free(jdata->sound_buffer);
 	if (jack_client_close(jdata->client)) {
 		fprintf(stderr, "Cannot close Jack client!\n");
 		ret = 1;

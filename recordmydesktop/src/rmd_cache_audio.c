@@ -42,20 +42,18 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 	size_t	write_size = pdata->periodsize * pdata->sound_framesize;
 
 #ifdef HAVE_LIBJACK
-	if (pdata->args.use_jack)
+	void	*jackbuf = NULL;
+
+	if (pdata->args.use_jack) {
 		write_size = pdata->sound_framesize * pdata->jdata->buffersize;
+		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
+	}
 #endif
 
 //We are simply going to throw sound on the disk.
 //It's sound is tiny compared to that of image, so
 //compressing would reducethe overall size by only an
 //insignificant fraction.
-
-#ifdef HAVE_LIBJACK
-	void	*jackbuf = NULL;
-	if (pdata->args.use_jack)
-		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
-#endif
 
 	while (pdata->running) {
 		SndBuffer	*buff = NULL;
@@ -83,19 +81,19 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 			free(buff);
 		} else {
 #ifdef HAVE_LIBJACK
-			if ((*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer) >= write_size) {
-				(*jack_ringbuffer_read)(pdata->jdata->sound_buffer, jackbuf, write_size);
-				fwrite(jackbuf, 1, write_size, pdata->cache_data->afp);
-			} else {
-				/* FIXME TODO this needs redoing... */
-				//pdata->v_enc_thread_waiting=1;
-				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
-				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-				//pdata->v_enc_thread_waiting=0;
+			pthread_mutex_lock(&pdata->sound_buffer_mutex);
+			while (	pdata->running &&
+				jack_ringbuffer_read_space(pdata->jdata->sound_buffer) < write_size)
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
 
-				continue;
-			}
+			if (pdata->running)
+				jack_ringbuffer_read(pdata->jdata->sound_buffer, jackbuf, write_size);
+			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
+
+			if (!pdata->running)
+				break;
+
+			fwrite(jackbuf, 1, write_size, pdata->cache_data->afp);
 #endif
 		}
 		pdata->avd -= pdata->periodtime;

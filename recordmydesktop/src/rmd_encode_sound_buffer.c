@@ -82,31 +82,32 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 			free(buff);
 		} else {
 #ifdef HAVE_LIBJACK
-			if (	(*jack_ringbuffer_read_space)(pdata->jdata->sound_buffer) >=
-				(pdata->sound_framesize * pdata->jdata->buffersize)) {
 
-				(*jack_ringbuffer_read)(	pdata->jdata->sound_buffer,
+			pthread_mutex_lock(&pdata->sound_buffer_mutex);
+			while (	pdata->running &&
+				jack_ringbuffer_read_space(pdata->jdata->sound_buffer) <
+				pdata->sound_framesize * pdata->jdata->buffersize)
+				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
+
+			if (pdata->running)
+				jack_ringbuffer_read(	pdata->jdata->sound_buffer,
 								jackbuf,
 								(pdata->sound_framesize *
 								pdata->jdata->buffersize)
 							);
 
-				vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
+			pthread_mutex_unlock(&pdata->sound_buffer_mutex);
 
-				for (int j = 0, count = 0; j < pdata->args.channels; j++) {
-					for (int i = 0; i < sampread; i++) {
-						vorbis_buffer[j][i] = ((float*)jackbuf)[count];
-						count++;
-					}
+			if (!pdata->running)
+				break;
+
+			vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
+
+			for (int j = 0, count = 0; j < pdata->args.channels; j++) {
+				for (int i = 0; i < sampread; i++) {
+					vorbis_buffer[j][i] = ((float*)jackbuf)[count];
+					count++;
 				}
-			} else {
-			/* FIXME TODO this needs redoing, I don't have JACK ATM so I can't build/test it for now */
-			//	pdata->v_enc_thread_waiting = 1;
-				pthread_mutex_lock(&pdata->snd_buff_ready_mutex);
-				pthread_cond_wait(&pdata->sound_data_read, &pdata->snd_buff_ready_mutex);
-				pthread_mutex_unlock(&pdata->snd_buff_ready_mutex);
-			//	pdata->v_enc_thread_waiting=0;
-				continue;
 			}
 #endif
 		}
