@@ -223,17 +223,17 @@ static void rmdBlocksReset(unsigned int blocks_w, unsigned int blocks_h) {
 *
 * \param y_offset upper y of the recording area
 *
-* \param blocknum_x Width of image in blocks
+* \param blocks_w Width of image in blocks
 *
-* \param blocknum_y Height of image in blocks
+* \param blocks_h Height of image in blocks
 */
 static void rmdBlocksFromList(	RectArea   **root,
 				unsigned int x_offset,
 				unsigned int y_offset,
-				unsigned int blocknum_x,
-				unsigned int blocknum_y) {
+				unsigned int blocks_w,
+				unsigned int blocks_h) {
 
-	rmdBlocksReset(blocknum_x, blocknum_y);
+	rmdBlocksReset(blocks_w, blocks_h);
 
 	for (RectArea *temp = *root; temp; temp = temp->next) {
 		int	row_start, row_end, column_start, column_end;
@@ -246,7 +246,7 @@ static void rmdBlocksFromList(	RectArea   **root,
 		for (int i = row_start; i < row_end + 1; i++) {
 			for (int j = column_start; j < column_end + 1; j++) {
 
-				int	blockno = i * blocknum_x + j;
+				int	blockno = i * blocks_w + j;
 
 				yblocks[blockno] = 1;
 				ublocks[blockno] = 1;
@@ -257,8 +257,8 @@ static void rmdBlocksFromList(	RectArea   **root,
 }
 
 void *rmdGetFrame(ProgData *pdata) {
-	int	blocknum_x = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
-		blocknum_y = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH;
+	int	blocks_w = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
+		blocks_h = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH;
 	unsigned int msk_ret;
 	XRectangle mouse_pos_abs, mouse_pos_rel, mouse_pos_temp;
 	BRWindow temp_brwin;
@@ -449,8 +449,8 @@ void *rmdGetFrame(ProgData *pdata) {
 			rmdBlocksFromList(	&pdata->rect_root,
 						temp_brwin.rrect.x,
 						temp_brwin.rrect.y,
-						pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
-						pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH);
+						blocks_w,
+						blocks_h);
 
 			pthread_mutex_unlock(&pdata->yuv_mutex);
 		} else {
@@ -478,7 +478,7 @@ void *rmdGetFrame(ProgData *pdata) {
 			}
 
 			pthread_mutex_lock(&pdata->yuv_mutex);
-			rmdBlocksReset(blocknum_x, blocknum_y);
+			rmdBlocksReset(blocks_w, blocks_h);
 			rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
 						front_buff,
 						back_buff,
