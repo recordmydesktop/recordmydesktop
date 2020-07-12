@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/prctl.h>
+#include <time.h>
 #include <unistd.h>
 
 void rmdThreads(ProgData *pdata) {
@@ -58,7 +59,7 @@ void rmdThreads(ProgData *pdata) {
 
 	if (pdata->args.delay > 0) {
 		fprintf(stderr, "Will sleep for %d seconds now.\n", pdata->args.delay);
-		sleep(pdata->args.delay);
+		nanosleep(&(struct timespec){ .tv_sec = pdata->args.delay }, NULL);
 	}
 
 	/*start threads*/
@@ -125,7 +126,7 @@ void rmdThreads(ProgData *pdata) {
 		puts("waiting for th_enc");
 		pthread_cond_signal(&pdata->image_buffer_ready);
 		pthread_mutex_unlock(&pdata->theora_lib_mutex);
-		usleep(10000);
+		nanosleep(&(struct timespec){ .tv_nsec = 10000000 }, NULL);
 		pthread_mutex_lock(&pdata->theora_lib_mutex);
 	}
 	pthread_mutex_unlock(&pdata->theora_lib_mutex);
@@ -150,7 +151,7 @@ void rmdThreads(ProgData *pdata) {
 			puts("waiting for v_enc");
 			pthread_cond_signal(&pdata->sound_data_read);
 			pthread_mutex_unlock(&pdata->vorbis_lib_mutex);
-			usleep(10000);
+			nanosleep(&(struct timespec){ .tv_nsec = 10000000 }, NULL);
 			pthread_mutex_lock(&pdata->vorbis_lib_mutex);
 		}
 		pthread_mutex_unlock(&pdata->vorbis_lib_mutex);

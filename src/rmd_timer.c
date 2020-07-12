@@ -34,12 +34,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <time.h>
 #include <unistd.h>
 
 
 void *rmdTimer(ProgData *pdata){
-	long unsigned int secs_tw=1/pdata->args.fps;
-	long unsigned int usecs_tw=(1000000)/pdata->args.fps- secs_tw*1000000;
+	struct timespec	delay;
+
+	delay.tv_sec = 1.f / pdata->args.fps;
+	delay.tv_nsec = 1000000000.f / pdata->args.fps - delay.tv_sec * 1000000000.f;
 
 	while (pdata->timer_alive) {
 
@@ -70,11 +73,7 @@ void *rmdTimer(ProgData *pdata){
 		pthread_mutex_unlock(&pdata->time_mutex);
 		pthread_cond_signal(&pdata->time_cond);
 
-		/* FIXME use nanosleep */
-		if (secs_tw)
-			sleep(secs_tw);
-
-		usleep(usecs_tw);
+		nanosleep(&delay, NULL);
 	}
 
 	pthread_exit(&errno);

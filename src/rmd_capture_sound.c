@@ -38,6 +38,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 void *rmdCaptureSound(ProgData *pdata) {
@@ -46,7 +47,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 	int frames = pdata->periodsize;
 #endif
 	//start capturing only after first frame is taken
-	usleep(pdata->frametime);
+	nanosleep(&(struct timespec){ .tv_nsec = pdata->frametime * 1000 }, NULL);
 
 	while (pdata->running) {
 		int		sret = 0;

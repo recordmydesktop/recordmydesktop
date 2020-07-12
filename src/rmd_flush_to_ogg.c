@@ -37,8 +37,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <time.h>
 #include <unistd.h>
-
 
 
 //we copy the page because the next call to ogg_stream_pageout
@@ -162,7 +162,7 @@ void *rmdFlushToOgg(ProgData *pdata) {
 			audioflag=0;
 #endif
 		if ((!audioflag && !v_st_fin && !pdata->args.nosound) || (!videoflag && !th_st_fin)) {
-			usleep(10000);
+			nanosleep(&(struct timespec){ .tv_nsec = 10000000 }, NULL);
 			continue;
 		}
 
