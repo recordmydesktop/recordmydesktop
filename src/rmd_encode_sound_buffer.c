@@ -28,6 +28,7 @@
 #include "rmd_encode_sound_buffer.h"
 
 #include "rmd_jack.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -44,6 +45,8 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 	if (pdata->args.use_jack)
 		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 #endif
+
+	rmdThreadsSetName("rmdEncodeSounds");
 
 	pdata->v_encoding_clean = 0;
 	while (pdata->running) {

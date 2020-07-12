@@ -32,6 +32,7 @@
 #include "rmd_getzpixmap.h"
 #include "rmd_poll_events.h"
 #include "rmd_rectinsert.h"
+#include "rmd_threads.h"
 #include "rmd_update_image.h"
 #include "rmd_yuv_utils.h"
 #include "rmd_types.h"
@@ -267,6 +268,8 @@ void *rmdGetFrame(ProgData *pdata) {
 	Image image = {}, image_back = {};	//the image that holds
 						//the current full screenshot
 	int init_img1 = 0, init_img2 = 0, img_sel, d_buff;
+
+	rmdThreadsSetName("rmdGetFrame");
 
 	img_sel = d_buff = pdata->args.full_shots;
 

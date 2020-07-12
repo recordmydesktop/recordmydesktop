@@ -27,6 +27,7 @@
 #include "config.h"
 #include "rmd_encode_image_buffer.h"
 
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <errno.h>
@@ -34,6 +35,8 @@
 
 void *rmdEncodeImageBuffer(ProgData *pdata) {
 	unsigned int	encode_frameno = 0;
+
+	rmdThreadsSetName("rmdEncodeImages");
 
 	pdata->th_encoding_clean = 0;
 

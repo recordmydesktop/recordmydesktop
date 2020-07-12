@@ -29,6 +29,7 @@
 
 #include "rmd_encode_image_buffer.h"
 #include "rmd_encode_sound_buffer.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -74,6 +75,8 @@ void *rmdFlushToOgg(ProgData *pdata) {
 	double		videotime = 0;
 	int		th_st_fin = 0,
 			v_st_fin = (pdata->args.nosound);
+
+	rmdThreadsSetName("rmdFlushToOgg");
 
 	while (!(th_st_fin && v_st_fin)) {
 		int audio_or_video = 0;

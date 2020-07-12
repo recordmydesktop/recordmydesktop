@@ -29,6 +29,7 @@
 
 #include "rmd_yuv_utils.h"
 #include "rmd_cache.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <signal.h>
@@ -105,6 +106,8 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 	unsigned long long int total_bytes = 0;
 	unsigned long long int total_received_bytes = 0;
 	unsigned int	capture_frameno = 0;
+
+	rmdThreadsSetName("rmdCacheImages");
 
 	if (!pdata->args.zerocompression) {
 		fp = pdata->cache_data->ifp;

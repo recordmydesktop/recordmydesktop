@@ -43,6 +43,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/prctl.h>
 #include <unistd.h>
 
 void rmdThreads(ProgData *pdata) {
@@ -166,4 +167,8 @@ void rmdThreads(ProgData *pdata) {
 	//Now that we are done with recording we cancel the timer
 	pdata->timer_alive = 0;
 	pthread_join(timer_t,NULL);
+}
+
+void rmdThreadsSetName(const char *name) {
+	prctl(PR_SET_NAME, (unsigned long)name, 0, 0, 0);
 }

@@ -28,6 +28,7 @@
 #include "rmd_cache_audio.h"
 
 #include "rmd_jack.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -49,6 +50,8 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 	}
 #endif
+
+	rmdThreadsSetName("rmdCacheSounds");
 
 //We are simply going to throw sound on the disk.
 //It's sound is tiny compared to that of image, so

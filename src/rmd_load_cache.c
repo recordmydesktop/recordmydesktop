@@ -31,6 +31,7 @@
 #include "rmd_encode_image_buffer.h"
 #include "rmd_encode_sound_buffer.h"
 #include "rmd_macro.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -183,6 +184,8 @@ void *rmdLoadCache(ProgData *pdata) {
 	u_int32_t	YBlocks[(yuv->y_width * yuv->y_height) / Y_UNIT_BYTES],
 			UBlocks[(yuv->uv_width * yuv->uv_height) / UV_UNIT_BYTES],
 			VBlocks[(yuv->uv_width * yuv->uv_height) / UV_UNIT_BYTES];
+
+	rmdThreadsSetName("rmdEncodeCache");
 
 	// We allocate the frame that we will use
 	frame.header	= &fheader;

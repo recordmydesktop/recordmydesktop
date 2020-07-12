@@ -38,6 +38,7 @@
 * \param pdata ProgData struct containing all program data
 */
 void rmdThreads(ProgData *pdata);
+void rmdThreadsSetName(const char *name);
 
 
 #endif
