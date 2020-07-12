@@ -45,6 +45,7 @@
 #include <sys/shm.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 /* clip_event_area dejavu */
@@ -345,8 +346,16 @@ void *rmdGetFrame(ProgData *pdata) {
 		//events (if not full_shots)
 		rmdEventLoop(pdata);
 
-		if (pdata->paused)
+		if (pdata->paused) {
+			/* This is a bit janky, but there's need to service the event loop
+			 * when paused, so instead of blocking on pause_cond, a short sleep
+			 * is performed.
+			 * Since the timer keeps running currently when paused, the above
+			 * cond_wait() will never prevent us from reaching here.
+			 */
+			nanosleep(&(struct timespec){ .tv_nsec = 50000000 }, NULL);
 			continue;
+		}
 
 		//switch back and front buffers (full_shots only)
 		if (d_buff)
