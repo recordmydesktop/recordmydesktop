@@ -1,3 +1,8 @@
+/*Version 0.4.0*/
+* Recorded area is no longer forced to 16-pixel boundaries
+* Fixed --y argument handling
+* Fixed a clipping boundary condition off-by-one error
+
 /*Version 0.3.8.1*/
 * Fixed a bug that caused compilation to fail on some platforms, due 
 to missing headers.
