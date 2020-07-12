@@ -1,3 +1,7 @@
+/*Version 0.4.1*/
+* Fixed 100% CPU usage when paused
+* Threads are now named appropriately via prctl(PR_SET_NAME)
+
 /*Version 0.4.0*/
 * Recorded area is no longer forced to 16-pixel boundaries
 * Fixed --y argument handling
