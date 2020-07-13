@@ -34,14 +34,21 @@
 
 
 void *rmdEncodeImageBuffer(ProgData *pdata) {
-	unsigned int	encode_frameno = 0;
+	unsigned int	encode_frameno = 0, last_encode_frameno = 0;
 
 	rmdThreadsSetName("rmdEncodeImages");
 
 	pdata->th_encoding_clean = 0;
 
 	while (pdata->running) {
-		EncData	*enc_data = pdata->enc_data;
+		EncData		*enc_data = pdata->enc_data;
+		unsigned int	n_frames;
+		int		r;
+
+		pthread_mutex_lock(&pdata->pause_mutex);
+		while (pdata->paused)
+			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
+		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
 		while (pdata->running && encode_frameno >= pdata->capture_frameno)
@@ -49,25 +56,29 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 		encode_frameno = pdata->capture_frameno;
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
 
-		pthread_mutex_lock(&pdata->pause_mutex);
-		while (pdata->paused)
-			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
-		pthread_mutex_unlock(&pdata->pause_mutex);
-
 		pthread_mutex_lock(&pdata->yuv_mutex);
-		if (theora_encode_YUVin(&enc_data->m_th_st, &enc_data->yuv)) {
+		r = theora_encode_YUVin(&enc_data->m_th_st, &enc_data->yuv);
+		pthread_mutex_unlock(&pdata->yuv_mutex);
+		if (r) {
 			fprintf(stderr, "Encoder not ready!\n");
-			pthread_mutex_unlock(&pdata->yuv_mutex);
-		} else {
-			pthread_mutex_unlock(&pdata->yuv_mutex);
-
-			if (theora_encode_packetout(&enc_data->m_th_st, 0, &enc_data->m_ogg_pckt1) == 1) {
-				pthread_mutex_lock(&pdata->libogg_mutex);
-				ogg_stream_packetin(&enc_data->m_ogg_ts, &enc_data->m_ogg_pckt1);
-				pdata->avd += pdata->frametime;
-				pthread_mutex_unlock(&pdata->libogg_mutex);
-			}
+			continue;
 		}
+
+		n_frames = encode_frameno - last_encode_frameno;
+		if (n_frames > 1)
+			theora_control(	&enc_data->m_th_st,
+					TH_ENCCTL_SET_DUP_COUNT,
+					(void *)&(int){n_frames - 1},
+					sizeof(int));
+
+		while (theora_encode_packetout(&enc_data->m_th_st, 0, &enc_data->m_ogg_pckt1) > 0) {
+			pthread_mutex_lock(&pdata->libogg_mutex);
+			ogg_stream_packetin(&enc_data->m_ogg_ts, &enc_data->m_ogg_pckt1);
+			pdata->avd += pdata->frametime;
+			pthread_mutex_unlock(&pdata->libogg_mutex);
+		}
+
+		last_encode_frameno = encode_frameno;
 	}
 
 	//last packet

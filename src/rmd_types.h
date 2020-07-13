@@ -33,6 +33,7 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <theora/theora.h>
+#include <theora/theoraenc.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
 #include <ogg/ogg.h>
