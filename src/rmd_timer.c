@@ -27,6 +27,7 @@
 #include "config.h"
 #include "rmd_timer.h"
 
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -40,6 +41,8 @@
 
 void *rmdTimer(ProgData *pdata){
 	struct timespec	delay;
+
+	rmdThreadsSetName("rmdTimer");
 
 	delay.tv_sec = 1.f / pdata->args.fps;
 	delay.tv_nsec = 1000000000.f / pdata->args.fps - delay.tv_sec * 1000000000.f;

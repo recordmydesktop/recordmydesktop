@@ -46,7 +46,7 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 #endif
 
-	rmdThreadsSetName("rmdEncodeSounds");
+	rmdThreadsSetName("rmdEncodeSound");
 
 	pdata->v_encoding_clean = 0;
 	while (pdata->running) {

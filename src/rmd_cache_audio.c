@@ -51,7 +51,7 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 	}
 #endif
 
-	rmdThreadsSetName("rmdCacheSounds");
+	rmdThreadsSetName("rmdCacheSound");
 
 //We are simply going to throw sound on the disk.
 //It's sound is tiny compared to that of image, so

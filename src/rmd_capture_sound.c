@@ -29,6 +29,7 @@
 
 #include "rmd_jack.h"
 #include "rmd_opendev.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -46,6 +47,8 @@ void *rmdCaptureSound(ProgData *pdata) {
 #ifdef HAVE_LIBASOUND
 	int frames = pdata->periodsize;
 #endif
+	rmdThreadsSetName("rmdCaptureSound");
+
 	//start capturing only after first frame is taken
 	nanosleep(&(struct timespec){ .tv_nsec = pdata->frametime * 1000 }, NULL);
 
