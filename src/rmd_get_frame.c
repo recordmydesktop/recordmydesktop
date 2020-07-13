@@ -331,13 +331,9 @@ void *rmdGetFrame(ProgData *pdata) {
 	while (pdata->running) {
 		unsigned	time_frameno;
 
-		//if we are left behind we must not wait.
-		//also before actually pausing we must make sure the streams
-		//are synced. sound stops so this should only happen quickly.
 		pthread_mutex_lock(&pdata->time_mutex);
-		while (	(pdata->avd > 0 || pdata->args.nosound) &&
-			pdata->capture_frameno >= pdata->time_frameno)
-				pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
+		while (pdata->capture_frameno >= pdata->time_frameno)
+			pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
 
 		time_frameno = pdata->time_frameno;
 		pthread_mutex_unlock(&pdata->time_mutex);
