@@ -581,7 +581,7 @@ void *rmdGetFrame(ProgData *pdata) {
 		/* notify the encoder of the new frame */
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
 		pdata->capture_frameno = time_frameno;
-		pthread_cond_broadcast(&pdata->image_buffer_ready);
+		pthread_cond_signal(&pdata->image_buffer_ready);
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
 	}
 
