@@ -81,6 +81,7 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	pthread_mutex_init(&pdata->yuv_mutex, NULL);
 	pthread_mutex_init(&pdata->pause_mutex, NULL);
 	pthread_mutex_init(&pdata->time_mutex, NULL);
+	pthread_mutex_init(&pdata->avd_mutex, NULL);
 	pthread_cond_init(&pdata->time_cond, NULL);
 	pthread_cond_init(&pdata->pause_cond, NULL);
 	pthread_cond_init(&pdata->image_buffer_ready, NULL);

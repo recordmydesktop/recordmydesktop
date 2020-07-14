@@ -329,6 +329,7 @@ struct _ProgData {
 
 	pthread_mutex_t pause_mutex;
 	pthread_mutex_t time_mutex;
+	pthread_mutex_t	avd_mutex;
 
 #ifdef HAVE_LIBASOUND
 	snd_pcm_t *sound_handle;
