@@ -74,9 +74,12 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 		while (theora_encode_packetout(&enc_data->m_th_st, 0, &enc_data->m_ogg_pckt1) > 0) {
 			pthread_mutex_lock(&pdata->libogg_mutex);
 			ogg_stream_packetin(&enc_data->m_ogg_ts, &enc_data->m_ogg_pckt1);
-			pdata->avd += pdata->frametime;
 			pthread_mutex_unlock(&pdata->libogg_mutex);
 		}
+
+		pthread_mutex_lock(&pdata->avd_mutex);
+		pdata->avd += pdata->frametime * n_frames;
+		pthread_mutex_unlock(&pdata->avd_mutex);
 
 		last_encode_frameno = encode_frameno;
 	}
