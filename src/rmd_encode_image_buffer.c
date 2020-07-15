@@ -77,10 +77,6 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 			pthread_mutex_unlock(&pdata->libogg_mutex);
 		}
 
-		pthread_mutex_lock(&pdata->avd_mutex);
-		pdata->avd += pdata->frametime * n_frames;
-		pthread_mutex_unlock(&pdata->avd_mutex);
-
 		last_encode_frameno = encode_frameno;
 	}
 

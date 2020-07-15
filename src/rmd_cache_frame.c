@@ -105,7 +105,7 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 			v_short_blocks[blocknum_x * blocknum_y];
 	unsigned long long int total_bytes = 0;
 	unsigned long long int total_received_bytes = 0;
-	unsigned int	capture_frameno = 0, last_capture_frameno = 0;
+	unsigned int	capture_frameno = 0;
 
 	rmdThreadsSetName("rmdCacheImages");
 
@@ -255,9 +255,6 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 
 		nbytes += rmdFlushBlock(NULL, 0, 0, 0, 0, fp, ucfp, 1);
 		/**@________________@**/
-		pthread_mutex_lock(&pdata->avd_mutex);
-		pdata->avd += pdata->frametime * (capture_frameno - last_capture_frameno);
-		pthread_mutex_unlock(&pdata->avd_mutex);
 
 		if (nbytes > CACHE_FILE_SIZE_LIMIT) {
 			if (rmdSwapCacheFilesWrite(pdata->cache_data->imgdata, nth_cache, &fp, &ucfp)) {
@@ -281,8 +278,6 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 			nth_cache++;
 			nbytes = 0;
 		}
-
-		last_capture_frameno = capture_frameno;
 	}
 	total_bytes += nbytes;
 
