@@ -105,7 +105,7 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 			v_short_blocks[blocknum_x * blocknum_y];
 	unsigned long long int total_bytes = 0;
 	unsigned long long int total_received_bytes = 0;
-	unsigned int	capture_frameno = 0;
+	unsigned int	capture_frameno = 0, last_capture_frameno = 0;
 
 	rmdThreadsSetName("rmdCacheImages");
 
@@ -181,8 +181,8 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 		}
 
 		strncpy(fheader.frame_prefix, "FRAM", 4);
-		fheader.frameno = ++frameno;
-		fheader.current_total = pdata->frames_total;
+		fheader.capture_frameno = capture_frameno;
+		frameno++;
 
 		fheader.Ynum = ynum;
 		fheader.Unum = unum;
@@ -255,7 +255,9 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 
 		nbytes += rmdFlushBlock(NULL, 0, 0, 0, 0, fp, ucfp, 1);
 		/**@________________@**/
-		pdata->avd += pdata->frametime;
+		pthread_mutex_lock(&pdata->avd_mutex);
+		pdata->avd += pdata->frametime * (capture_frameno - last_capture_frameno);
+		pthread_mutex_unlock(&pdata->avd_mutex);
 
 		if (nbytes > CACHE_FILE_SIZE_LIMIT) {
 			if (rmdSwapCacheFilesWrite(pdata->cache_data->imgdata, nth_cache, &fp, &ucfp)) {
@@ -279,6 +281,8 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 			nth_cache++;
 			nbytes = 0;
 		}
+
+		last_capture_frameno = capture_frameno;
 	}
 	total_bytes += nbytes;
 
@@ -307,7 +311,7 @@ void *rmdCacheImageBuffer(ProgData *pdata) {
 
 	fprintf(stderr, "Saved %d frames in a total of %d requests\n",
 			frameno,
-			pdata->frames_total);
+			capture_frameno);
 	fflush(stderr);
 
 	if (!pdata->args.zerocompression) {

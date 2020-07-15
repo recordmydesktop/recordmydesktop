@@ -34,6 +34,7 @@
 * feed a yuv buffer to the theora encoder and submit outcome to
 * the ogg stream.
 * \param pdata ProgData struct containing all program data
+* \param n_frames number of frames to encode from image buffer
 */
 void *rmdEncodeImageBuffer(ProgData *pdata);
 
@@ -44,7 +45,7 @@ void *rmdEncodeImageBuffer(ProgData *pdata);
 * \param pdata ProgData struct containing all program data
 *
 */
-void rmdSyncEncodeImageBuffer(ProgData *pdata);
+void rmdSyncEncodeImageBuffer(ProgData *pdata, unsigned int n_frames);
 
 
 #endif

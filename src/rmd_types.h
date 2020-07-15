@@ -349,19 +349,12 @@ struct _ProgData {
 //We need the total number of blocks
 //for each plane.
 
-//The number of the frame compared to the
-//number of time expirations at the time of
-//caching, will enable us to make up for lost frames.
-
-
 typedef struct _FrameHeader{
 	char		frame_prefix[4];	//always FRAM
-	u_int32_t   frameno,			//number of frame(cached frames)
-				current_total;	  //number of frames that should have been
-									//taken at time of caching this one
-	u_int32_t   Ynum,   //number of changed blocks in the Y plane
-				Unum,   //number of changed blocks in the U plane
-				Vnum;   //number of changed blocks in the V plane
+	u_int32_t	capture_frameno;	//number of frame
+	u_int32_t	Ynum,			//number of changed blocks in the Y plane
+			Unum,			//number of changed blocks in the U plane
+			Vnum;			//number of changed blocks in the V plane
 }FrameHeader;
 
 #endif

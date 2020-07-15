@@ -127,7 +127,7 @@ void *rmdFlushToOgg(ProgData *pdata) {
 					while (!pdata->th_encoding_clean)
 						pthread_cond_wait(&pdata->theora_lib_clean, &pdata->theora_lib_mutex);
 					pthread_mutex_unlock(&pdata->theora_lib_mutex);
-					rmdSyncEncodeImageBuffer(pdata);
+					rmdSyncEncodeImageBuffer(pdata, 1);
 				}
 			}
 

@@ -161,6 +161,14 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp) {
 	return 0;
 }
 
+static int read_header(ProgData *pdata, gzFile ifp, FILE *ucfp, FrameHeader *fheader) {
+	if (!pdata->args.zerocompression) {
+		return gzread(ifp, fheader, sizeof(FrameHeader)) == sizeof(FrameHeader);
+	} else {
+		return fread(fheader, sizeof(FrameHeader), 1, ucfp) == 1;
+	}
+}
+
 void *rmdLoadCache(ProgData *pdata) {
 
 	yuv_buffer	*yuv = &pdata->enc_data->yuv;
@@ -171,9 +179,6 @@ void *rmdLoadCache(ProgData *pdata) {
 	CachedFrame	frame;
 	int		nth_cache = 1,
 			audio_end = 0,
-			extra_frames = 0,	//total number of duplicated frames
-			missing_frames = 0,	//if this is found >0 current run will not load
-						//a frame but it will proccess the previous
 			thread_exit = 0,	//0 success, -1 couldn't find files,1 couldn't remove
 			blocknum_x = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
 			blocknum_y = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH,
@@ -184,6 +189,7 @@ void *rmdLoadCache(ProgData *pdata) {
 	u_int32_t	YBlocks[(yuv->y_width * yuv->y_height) / Y_UNIT_BYTES],
 			UBlocks[(yuv->uv_width * yuv->uv_height) / UV_UNIT_BYTES],
 			VBlocks[(yuv->uv_width * yuv->uv_height) / UV_UNIT_BYTES];
+	unsigned int	last_capture_frameno = 0;
 
 	rmdThreadsSetName("rmdEncodeCache");
 
@@ -225,70 +231,60 @@ void *rmdLoadCache(ProgData *pdata) {
 	//If sound finishes first,we go on with the video.
 	//If video ends we will do one more run to flush audio in the ogg file
 	while (pdata->running) {
+
 		//video load and encoding
 		if (pdata->avd <= 0 || pdata->args.nosound || audio_end) {
-			if (missing_frames > 0) {
-				extra_frames++;
-				missing_frames--;
-				rmdSyncEncodeImageBuffer(pdata);
-			} else if (((!pdata->args.zerocompression) &&
-					 (gzread(ifp, frame.header, sizeof(FrameHeader)) ==
-					  sizeof(FrameHeader) )) ||
-					((pdata->args.zerocompression) &&
-					(fread(frame.header, sizeof(FrameHeader), 1, ucfp) == 1))) {
-				//sync
-				missing_frames += frame.header->current_total -
-								(extra_frames + frame.header->frameno);
+
+			if (read_header(pdata, ifp, ucfp, frame.header)) {
+
 				if (pdata->frames_total) {
 					fprintf(stdout,	"\r[%d%%] ",
-							((frame.header->frameno + extra_frames) * 100) / pdata->frames_total);
+							((frame.header->capture_frameno) * 100) / pdata->capture_frameno);
 				} else
 					fprintf(stdout,	"\r[%d frames rendered] ",
-							(frame.header->frameno + extra_frames));
+							(frame.header->capture_frameno));
 				fflush(stdout);
-				if ( (frame.header->Ynum <= blocknum_x * blocknum_y) &&
-					(frame.header->Unum <= blocknum_x * blocknum_y) &&
-					(frame.header->Vnum <= blocknum_x * blocknum_y) &&
-					!rmdReadFrame(	&frame,
-							(pdata->args.zerocompression ? ucfp : NULL),
-							(pdata->args.zerocompression ? NULL : ifp))
-						) {
 
-						//load the blocks for each buffer
-						if (frame.header->Ynum)
-							for (int j = 0; j < frame.header->Ynum; j++)
-								rmdLoadBlock(	yuv->y,
-										&frame.YData[j * blockszy],
-										frame.YBlocks[j],
-										yuv->y_width,
-										yuv->y_height,
-										Y_UNIT_WIDTH);
-						if (frame.header->Unum)
-							for (int j = 0; j < frame.header->Unum; j++)
-								rmdLoadBlock(	yuv->u,
-										&frame.UData[j * blockszuv],
-										frame.UBlocks[j],
-										yuv->uv_width,
-										yuv->uv_height,
-										UV_UNIT_WIDTH);
-						if (frame.header->Vnum)
-							for (int j = 0; j < frame.header->Vnum; j++)
-								rmdLoadBlock(	yuv->v,
-										&frame.VData[j * blockszuv],
-										frame.VBlocks[j],
-										yuv->uv_width,
-										yuv->uv_height,
-										UV_UNIT_WIDTH);
+				if (	(frame.header->Ynum > blocknum_x * blocknum_y) ||
+					(frame.header->Unum > blocknum_x * blocknum_y) ||
+					(frame.header->Vnum > blocknum_x * blocknum_y) ||
+					rmdReadFrame(	&frame,
+							pdata->args.zerocompression ? ucfp : NULL,
+							pdata->args.zerocompression ? NULL : ifp) < 0) {
 
-						//encode. This is not made in a thread since
-						//now blocking is not a problem
-						//and this way sync problems
-						//can be avoided more easily.
-						rmdSyncEncodeImageBuffer(pdata);
-				} else {
 					raise(SIGINT);
 					continue;
 				}
+
+				//load the blocks for each buffer
+				if (frame.header->Ynum)
+					for (int j = 0; j < frame.header->Ynum; j++)
+						rmdLoadBlock(	yuv->y,
+								&frame.YData[j * blockszy],
+								frame.YBlocks[j],
+								yuv->y_width,
+								yuv->y_height,
+								Y_UNIT_WIDTH);
+				if (frame.header->Unum)
+					for (int j = 0; j < frame.header->Unum; j++)
+						rmdLoadBlock(	yuv->u,
+								&frame.UData[j * blockszuv],
+								frame.UBlocks[j],
+								yuv->uv_width,
+								yuv->uv_height,
+								UV_UNIT_WIDTH);
+				if (frame.header->Vnum)
+					for (int j = 0; j < frame.header->Vnum; j++)
+						rmdLoadBlock(	yuv->v,
+								&frame.VData[j * blockszuv],
+								frame.VBlocks[j],
+								yuv->uv_width,
+								yuv->uv_height,
+								UV_UNIT_WIDTH);
+
+				rmdSyncEncodeImageBuffer(pdata, fheader.capture_frameno - last_capture_frameno);
+
+				last_capture_frameno = fheader.capture_frameno;
 			} else {
 				if (rmdSwapCacheFilesRead(	pdata->cache_data->imgdata,
 								nth_cache,
@@ -299,7 +295,6 @@ void *rmdLoadCache(ProgData *pdata) {
 					fprintf(stderr, "\t[Cache File %d]", nth_cache);
 					nth_cache++;
 				}
-				continue;
 			}
 		//audio load and encoding
 		} else {

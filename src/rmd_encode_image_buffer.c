@@ -95,7 +95,7 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 
 //this function is meant to be called normally
 //not through a thread of it's own
-void rmdSyncEncodeImageBuffer(ProgData *pdata) {
+void rmdSyncEncodeImageBuffer(ProgData *pdata, unsigned int n_frames) {
 	EncData	*enc_data = pdata->enc_data;
 
 	if (theora_encode_YUVin(&enc_data->m_th_st, &enc_data->yuv)) {
@@ -103,14 +103,23 @@ void rmdSyncEncodeImageBuffer(ProgData *pdata) {
 		return;
 	}
 
-	if (theora_encode_packetout(&enc_data->m_th_st, !pdata->running, &enc_data->m_ogg_pckt1) == 1) {
+	if (n_frames > 1)
+		theora_control(	&enc_data->m_th_st,
+				TH_ENCCTL_SET_DUP_COUNT,
+				(void *)&(int){n_frames - 1},
+				sizeof(int));
+
+	while (theora_encode_packetout(&enc_data->m_th_st, 0, &enc_data->m_ogg_pckt1) > 0) {
 		pthread_mutex_lock(&pdata->libogg_mutex);
 		ogg_stream_packetin(&enc_data->m_ogg_ts, &enc_data->m_ogg_pckt1);
-
+		/* TODO: this is the only real difference from what's open-coded above,
+		 * investigate why this is done this way and make the thread just call
+		 * this function instead of duplicating it.
+		 */
 		if (!pdata->running)
 			enc_data->m_ogg_ts.e_o_s = 1;
-
-		pdata->avd += pdata->frametime;
 		pthread_mutex_unlock(&pdata->libogg_mutex);
 	}
+
+	pdata->avd += pdata->frametime * n_frames;
 }
