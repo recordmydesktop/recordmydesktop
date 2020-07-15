@@ -318,11 +318,6 @@ struct _ProgData {
 	boolean aborted;			 //1 if we should abort
 	boolean pause_state_changed; //1 if pause state changed
 
-	//the following values are of no effect
-	//but they might be usefull later for profiling
-	unsigned int	frames_total,   //frames calculated by total time expirations
-			frames_lost;	//the value of shame
-
 	/* timer advances time_frameno, getframe copies time_frameno to capture_frameno
 	 * access to both is serialized by time_{mutex,cond}
 	 */

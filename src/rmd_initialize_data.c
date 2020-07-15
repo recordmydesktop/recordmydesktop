@@ -97,8 +97,6 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	pdata->paused			= FALSE;
 	pdata->aborted			= FALSE;
 	pdata->pause_state_changed	= FALSE;
-	pdata->frames_total		= 0;
-	pdata->frames_lost		= 0;
 	pdata->capture_frameno		= 0;
 	pdata->time_frameno		= 0;
 

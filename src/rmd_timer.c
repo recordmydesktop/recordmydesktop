@@ -113,13 +113,7 @@ void *rmdTimer(ProgData *pdata) {
 			}
 		}
 
-		if (!pdata->paused) {
-			pthread_mutex_unlock(&pdata->pause_mutex);
-
-			/* FIXME TODO: detect dropped frames by delta between {time,capture}_frameno */
-			pdata->frames_total++;
-		} else
-			pthread_mutex_unlock(&pdata->pause_mutex);
+		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		if (!pdata->args.nosound)
 			sync_streams(pdata, &frame_step, &delay);

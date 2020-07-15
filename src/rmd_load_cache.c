@@ -237,12 +237,8 @@ void *rmdLoadCache(ProgData *pdata) {
 
 			if (read_header(pdata, ifp, ucfp, frame.header)) {
 
-				if (pdata->frames_total) {
-					fprintf(stdout,	"\r[%d%%] ",
-							((frame.header->capture_frameno) * 100) / pdata->capture_frameno);
-				} else
-					fprintf(stdout,	"\r[%d frames rendered] ",
-							(frame.header->capture_frameno));
+				fprintf(stdout,	"\r[%d%%] ",
+						((frame.header->capture_frameno) * 100) / pdata->capture_frameno);
 				fflush(stdout);
 
 				if (	(frame.header->Ynum > blocknum_x * blocknum_y) ||
