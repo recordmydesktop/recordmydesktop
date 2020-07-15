@@ -99,10 +99,6 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 			fwrite(jackbuf, 1, write_size, pdata->cache_data->afp);
 #endif
 		}
-
-		pthread_mutex_lock(&pdata->avd_mutex);
-		pdata->avd -= pdata->periodtime;
-		pthread_mutex_unlock(&pdata->avd_mutex);
 	}
 
 	fclose(pdata->cache_data->afp);

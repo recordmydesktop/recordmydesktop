@@ -127,10 +127,6 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 			}
 		}
 		pthread_mutex_unlock(&pdata->libogg_mutex);
-
-		pthread_mutex_lock(&pdata->avd_mutex);
-		pdata->avd -= pdata->periodtime;
-		pthread_mutex_unlock(&pdata->avd_mutex);
 	}
 
 	pthread_mutex_lock(&pdata->vorbis_lib_mutex);

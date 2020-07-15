@@ -146,6 +146,16 @@ void *rmdCaptureSound(ProgData *pdata) {
 				sret += temp_sret;
 		} while (sret < (pdata->args.buffsize << 1) * pdata->args.channels);
 #endif
+
+		/* Since sound buffers are queued here by allocating buffers, their "stream time"
+		 * can be accounted for here instead of after encoding, since encoding isn't lossy
+		 * in the time domain there shouldn't be any disparity.  Infact, buffer underruns
+		 * should get accounted for too FIXME TODO
+		 */
+		pthread_mutex_lock(&pdata->avd_mutex);
+		pdata->avd -= pdata->periodtime;
+		pthread_mutex_unlock(&pdata->avd_mutex);
+
 		//queue the new buffer
 		pthread_mutex_lock(&pdata->sound_buffer_mutex);
 		tmp = pdata->sound_buffer;
