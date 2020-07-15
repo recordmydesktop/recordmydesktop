@@ -332,8 +332,21 @@ void *rmdGetFrame(ProgData *pdata) {
 		unsigned	time_frameno;
 
 		pthread_mutex_lock(&pdata->time_mutex);
-		while (pdata->capture_frameno >= pdata->time_frameno)
+		while (pdata->capture_frameno >= pdata->time_frameno) {
 			pthread_cond_wait(&pdata->time_cond, &pdata->time_mutex);
+
+			if (pdata->capture_frameno >= pdata->time_frameno) {
+				/* *Likely* paused, but could be a spurious wakeup.
+				 * either way, it's harmless to service the event loop
+				 * before waiting again.  This is how the timer keeps
+				 * the event loop serviced by signaling us without
+				 * advancing time_frameno.
+				 */
+				pthread_mutex_unlock(&pdata->time_mutex);
+				rmdEventLoop(pdata);
+				pthread_mutex_lock(&pdata->time_mutex);
+			}
+		}
 
 		time_frameno = pdata->time_frameno;
 		pthread_mutex_unlock(&pdata->time_mutex);
@@ -341,17 +354,6 @@ void *rmdGetFrame(ProgData *pdata) {
 		//read all events and construct list with damage 
 		//events (if not full_shots)
 		rmdEventLoop(pdata);
-
-		if (pdata->paused) {
-			/* This is a bit janky, but there's need to service the event loop
-			 * when paused, so instead of blocking on pause_cond, a short sleep
-			 * is performed.
-			 * Since the timer keeps running currently when paused, the above
-			 * cond_wait() will never prevent us from reaching here.
-			 */
-			nanosleep(&(struct timespec){ .tv_nsec = 50000000 }, NULL);
-			continue;
-		}
 
 		//switch back and front buffers (full_shots only)
 		if (d_buff)

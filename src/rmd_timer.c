@@ -113,14 +113,25 @@ void *rmdTimer(ProgData *pdata) {
 			}
 		}
 
+		/* When paused, stop advancing time_frameno, get_frame only progresses
+		 * when time_frameno > capture_frameno.  But get_frame needs to service
+		 * the event loop even when paused, so still signal time_cond just with
+		 * pdata->time_frameno frozen.  get_frame will then handle time_cond
+		 * wakeups where capture_frameno >= time_frameno as "poll events".
+		 */
+		if (pdata->paused)
+			frame_step = 0;
 		pthread_mutex_unlock(&pdata->pause_mutex);
 
-		if (!pdata->args.nosound)
-			sync_streams(pdata, &frame_step, &delay);
+		if (frame_step) {
+			if (!pdata->args.nosound)
+				sync_streams(pdata, &frame_step, &delay);
 
-		pthread_mutex_lock(&pdata->time_mutex);
-		pdata->time_frameno += frame_step;
-		pthread_mutex_unlock(&pdata->time_mutex);
+			pthread_mutex_lock(&pdata->time_mutex);
+			pdata->time_frameno += frame_step;
+			pthread_mutex_unlock(&pdata->time_mutex);
+		}
+
 		pthread_cond_signal(&pdata->time_cond);
 
 		nanosleep(&delay, NULL);
