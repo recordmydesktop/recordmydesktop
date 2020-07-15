@@ -580,11 +580,26 @@ void *rmdGetFrame(ProgData *pdata) {
 		if (!pdata->args.full_shots)
 			rmdClearList(&pdata->rect_root);
 
+		/* Since frame acquisition may take a long and variable time, update
+		 * frameno again just in case we've missed some so they can be included
+		 * as this frame by the encoder.
+		 */
+		pthread_mutex_lock(&pdata->time_mutex);
+		time_frameno = pdata->time_frameno;
+		pthread_mutex_unlock(&pdata->time_mutex);
+
 		/* notify the encoder of the new frame */
 		pthread_mutex_lock(&pdata->img_buff_ready_mutex);
 		pdata->capture_frameno = time_frameno;
 		pthread_cond_signal(&pdata->image_buffer_ready);
 		pthread_mutex_unlock(&pdata->img_buff_ready_mutex);
+
+		/* XXX: note if the encoder thread doesn't manage to wake up and grab the yuv_mutex
+		 * before this thread does in response to another tick, then the frame just
+		 * submitted is lost and the encoder thread will wait again for another frame.
+		 * In practice if this never happens it's irrelevant, but if it proves to be an
+		 * issue there are options.
+		 */
 	}
 
 	if (!pdata->args.noframe)
