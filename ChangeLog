@@ -1,3 +1,9 @@
+/*Version 0.4.2*/
+* Reworked AV-sync to be more accurate and not hog CPU when the
+video capture gets too far behind
+* Name the timer and sound capture threads
+* Fixup rmd{Encode,Cache}Sound thread names
+
 /*Version 0.4.1*/
 * Fixed 100% CPU usage when paused
 * Threads are now named appropriately via prctl(PR_SET_NAME)
