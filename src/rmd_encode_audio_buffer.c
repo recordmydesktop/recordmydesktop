@@ -37,7 +37,7 @@
 #include <errno.h>
 
 
-void *rmdEncodeSoundBuffer(ProgData *pdata) {
+void *rmdEncodeAudioBuffer(ProgData *pdata) {
 	int	sampread = pdata->periodsize;
 #ifdef HAVE_LIBJACK
 	void	*jackbuf = NULL;
@@ -46,7 +46,7 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 		jackbuf = malloc(pdata->sound_framesize * pdata->jdata->buffersize);
 #endif
 
-	rmdThreadsSetName("rmdEncodeSound");
+	rmdThreadsSetName("rmdEncodeAudio");
 
 	pdata->v_encoding_clean = 0;
 	while (pdata->running) {
@@ -136,7 +136,7 @@ void *rmdEncodeSoundBuffer(ProgData *pdata) {
 	pthread_exit(&errno);
 }
 
-void rmdSyncEncodeSoundBuffer(ProgData *pdata, signed char *buff) {
+void rmdSyncEncodeAudioBuffer(ProgData *pdata, signed char *buff) {
 	int	sampread = (buff != NULL) ? pdata->periodsize : 0;
 	float	**vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
 

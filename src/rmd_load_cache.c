@@ -300,7 +300,7 @@ void *rmdLoadCache(ProgData *pdata) {
 				if (nbytes <= 0)
 					audio_end = 1;
 				else
-					rmdSyncEncodeSoundBuffer(pdata, sound_data);
+					rmdSyncEncodeAudioBuffer(pdata, sound_data);
 			}
 		}
 	}

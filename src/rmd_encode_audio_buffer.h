@@ -24,28 +24,28 @@
 *   For further information contact me at johnvarouhakis@gmail.com            *
 ******************************************************************************/
 
-#ifndef ENCODE_SOUND_BUFFER_H
-#define ENCODE_SOUND_BUFFER_H 1
+#ifndef ENCODE_AUDIO_BUFFER_H
+#define ENCODE_AUDIO_BUFFER_H 1
 
 #include "rmd_types.h"
 
 
 /**
-* Sound encoding thread. Picks up data from the buffer queue ,
+* Audio encoding thread. Picks up data from the buffer queue ,
 * encodes and places them on the vorbis stream.
 *
 * \param pdata ProgData struct containing all program data
 */
-void *rmdEncodeSoundBuffer(ProgData *pdata);
+void *rmdEncodeAudioBuffer(ProgData *pdata);
 
 /**
-* As rmdEncodeSoundBuffer, only with the assumption that
+* As rmdEncodeAudioBuffer, only with the assumption that
 * this is not a thread on it's own
 *
 * \param pdata ProgData struct containing all program data
 *
 */
-void rmdSyncEncodeSoundBuffer(ProgData *pdata,signed char *buff);
+void rmdSyncEncodeAudioBuffer(ProgData *pdata,signed char *buff);
 
 
 #endif
