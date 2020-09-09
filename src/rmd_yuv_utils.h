@@ -31,22 +31,12 @@
 #include "rmd_types.h"
 
 
-// The macros work directly on this data (for performance reasons I
-// suppose) so we keep this global
-extern unsigned char Yr[256], Yg[256], Yb[256],
-                     Ur[256], Ug[256], UbVr[256],
-                     Vg[256], Vb[256];
-
-
 // We keep these global for now. FIXME: Isolate them.
 extern unsigned char	*yblocks,
 			*ublocks,
 			*vblocks;
 
-
-/**
-* Fill Yr,Yg,Yb,Ur,Ug.Ub,Vr,Vg,Vb arrays(globals) with values.
-*/
+/* Fill Yr,Yg,Yb,Ur,Ug.Ub,Vr,Vg,Vb arrays with values. */
 void rmdMakeMatrices(void);
 
 /* update yuv from data and optionally data_back */

@@ -30,10 +30,9 @@
 #include "rmd_math.h"
 
 
-// Keep these global (for performance reasons I assume).
-unsigned char	Yr[256], Yg[256], Yb[256],
-		Ur[256], Ug[256], UbVr[256],
-		Vg[256], Vb[256];
+static unsigned char	Yr[256], Yg[256], Yb[256],
+			Ur[256], Ug[256], UbVr[256],
+			Vg[256], Vb[256];
 
 // FIXME: These globals are modified in other source files! We keep
 // thsee here for now. These are the cache blocks. They need to be
