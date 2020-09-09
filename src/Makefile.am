@@ -8,8 +8,8 @@ recordmydesktop_SOURCES = \
 	rmd_cache_audio.h \
 	rmd_cache_frame.c \
 	rmd_cache_frame.h \
-	rmd_capture_sound.c \
-	rmd_capture_sound.h \
+	rmd_capture_audio.c \
+	rmd_capture_audio.h \
 	rmd_encode_cache.c \
 	rmd_encode_cache.h \
 	rmd_encode_image_buffer.c \

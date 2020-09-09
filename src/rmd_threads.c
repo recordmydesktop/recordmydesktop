@@ -29,7 +29,7 @@
 
 #include "rmd_cache_audio.h"
 #include "rmd_cache_frame.h"
-#include "rmd_capture_sound.h"
+#include "rmd_capture_audio.h"
 #include "rmd_encode_image_buffer.h"
 #include "rmd_encode_sound_buffer.h"
 #include "rmd_flush_to_ogg.h"

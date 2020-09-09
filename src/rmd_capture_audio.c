@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include "config.h"
-#include "rmd_capture_sound.h"
+#include "rmd_capture_audio.h"
 
 #include "rmd_jack.h"
 #include "rmd_opendev.h"
