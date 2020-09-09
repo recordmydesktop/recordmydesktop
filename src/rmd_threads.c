@@ -83,7 +83,7 @@ void rmdThreads(ProgData *pdata) {
 		if (!pdata->args.use_jack)
 			pthread_create(	&sound_capture_t,
 					NULL,
-					(void *)rmdCaptureSound,
+					(void *)rmdCaptureAudio,
 					(void *)pdata);
 
 		if (pdata->args.encOnTheFly)

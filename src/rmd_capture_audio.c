@@ -42,12 +42,12 @@
 #include <time.h>
 
 
-void *rmdCaptureSound(ProgData *pdata) {
+void *rmdCaptureAudio(ProgData *pdata) {
 
 #ifdef HAVE_LIBASOUND
 	int frames = pdata->periodsize;
 #endif
-	rmdThreadsSetName("rmdCaptureSound");
+	rmdThreadsSetName("rmdCaptureAudio");
 
 	//start capturing only after first frame is taken
 	nanosleep(&(struct timespec){ .tv_nsec = pdata->frametime * 1000 }, NULL);
@@ -80,7 +80,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 								   //didn't magically change
 							   );
 				if (pdata->sound_handle == NULL) {
-					fprintf(stderr, "Couldn't reopen sound device.Exiting\n");
+					fprintf(stderr, "Couldn't reopen audio device. Exiting\n");
 					pdata->running = FALSE;
 					errno = 3;
 					pthread_exit(&errno);
@@ -95,7 +95,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 								pdata->args.channels,
 								pdata->args.frequency);
 			if (pdata->sound_handle < 0) {
-				fprintf(stderr, "Couldn't reopen sound device. Exiting\n");
+				fprintf(stderr, "Couldn't reopen audio device. Exiting\n");
 				pdata->running = FALSE;
 				errno = 3;
 				pthread_exit(&errno);
@@ -123,7 +123,7 @@ void *rmdCaptureSound(ProgData *pdata) {
 						snd_strerror(temp_sret));
 				snd_pcm_prepare(pdata->sound_handle);
 			} else if (temp_sret < 0) {
-				fprintf(stderr,	"An error occured while reading sound data:\n"
+				fprintf(stderr,	"An error occured while reading audio data:\n"
 						" %s\n",
 						snd_strerror(temp_sret));
 				snd_pcm_prepare(pdata->sound_handle);

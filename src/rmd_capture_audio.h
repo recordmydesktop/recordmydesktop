@@ -24,19 +24,19 @@
 *   For further information contact me at johnvarouhakis@gmail.com            *
 ******************************************************************************/
 
-#ifndef CAPTURE_SOUND_H
-#define CAPTURE_SOUND_H 1
+#ifndef CAPTURE_AUDIO_H
+#define CAPTURE_AUDIO_H 1
 
 #include "rmd_types.h"
 
 
 /**
-* Sound capturing thread. Data are placed on a
+* Audio capturing thread. Data are placed on a
 * list to be picked up by other threads.
 *
 * \param pdata ProgData struct containing all program data
 */
-void *rmdCaptureSound(ProgData *pdata);
+void *rmdCaptureAudio(ProgData *pdata);
 
 
 #endif
