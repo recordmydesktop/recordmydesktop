@@ -39,7 +39,7 @@
 
 
 
-void *rmdCacheSoundBuffer(ProgData *pdata) {
+void *rmdCacheAudioBuffer(ProgData *pdata) {
 	size_t	write_size = pdata->periodsize * pdata->sound_framesize;
 
 #ifdef HAVE_LIBJACK
@@ -51,7 +51,7 @@ void *rmdCacheSoundBuffer(ProgData *pdata) {
 	}
 #endif
 
-	rmdThreadsSetName("rmdCacheSound");
+	rmdThreadsSetName("rmdCacheAudio");
 
 //We are simply going to throw sound on the disk.
 //It's sound is tiny compared to that of image, so

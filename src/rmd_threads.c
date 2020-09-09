@@ -94,7 +94,7 @@ void rmdThreads(ProgData *pdata) {
 		else
 			pthread_create(	&sound_cache_t,
 					NULL,
-					(void *)rmdCacheSoundBuffer,
+					(void *)rmdCacheAudioBuffer,
 					(void *)pdata);
 	}
 

@@ -31,12 +31,12 @@
 
 
 /**
-* Sound caching thread. Simply writes the pcm buffers on disk
+* Audio caching thread. Simply writes the pcm buffers on disk
 *
 * \param pdata ProgData struct containing all program data
 *
 */
-void *rmdCacheSoundBuffer(ProgData *pdata);
+void *rmdCacheAudioBuffer(ProgData *pdata);
 
 
 #endif
