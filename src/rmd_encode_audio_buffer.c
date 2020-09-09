@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include "config.h"
-#include "rmd_encode_sound_buffer.h"
+#include "rmd_encode_audio_buffer.h"
 
 #include "rmd_jack.h"
 #include "rmd_threads.h"

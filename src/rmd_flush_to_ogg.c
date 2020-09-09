@@ -27,8 +27,8 @@
 #include "config.h"
 #include "rmd_flush_to_ogg.h"
 
+#include "rmd_encode_audio_buffer.h"
 #include "rmd_encode_image_buffer.h"
-#include "rmd_encode_sound_buffer.h"
 #include "rmd_threads.h"
 #include "rmd_types.h"
 

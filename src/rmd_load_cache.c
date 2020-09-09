@@ -28,8 +28,8 @@
 #include "rmd_load_cache.h"
 
 #include "rmd_cache.h"
+#include "rmd_encode_audio_buffer.h"
 #include "rmd_encode_image_buffer.h"
-#include "rmd_encode_sound_buffer.h"
 #include "rmd_macro.h"
 #include "rmd_threads.h"
 #include "rmd_types.h"
