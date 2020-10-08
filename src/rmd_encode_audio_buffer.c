@@ -37,7 +37,8 @@
 #include <errno.h>
 
 
-void *rmdEncodeAudioBuffer(ProgData *pdata) {
+void *rmdEncodeAudioBuffer(ProgData *pdata)
+{
 	int	sampread = pdata->periodsize;
 #ifdef HAVE_LIBJACK
 	void	*jackbuf = NULL;
@@ -122,9 +123,8 @@ void *rmdEncodeAudioBuffer(ProgData *pdata) {
 			vorbis_analysis(&pdata->enc_data->m_vo_block, NULL);
 			vorbis_bitrate_addblock(&pdata->enc_data->m_vo_block);
 
-			while (vorbis_bitrate_flushpacket(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_ogg_pckt2)) {
+			while (vorbis_bitrate_flushpacket(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_ogg_pckt2))
 				ogg_stream_packetin(&pdata->enc_data->m_ogg_vs, &pdata->enc_data->m_ogg_pckt2);
-			}
 		}
 		pthread_mutex_unlock(&pdata->libogg_mutex);
 	}
@@ -136,7 +136,8 @@ void *rmdEncodeAudioBuffer(ProgData *pdata) {
 	pthread_exit(&errno);
 }
 
-void rmdSyncEncodeAudioBuffer(ProgData *pdata, signed char *buff) {
+void rmdSyncEncodeAudioBuffer(ProgData *pdata, signed char *buff)
+{
 	int	sampread = (buff != NULL) ? pdata->periodsize : 0;
 	float	**vorbis_buffer = vorbis_analysis_buffer(&pdata->enc_data->m_vo_dsp, sampread);
 

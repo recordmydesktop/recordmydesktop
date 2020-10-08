@@ -47,8 +47,8 @@ void rmdUpdateImage(	Display * dpy,
 			Image *image,
 			int noshmem,
 			int shm_opcode,
-			int no_quick_subsample){
-
+			int no_quick_subsample)
+{
 	RectArea *temp;
 
 	for (temp = *root; temp; temp = temp->next) {

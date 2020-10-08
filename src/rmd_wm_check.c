@@ -32,7 +32,8 @@
 #include <X11/Xatom.h>
 
 
-char *rmdWMCheck(Display *dpy,Window root) {
+char *rmdWMCheck(Display *dpy,Window root)
+{
 	Window  	*wm_child=NULL;
 	Atom		nwm_atom,
 			utf8_string,

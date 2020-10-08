@@ -29,7 +29,8 @@
 
 
 
-static void rmdSetPixel(boolean *state, int x, int y, boolean value) {
+static void rmdSetPixel(boolean *state, int x, int y, boolean value)
+{
     int index = y * STATE_WIDTH + x;
 
     // Guard against non-optimal implementations
@@ -40,7 +41,8 @@ static void rmdSetPixel(boolean *state, int x, int y, boolean value) {
     state[y * STATE_WIDTH + x] = value;
 }
 
-static boolean rmdGetPixel(boolean *state, int x, int y) {
+static boolean rmdGetPixel(boolean *state, int x, int y)
+{
     int index = y * STATE_WIDTH + x;
 
     // Guard against non-optimal implementations
@@ -51,7 +53,8 @@ static boolean rmdGetPixel(boolean *state, int x, int y) {
     return state[y * STATE_WIDTH + x];
 }
 
-static void rmdWriteGeomToState(XRectangle *rect, boolean *state) {
+static void rmdWriteGeomToState(XRectangle *rect, boolean *state)
+{
     int x, y;
 
     for (y = rect->y; y < rect->y + rect->height; y++) {
@@ -61,7 +64,8 @@ static void rmdWriteGeomToState(XRectangle *rect, boolean *state) {
     }
 }
 
-static void rmdClearState(boolean *state) {
+static void rmdClearState(boolean *state)
+{
     int x, y;
 
     for (y = 0; y < STATE_HEIGHT; y++) {
@@ -71,7 +75,8 @@ static void rmdClearState(boolean *state) {
     }
 }
 
-static void rmdWarnIfNonOptimal(XRectangle *rect) {
+static void rmdWarnIfNonOptimal(XRectangle *rect)
+{
     if (rect->x      < 0 || rect->x      >= STATE_WIDTH  ||
         rect->y      < 0 || rect->y      >= STATE_HEIGHT ||
         rect->width  == 0 || rect->width  >  STATE_WIDTH  ||
@@ -87,7 +92,8 @@ static void rmdWarnIfNonOptimal(XRectangle *rect) {
     }
 }
 
-static void GetState(RectArea *root, boolean *state) {
+static void GetState(RectArea *root, boolean *state)
+{
     RectArea *current = root;
 
     rmdClearState(state);
@@ -102,7 +108,8 @@ static void GetState(RectArea *root, boolean *state) {
     }
 }
  
-static boolean rmdStatesEqual(boolean *a, boolean *b) {
+static boolean rmdStatesEqual(boolean *a, boolean *b)
+{
     int x, y;
 
     for (y = 0; y < STATE_HEIGHT; y++) {
@@ -116,7 +123,8 @@ static boolean rmdStatesEqual(boolean *a, boolean *b) {
     return TRUE;
 }
 
-static void rmdPrintState(boolean *state) {
+static void rmdPrintState(boolean *state)
+{
     int x, y;
     
     for (y = 0; y < STATE_HEIGHT; y++) {
@@ -138,7 +146,8 @@ static void rmdPrintState(boolean *state) {
  * rmdRectInsert() with various testdata and after each call comparing
  * the current state with a predefied set of expected states.
  */
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     boolean current_state[STATE_WIDTH * STATE_HEIGHT];
     RectArea *root = NULL;
     int i = 0;

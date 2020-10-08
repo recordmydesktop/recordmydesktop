@@ -41,7 +41,8 @@ unsigned char	*yblocks,
 		*ublocks,
 		*vblocks;
 
-void rmdMakeMatrices (void) {
+void rmdMakeMatrices (void)
+{
 	int i;
 
  	/* assuming 8-bit precision */
@@ -374,8 +375,8 @@ void rmdUpdateYuvBuffer(	yuv_buffer *yuv,
 				int width_tm,
 				int height_tm,
 				int sampling,
-				int depth) {
-
+				int depth)
+{
 	if (data_back == NULL) {
 		switch (depth) {
 		case 24:
@@ -415,8 +416,8 @@ void rmdDummyPointerToYuv(	yuv_buffer *yuv,
 				int height_tm,
 				int x_offset,
 				int y_offset,
-				unsigned char no_pixel) {
-
+				unsigned char no_pixel)
+{
 	int i, k, j = 0;
 	int x_2 = x_tm / 2, y_2 = y_tm / 2, y_width_2 = yuv->y_width/2;
 
@@ -443,7 +444,6 @@ void rmdDummyPointerToYuv(	yuv_buffer *yuv,
 			}
 		}
 	}
-
 }
 
 static inline unsigned char avg_4_pixels(	unsigned char *data_array,
@@ -452,7 +452,6 @@ static inline unsigned char avg_4_pixels(	unsigned char *data_array,
 						int i_tm,
 						int offset)
 {
-
     return 	((data_array[(k_tm*width_img+i_tm)*RMD_ULONG_SIZE_T+offset]+
 		data_array[((k_tm-1)*width_img+i_tm)*RMD_ULONG_SIZE_T+offset]+
 		data_array[(k_tm*width_img+i_tm-1)*RMD_ULONG_SIZE_T+offset]+
@@ -467,8 +466,8 @@ void rmdXFixesPointerToYuv(	yuv_buffer *yuv,
 				int height_tm,
 				int x_offset,
 				int y_offset,
-				int column_discard_stride) {
-
+				int column_discard_stride)
+{
 	unsigned char	avg0, avg1, avg2, avg3;
 	int		x_2 = x_tm / 2, y_2 = y_tm / 2;
 

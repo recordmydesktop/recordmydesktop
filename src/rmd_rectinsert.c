@@ -59,7 +59,8 @@
 static int rmdCollideRects(	const XRectangle *xrect1,
 				const XRectangle *xrect2,
 				XRectangle xrect_return[],
-				int *nrects) {
+				int *nrects)
+{
 	if ((xrect1->x>=xrect2->x)&&
 		(xrect1->x+xrect1->width<=xrect2->x+xrect2->width)&&
 		(xrect1->y>=xrect2->y)&&
@@ -277,8 +278,8 @@ static int rmdCollideRects(	const XRectangle *xrect1,
 	}
 }
 
-int rmdRectInsert(RectArea **root, const XRectangle *xrect) {
-
+int rmdRectInsert(RectArea **root, const XRectangle *xrect)
+{
 	int		total_insertions = 0;
 	RectArea	*temp = NULL, *newnode = (RectArea *)malloc(sizeof(RectArea));
 
@@ -465,8 +466,8 @@ int rmdRectInsert(RectArea **root, const XRectangle *xrect) {
 	return total_insertions;
 }
 
-void rmdClearList(RectArea **root) {
-
+void rmdClearList(RectArea **root)
+{
 	RectArea *temp;
 	temp=*root;
 	if (temp!=NULL) {

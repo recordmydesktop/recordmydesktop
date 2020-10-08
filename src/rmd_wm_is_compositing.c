@@ -35,7 +35,8 @@
 #include <stdlib.h>
 
 
-boolean rmdWMIsCompositing( Display *dpy, int screen ) {
+boolean rmdWMIsCompositing(Display *dpy, int screen)
+{
 	Window win;
 	Atom atom;
 	char buf[32];

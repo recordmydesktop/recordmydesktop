@@ -46,7 +46,8 @@
 #include <string.h>
 #include <errno.h>
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
 	ProgData pdata = {};
 	EncData enc_data = {};
 	CacheData cache_data = {};
@@ -105,7 +106,7 @@ int main(int argc, char **argv){
 	if (!rmdSetBRWindow(pdata.dpy, &pdata.brwin, &pdata.specs, &pdata.args))
 		exit(11);
 
-	if (!pdata.args.nowmcheck && rmdWMIsCompositing( pdata.dpy, pdata.specs.screen ) ) {
+	if (!pdata.args.nowmcheck && rmdWMIsCompositing(pdata.dpy, pdata.specs.screen)) {
 
 		fprintf(stderr, "\nDetected compositing window manager.\n"
 			"Reverting to full screen capture at every frame.\n"

@@ -42,7 +42,8 @@
 #include <time.h>
 
 
-void *rmdCaptureAudio(ProgData *pdata) {
+void *rmdCaptureAudio(ProgData *pdata)
+{
 
 #ifdef HAVE_LIBASOUND
 	int frames = pdata->periodsize;
@@ -160,7 +161,7 @@ void *rmdCaptureAudio(ProgData *pdata) {
 		pthread_mutex_lock(&pdata->sound_buffer_mutex);
 		tmp = pdata->sound_buffer;
 		if (!tmp)
-				pdata->sound_buffer = newbuf;
+			pdata->sound_buffer = newbuf;
 		else {
 			while (tmp->next != NULL)
 				tmp = tmp->next;

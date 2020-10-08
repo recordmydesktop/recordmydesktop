@@ -38,8 +38,8 @@ unsigned char *rmdMakeDummyPointer(	Display *display,
 					int size,
 					int color,
 					int type,
-					unsigned char *npxl) {
-
+					unsigned char *npxl)
+{
 	unsigned long	bpixel = XBlackPixel(display, specs->screen);
 	unsigned long	wpixel = XWhitePixel(display, specs->screen);
 	int		i, k, o = '.';

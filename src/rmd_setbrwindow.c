@@ -33,8 +33,8 @@
 boolean rmdSetBRWindow(	Display *dpy,
 			BRWindow *brwin,
 			DisplaySpecs *specs,
-			ProgArgs *args) {
-
+			ProgArgs *args)
+{
 	//before we start recording we have to make sure the ranges are valid
 	if (args->windowid == 0) {//root window
 		//first set it up

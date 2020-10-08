@@ -33,7 +33,8 @@
 #include <errno.h>
 
 
-void *rmdEncodeImageBuffer(ProgData *pdata) {
+void *rmdEncodeImageBuffer(ProgData *pdata)
+{
 	unsigned int	encode_frameno = 0, last_encode_frameno = 0;
 
 	rmdThreadsSetName("rmdEncodeImages");
@@ -91,7 +92,8 @@ void *rmdEncodeImageBuffer(ProgData *pdata) {
 
 //this function is meant to be called normally
 //not through a thread of it's own
-void rmdSyncEncodeImageBuffer(ProgData *pdata, unsigned int n_frames) {
+void rmdSyncEncodeImageBuffer(ProgData *pdata, unsigned int n_frames)
+{
 	EncData	*enc_data = pdata->enc_data;
 
 	if (theora_encode_YUVin(&enc_data->m_th_st, &enc_data->yuv)) {

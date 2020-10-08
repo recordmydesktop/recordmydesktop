@@ -46,7 +46,8 @@
 *
 *   \returns Zero always
 */
-static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t) {
+static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t)
+{
 	JackData *jdata = (JackData *)jdata_t;
 
 	if (!jdata->pdata->running || jdata->pdata->paused || !jdata->capture_started)
@@ -80,7 +81,8 @@ static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t) {
 *
 *   \returns 0 on Success, 1 on failure
 */
-static int rmdSetupPorts(JackData *jdata) {
+static int rmdSetupPorts(JackData *jdata)
+{
 	jdata->ports = malloc(sizeof(jack_port_t *) * jdata->nports);
 	jdata->portbuf = malloc(sizeof(jack_default_audio_sample_t *) * jdata->nports);
 	memset(jdata->portbuf, 0, sizeof(jack_default_audio_sample_t *) * jdata->nports);
@@ -118,7 +120,8 @@ static int rmdSetupPorts(JackData *jdata) {
 //the program should stop recording,
 //encode the result(if not on the fly)
 //an exit cleanly.
-static void rmdJackShutdown(void *jdata_t) {
+static void rmdJackShutdown(void *jdata_t)
+{
 	JackData *jdata = (JackData *)jdata_t;
 
 	jdata->pdata->running = FALSE;
@@ -126,7 +129,8 @@ static void rmdJackShutdown(void *jdata_t) {
 	fprintf (stderr, "JACK shutdown\n");
 }
 
-int rmdStartJackClient(JackData *jdata) {
+int rmdStartJackClient(JackData *jdata)
+{
 	float ring_buffer_size = 0.0;
 	int pid;
 	char pidbuf[8];
@@ -183,7 +187,8 @@ int rmdStartJackClient(JackData *jdata) {
 	return 0;
 }
 
-int rmdStopJackClient(JackData *jdata) {
+int rmdStopJackClient(JackData *jdata)
+{
 	int ret = 0;
 
 	jack_ringbuffer_free(jdata->sound_buffer);

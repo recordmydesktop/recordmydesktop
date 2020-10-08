@@ -38,7 +38,8 @@
 
 
 
-static void m_add_fishead_packet(ogg_stream_state *m_ogg_state) {
+static void m_add_fishead_packet(ogg_stream_state *m_ogg_state)
+{
 	fishead_packet	skel_fp;
 
 	skel_fp.ptime_n = skel_fp.btime_n = 0;
@@ -48,7 +49,8 @@ static void m_add_fishead_packet(ogg_stream_state *m_ogg_state) {
 }
 
 
-static int rmdIncrementalNaming(char **name) {
+static int rmdIncrementalNaming(char **name)
+{
 	struct stat buff;
 	char *base_name__;
 	int i = 0, fname_length = strlen(*name)-4;
@@ -83,7 +85,8 @@ static int rmdIncrementalNaming(char **name) {
 	return 0;
 }
 
-void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready) {
+void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready)
+{
 	int y0, y1, y2, fname_length;
 	ogg_stream_state m_ogg_skel;
 	ogg_page skel_og_pg;

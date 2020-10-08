@@ -40,8 +40,8 @@
 int rmdRegisterShortcut(	Display *dpy,
 				Window root,
 				const char *shortcut,
-				HotKey *hotkey) {
-
+				HotKey *hotkey)
+{
 	int		keycode = 0, i, j;
 	KeySym		key = 0;
 	unsigned int	modifier_mask = 0, numlock_mask = 0;

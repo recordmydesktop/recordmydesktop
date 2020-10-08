@@ -42,7 +42,8 @@ void rmdDrawFrame(	Display *dpy,
 			int screen,  
 			Window win,
 			int width,
-			int height) {
+			int height)
+{
 
 	GC gc;
 	XGCValues gcv;
@@ -78,7 +79,8 @@ void rmdDrawFrame(	Display *dpy,
 void rmdMoveFrame(	Display *dpy,
 			Window win,
 			int x,
-			int y) {
+			int y)
+{
 
 	XMoveWindow(dpy, win, x-BORDER_WIDTH, y-BORDER_WIDTH);
 //	XSync(pdata->dpy, False);
@@ -90,7 +92,8 @@ Window rmdFrameInit(	Display *dpy,
 			int x,
 			int y,
 			int width,
-			int height) {
+			int height)
+{
 
 	XSetWindowAttributes attribs;
 	XColor white, white_e;

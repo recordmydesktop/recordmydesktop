@@ -45,7 +45,8 @@
 //will invalidate it. But we must have pages from
 //both streams at every time in
 //order to do correct multiplexing
-static void page_copy(ogg_page *new, ogg_page *old) {
+static void page_copy(ogg_page *new, ogg_page *old)
+{
 
 	new->header_len = old->header_len;
 	new->header = malloc(new->header_len);
@@ -57,13 +58,15 @@ static void page_copy(ogg_page *new, ogg_page *old) {
 }
 
 //free our copy
-static void page_free(ogg_page *pg) {
+static void page_free(ogg_page *pg)
+{
 	pg->header_len = pg->body_len = 0;
 	free(pg->header);
 	free(pg->body);
 }
 
-void *rmdFlushToOgg(ProgData *pdata) {
+void *rmdFlushToOgg(ProgData *pdata)
+{
 	int		videoflag = 0, audioflag = 0;
 	double		video_bytesout = 0, audio_bytesout = 0;
 	ogg_page	videopage,	//owned by libogg

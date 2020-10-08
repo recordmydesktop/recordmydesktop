@@ -28,6 +28,7 @@
 
 #include <math.h>
 
-double rmdRoundf(double val) {
+double rmdRoundf(double val)
+{
 	return val < 0.0 ? ceilf(val - .5) : floorf(val + 0.5);
 }

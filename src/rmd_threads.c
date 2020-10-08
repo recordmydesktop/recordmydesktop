@@ -47,7 +47,8 @@
 #include <time.h>
 #include <unistd.h>
 
-void rmdThreads(ProgData *pdata) {
+void rmdThreads(ProgData *pdata)
+{
 	pthread_t	image_capture_t,
 			image_encode_t,
 			image_cache_t,
@@ -170,6 +171,7 @@ void rmdThreads(ProgData *pdata) {
 	pthread_join(timer_t,NULL);
 }
 
-void rmdThreadsSetName(const char *name) {
+void rmdThreadsSetName(const char *name)
+{
 	prctl(PR_SET_NAME, (unsigned long)name, 0, 0, 0);
 }

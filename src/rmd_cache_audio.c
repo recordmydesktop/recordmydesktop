@@ -39,7 +39,8 @@
 
 
 
-void *rmdCacheAudioBuffer(ProgData *pdata) {
+void *rmdCacheAudioBuffer(ProgData *pdata)
+{
 	size_t	write_size = pdata->periodsize * pdata->sound_framesize;
 
 #ifdef HAVE_LIBJACK

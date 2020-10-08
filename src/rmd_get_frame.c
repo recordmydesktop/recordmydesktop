@@ -99,8 +99,8 @@ static void clip_dummy_pointer_area(XRectangle *area, XRectangle *clip, XRectang
 static void mark_buffer_area(	unsigned char *data,
 				int x_tm, int y_tm,
 				int width_tm, int height_tm,
-				int buffer_width, int depth) {
-
+				int buffer_width, int depth)
+{
 	if ((depth == 24) || (depth == 32)) {
 		MARK_BUFFER_AREA_C(	data,
 					x_tm,
@@ -122,7 +122,8 @@ static void mark_buffer_area(	unsigned char *data,
 
 //besides taking the first screenshot, this functions primary purpose is to 
 //initialize the structures and memory.
-static int rmdFirstFrame(ProgData *pdata, Image *image) {
+static int rmdFirstFrame(ProgData *pdata, Image *image)
+{
 	const XRectangle	*rrect = &pdata->brwin.rrect;
 
 	if (pdata->args.noshared) {
@@ -185,7 +186,8 @@ static int rmdFirstFrame(ProgData *pdata, Image *image) {
 }
 
 //make a deep copy
-static void rmdBRWinCpy(BRWindow *target, BRWindow *source) {
+static void rmdBRWinCpy(BRWindow *target, BRWindow *source)
+{
 	target->winrect = source->winrect;
 	target->rrect = source->rrect;
 	target->windowid = source->windowid;
@@ -197,7 +199,8 @@ static void rmdMoveCaptureArea(	XRectangle *rect,
 				int cursor_x,
 				int cursor_y,
 				int width,
-				int height) {
+				int height)
+{
 	int t_x = 0, t_y = 0;
 
 	t_x = cursor_x - rect->width / 2;
@@ -209,7 +212,8 @@ static void rmdMoveCaptureArea(	XRectangle *rect,
 }
 
 
-static void rmdBlocksReset(unsigned int blocks_w, unsigned int blocks_h) {
+static void rmdBlocksReset(unsigned int blocks_w, unsigned int blocks_h)
+{
 	memset(yblocks, 0, blocks_w * blocks_h * sizeof(*yblocks));
 	memset(ublocks, 0, blocks_w * blocks_h * sizeof(*ublocks));
 	memset(vblocks, 0, blocks_w * blocks_h * sizeof(*vblocks));
@@ -233,8 +237,8 @@ static void rmdBlocksFromList(	RectArea   **root,
 				unsigned int x_offset,
 				unsigned int y_offset,
 				unsigned int blocks_w,
-				unsigned int blocks_h) {
-
+				unsigned int blocks_h)
+{
 	rmdBlocksReset(blocks_w, blocks_h);
 
 	for (RectArea *temp = *root; temp; temp = temp->next) {
@@ -258,7 +262,8 @@ static void rmdBlocksFromList(	RectArea   **root,
 	}
 }
 
-void *rmdGetFrame(ProgData *pdata) {
+void *rmdGetFrame(ProgData *pdata)
+{
 	int	blocks_w = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
 		blocks_h = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH;
 	unsigned int msk_ret;

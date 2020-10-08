@@ -65,7 +65,8 @@ static void rmdPrintAndExit(poptContext con, enum poptCallbackReason reason, con
 static boolean rmdValidateArguments(const ProgArgs *args);
 
 
-boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return) {
+boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
+{
 	poptContext popt_context = NULL;
 	boolean no_cursor = FALSE;
 	boolean quick_subsampling = FALSE;

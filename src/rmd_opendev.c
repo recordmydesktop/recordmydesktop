@@ -48,8 +48,8 @@ snd_pcm_t *rmdOpenDev(	const char *pcm_dev,
 			snd_pcm_uframes_t *buffsize,
 			snd_pcm_uframes_t *periodsize,
 			unsigned int *periodtime,
-			int *hard_pause) {
-
+			int *hard_pause)
+{
 	snd_pcm_t *mhandle;
 	snd_pcm_hw_params_t *hwparams;
 	unsigned int periods = 2;
@@ -140,7 +140,8 @@ snd_pcm_t *rmdOpenDev(	const char *pcm_dev,
 
 #else
 
-int rmdOpenDev(const char *pcm_dev, unsigned int channels, unsigned int frequency) {
+int rmdOpenDev(const char *pcm_dev, unsigned int channels, unsigned int frequency)
+{
 	int fd ;
 	unsigned int value;
 

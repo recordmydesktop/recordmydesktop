@@ -53,7 +53,8 @@ static int rmdFlushBlock(
 			int blockwidth,
 			gzFile fp,
 			FILE *ucfp,
-			int flush) {
+			int flush)
+{
 
 	int	bytes_written = 0,
 		block_i = (!blockwidth) ? 0 : (blockno / (width / blockwidth)),//place on the grid
@@ -88,7 +89,8 @@ static int rmdFlushBlock(
 	return bytes_written;
 }
 
-void *rmdCacheImageBuffer(ProgData *pdata) {
+void *rmdCacheImageBuffer(ProgData *pdata)
+{
 
 	gzFile		fp = NULL;
 	FILE		*ucfp = NULL;

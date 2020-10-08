@@ -33,8 +33,8 @@
 #include <stdio.h>
 
 
-int rmdWriteSpecsFile(ProgData *pdata) {
-	
+int rmdWriteSpecsFile(ProgData *pdata)
+{
 	FILE *fp;
 
 	fp=fopen(pdata->cache_data->specsfile,"wb");
@@ -63,7 +63,8 @@ int rmdWriteSpecsFile(ProgData *pdata) {
 	return 0;
 }
 
-int rmdReadSpecsFile(ProgData *pdata) {
+int rmdReadSpecsFile(ProgData *pdata)
+{
 	char Cached_Version[256];
 	FILE *fp;
 

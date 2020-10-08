@@ -40,7 +40,8 @@
 #include <stdlib.h>
 
 
-int rmdRescue(const char *path) {
+int rmdRescue(const char *path)
+{
 	unsigned short	width, height;
 	ProgData	pdata;
 	EncData		enc_data;

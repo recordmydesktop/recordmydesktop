@@ -42,10 +42,12 @@
 #include <string.h>
 
 #ifdef HAVE_LIBASOUND
-static void rmdFixBufferSize(snd_pcm_uframes_t *buffsize) {
+static void rmdFixBufferSize(snd_pcm_uframes_t *buffsize)
+{
 	snd_pcm_uframes_t buffsize_t = *buffsize,
 #else
-static void rmdFixBufferSize(u_int32_t *buffsize) {
+static void rmdFixBufferSize(u_int32_t *buffsize)
+{
 	u_int32_t buffsize_t = *buffsize,
 #endif
 	buffsize_ret = 1;
@@ -58,7 +60,8 @@ static void rmdFixBufferSize(u_int32_t *buffsize) {
 			(int)buffsize_ret, (int)*buffsize);
 }
 
-int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data) {
+int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
+{
 	fprintf(stderr, "Initializing...\n");
 
 	rmdMakeMatrices();
@@ -186,7 +189,8 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 
 }
 
-void rmdSetupDefaultArgs(ProgArgs *args) {
+void rmdSetupDefaultArgs(ProgArgs *args)
+{
 	args->delay			= 0;
 	args->windowid			= 0;
 	args->x				= 0;
@@ -244,7 +248,8 @@ void rmdSetupDefaultArgs(ProgArgs *args) {
 	strcpy(args->filename, "out.ogv");
 }
 
-void rmdCleanUp(void) {
+void rmdCleanUp(void)
+{
 	free(yblocks);
 	free(ublocks);
 	free(vblocks);

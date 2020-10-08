@@ -73,8 +73,8 @@ static void rmdLoadBlock(
 			int blockno,
 			int width,
 			int height,
-			int blockwidth) {
-
+			int blockwidth)
+{
 	int	block_i = blockno / (width / blockwidth),//place on the grid
 		block_k = blockno % (width / blockwidth);
 
@@ -85,7 +85,8 @@ static void rmdLoadBlock(
 }
 
 //returns number of bytes
-static int rmdReadZF(void * buffer, size_t size, size_t nmemb, FILE *ucfp, gzFile ifp) {
+static int rmdReadZF(void * buffer, size_t size, size_t nmemb, FILE *ucfp, gzFile ifp)
+{
 	if ((ifp != NULL && ucfp != NULL) ||
 	   (ifp == NULL && ucfp == NULL))
 		return -1;
@@ -95,7 +96,8 @@ static int rmdReadZF(void * buffer, size_t size, size_t nmemb, FILE *ucfp, gzFil
 		return gzread(ifp, buffer, size * nmemb);
 }
 
-static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp) {
+static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
+{
 	int	index_entry_size = sizeof(u_int32_t);
 
 	if (frame->header->Ynum > 0) {
@@ -161,7 +163,8 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp) {
 	return 0;
 }
 
-static int read_header(ProgData *pdata, gzFile ifp, FILE *ucfp, FrameHeader *fheader) {
+static int read_header(ProgData *pdata, gzFile ifp, FILE *ucfp, FrameHeader *fheader)
+{
 	if (!pdata->args.zerocompression) {
 		return gzread(ifp, fheader, sizeof(FrameHeader)) == sizeof(FrameHeader);
 	} else {
@@ -169,8 +172,8 @@ static int read_header(ProgData *pdata, gzFile ifp, FILE *ucfp, FrameHeader *fhe
 	}
 }
 
-void *rmdLoadCache(ProgData *pdata) {
-
+void *rmdLoadCache(ProgData *pdata)
+{
 	yuv_buffer	*yuv = &pdata->enc_data->yuv;
 	gzFile		ifp = NULL;
 	FILE		*ucfp = NULL;

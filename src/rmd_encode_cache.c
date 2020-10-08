@@ -39,7 +39,8 @@
 
 
 
-void rmdEncodeCache(ProgData *pdata){
+void rmdEncodeCache(ProgData *pdata)
+{
 	pthread_t	flush_to_ogg_t, load_cache_t;
 
 	fprintf(stderr, "STATE:ENCODING\n");

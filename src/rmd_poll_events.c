@@ -44,7 +44,6 @@
 
 static int clip_event_area(XDamageNotifyEvent *e, XRectangle *cliprect, XRectangle *res)
 {
-
 #if 0
 	printf("got area %x,%x %x,%x\n",
 		e->area.x,
@@ -52,7 +51,6 @@ static int clip_event_area(XDamageNotifyEvent *e, XRectangle *cliprect, XRectang
 		e->area.width,
 		e->area.height);
 #endif
-
 	if (	e->area.x <= cliprect->x &&
 		e->area.y <= cliprect->y &&
 		e->area.width >= cliprect->width &&
@@ -100,7 +98,8 @@ static int clip_event_area(XDamageNotifyEvent *e, XRectangle *cliprect, XRectang
 /* Try align xrect to even boundaries relative to cliprect,
  * this is done for the UV routines which operate at 2x2 rgb pixel granularity.
  */
-static void uv_align(XRectangle *cliprect, XRectangle *xrect) {
+static void uv_align(XRectangle *cliprect, XRectangle *xrect)
+{
 	XRectangle	rel;
 
 	rel.x = xrect->x - cliprect->x;
@@ -134,12 +133,12 @@ static void uv_align(XRectangle *cliprect, XRectangle *xrect) {
 }
 
 
-void rmdInitEventsPolling(ProgData *pdata) {
-	Window root_return,
-		   parent_return,
-		   *children;
-	unsigned int i,
-				 nchildren;
+void rmdInitEventsPolling(ProgData *pdata)
+{
+	Window		root_return,
+			parent_return,
+			*children;
+	unsigned int	i, nchildren;
 
 	XSelectInput (pdata->dpy, pdata->specs.root, SubstructureNotifyMask);
 
@@ -168,7 +167,8 @@ void rmdInitEventsPolling(ProgData *pdata) {
 }
 
 
-void rmdEventLoop(ProgData *pdata) {
+void rmdEventLoop(ProgData *pdata)
+{
 	int inserts = 0;
 
 	XEvent event;

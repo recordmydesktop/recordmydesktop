@@ -43,7 +43,8 @@ int rmdGetZPixmap(	Display *dpy,
 			int x,
 			int y,
 			int width,
-			int height) {
+			int height)
+{
 
 	xGetImageReply reply;
 	xGetImageReq *request;
@@ -82,7 +83,8 @@ int rmdGetZPixmapSHM(	Display *dpy,
 			int x,
 			int y,
 			int width,
-			int height) {
+			int height)
+{
 
 	xShmGetImageReply reply;
 	xShmGetImageReq *request = NULL;

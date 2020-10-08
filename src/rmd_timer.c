@@ -47,7 +47,8 @@ static struct timespec us_to_timespec(unsigned int us)
 	};
 }
 
-static void sync_streams(ProgData *pdata, unsigned int *frame_step, struct timespec *delay) {
+static void sync_streams(ProgData *pdata, unsigned int *frame_step, struct timespec *delay)
+{
 	int	avd;
 
 	pthread_mutex_lock(&pdata->avd_mutex);
@@ -91,8 +92,8 @@ static void sync_streams(ProgData *pdata, unsigned int *frame_step, struct times
 #endif
 }
 
-void *rmdTimer(ProgData *pdata) {
-
+void *rmdTimer(ProgData *pdata)
+{
 	rmdThreadsSetName("rmdTimer");
 
 	while (pdata->timer_alive) {
