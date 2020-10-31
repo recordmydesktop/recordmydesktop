@@ -262,7 +262,6 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 			if (rmdSwapCacheFilesWrite(pdata->cache_data->imgdata, nth_cache, &fp, &ucfp)) {
 				fprintf(stderr,	"New cache file could not be created.\n"
 						"Ending recording...\n");
-				fflush(stderr);
 				raise(SIGINT);  //if for some reason we cannot make a new file
 						//we have to stop. If we are out of space,
 						//which means
@@ -309,7 +308,6 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 	fprintf(stderr, "Saved %d frames in a total of %d requests\n",
 			frameno,
 			capture_frameno);
-	fflush(stderr);
 
 	if (!pdata->args.zerocompression) {
 		gzflush(fp, Z_FINISH);

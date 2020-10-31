@@ -109,10 +109,10 @@ void *rmdTimer(ProgData *pdata)
 
 			if (!pdata->paused) {
 				pdata->paused = TRUE;
-				fprintf(stderr,"STATE:PAUSED\n");fflush(stderr);
-			} else{
+				fprintf(stderr, "STATE:PAUSED\n");
+			} else {
 				pdata->paused = FALSE;
-				fprintf(stderr,"STATE:RECORDING\n");fflush(stderr);
+				fprintf(stderr, "STATE:RECORDING\n");
 				pthread_cond_broadcast(&pdata->pause_cond);
 			}
 		}
