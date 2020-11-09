@@ -42,7 +42,10 @@
 #define CACHE_FILE_SIZE_LIMIT (500 * 1024 * 1024)
 
 
-/* periodic fdatasync thread for cache writers when fdatasyncing is enabled */
+/* Periodic fdatasync thread for cache writers.
+ * Note all writers create this thread initially to try perform a
+ * posix_fallocate() of CACHE_FILE_SIZE_LIMIT
+ */
 static void * rmdCacheFileSyncer(CacheFile *file)
 {
 	struct timespec	delay;
@@ -53,13 +56,18 @@ static void * rmdCacheFileSyncer(CacheFile *file)
 
 	rmdThreadsSetName("rmdCacheSyncer");
 
-	delay.tv_sec = file->periodic_datasync_ms / 1000;
-	delay.tv_nsec = (file->periodic_datasync_ms - delay.tv_sec * 1000) * 1000000;
-
 	if (file->gzfp)
 		fd = file->gzfd;
 	else
 		fd = fileno(file->fp);
+
+	(void) posix_fallocate(fd, 0, CACHE_FILE_SIZE_LIMIT);
+
+	if (!file->periodic_datasync_ms)
+		return NULL;
+
+	delay.tv_sec = file->periodic_datasync_ms / 1000;
+	delay.tv_nsec = (file->periodic_datasync_ms - delay.tv_sec * 1000) * 1000000;
 
 	for (;;) {
 		nanosleep(&delay, NULL);
@@ -106,7 +114,7 @@ static int _rmdCacheFileOpen(CacheFile *file, const char *path)
 
 	file->chapter_n_bytes = 0;
 
-	if (file->mode == RMD_CACHE_FILE_MODE_WRITE && file->periodic_datasync_ms)
+	if (file->mode == RMD_CACHE_FILE_MODE_WRITE)
 		pthread_create(&file->syncer_thread, NULL, (void *(*)(void *))rmdCacheFileSyncer, file);
 
 	return 0;
@@ -118,7 +126,7 @@ static int _rmdCacheFileClose(CacheFile *file)
 {
 	assert(file);
 
-	if (file->mode == RMD_CACHE_FILE_MODE_WRITE && file->periodic_datasync_ms) {
+	if (file->mode == RMD_CACHE_FILE_MODE_WRITE) {
 		pthread_cancel(file->syncer_thread);
 		pthread_join(file->syncer_thread, NULL);
 	}
