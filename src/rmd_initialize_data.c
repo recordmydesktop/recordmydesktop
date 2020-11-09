@@ -211,6 +211,7 @@ void rmdSetupDefaultArgs(ProgArgs *args)
 	args->jack_nports		= 0;
 	args->jack_ringbuffer_secs	= 3.0;
 	args->zerocompression		= 1;
+	args->periodic_datasync_ms	= 100;
 	args->no_quick_subsample	= 1;
 	args->cursor_color		= 1;
 	args->have_dummy_cursor		= 0;

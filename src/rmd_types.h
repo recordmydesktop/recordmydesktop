@@ -153,6 +153,7 @@ typedef struct _ProgArgs{
 	char *stop_shortcut;	//stop shortcut sequence(Control+Alt+s)
 	int noframe;			//don't draw a frame around the recording area
 	int zerocompression;	//image data are always flushed uncompressed
+	unsigned periodic_datasync_ms; //interval between background async fdatasync calls while writing cache files, when zero no periodic fdatasync is performed
 	int overwrite;		  //overwite a previously existing file
 							//(do not add a .number postfix)
 	int use_jack;		   //record audio with jack
@@ -195,9 +196,12 @@ typedef struct CacheFile {
 	unsigned	chapter;
 	size_t		chapter_n_bytes, total_n_bytes;
 	unsigned	compressed:1;
+	unsigned	periodic_datasync_ms;
 	CacheFileMode	mode;
 	gzFile		gzfp;
+	int		gzfd;
 	FILE		*fp;
+	pthread_t	syncer_thread;
 } CacheFile;
 
 //this struct will hold a few basic

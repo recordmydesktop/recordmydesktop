@@ -262,6 +262,11 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 		  "Image data are cached with light compression.",
 		  NULL },
 
+		{ "periodic-datasync-ms", '\0',
+		  POPT_ARG_INT, &arg_return->periodic_datasync_ms, 0,
+		  "Asynchronously fdatasync() cache files every specified ms while writing, 0 disables (default 100).",
+		  "N>=0"},
+
 		{ "workdir", '\0',
 		  POPT_ARG_STRING, &arg_return->workdir, 0,
 		  "Location where a temporary directory will be created to hold project files(default $HOME).",

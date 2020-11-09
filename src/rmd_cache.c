@@ -28,16 +28,46 @@
 #include "rmd_cache.h"
 
 #include "rmd_specsfile.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define CACHE_FILE_SIZE_LIMIT (500 * 1024 * 1024)
+
+
+/* periodic fdatasync thread for cache writers when fdatasyncing is enabled */
+static void * rmdCacheFileSyncer(CacheFile *file)
+{
+	struct timespec	delay;
+	int		fd;
+
+	assert(file);
+	assert(file->periodic_datasync_ms);
+
+	rmdThreadsSetName("rmdCacheSyncer");
+
+	delay.tv_sec = file->periodic_datasync_ms / 1000;
+	delay.tv_nsec = (file->periodic_datasync_ms - delay.tv_sec * 1000) * 1000000;
+
+	if (file->gzfp)
+		fd = file->gzfd;
+	else
+		fd = fileno(file->fp);
+
+	for (;;) {
+		nanosleep(&delay, NULL);
+		fdatasync(fd);
+	}
+
+	return NULL;
+}
 
 
 /* open file @ path storing the file handles in *file,
@@ -48,10 +78,12 @@
 static int _rmdCacheFileOpen(CacheFile *file, const char *path)
 {
 	const char	*modestr = "rb";
+	int		flags = O_RDONLY;
 
 	assert(file);
 
 	if (file->mode == RMD_CACHE_FILE_MODE_WRITE) {
+		flags = O_CREAT|O_WRONLY;
 		modestr = "wb";
 
 		if (file->compressed)
@@ -59,7 +91,12 @@ static int _rmdCacheFileOpen(CacheFile *file, const char *path)
 	}
 
 	if (file->compressed) {
-		file->gzfp = gzopen(path, modestr);
+		/* zlib doesn't expose a fileno() equivalent for the syncer */
+		file->gzfd = open(path, flags, S_IRUSR|S_IWUSR);
+		if (file->gzfd < 0)
+			return -1;
+
+		file->gzfp = gzdopen(file->gzfd, modestr);
 	} else {
 		file->fp = fopen(path, modestr);
 	}
@@ -69,6 +106,9 @@ static int _rmdCacheFileOpen(CacheFile *file, const char *path)
 
 	file->chapter_n_bytes = 0;
 
+	if (file->mode == RMD_CACHE_FILE_MODE_WRITE && file->periodic_datasync_ms)
+		pthread_create(&file->syncer_thread, NULL, (void *(*)(void *))rmdCacheFileSyncer, file);
+
 	return 0;
 }
 
@@ -77,6 +117,11 @@ static int _rmdCacheFileOpen(CacheFile *file, const char *path)
 static int _rmdCacheFileClose(CacheFile *file)
 {
 	assert(file);
+
+	if (file->mode == RMD_CACHE_FILE_MODE_WRITE && file->periodic_datasync_ms) {
+		pthread_cancel(file->syncer_thread);
+		pthread_join(file->syncer_thread, NULL);
+	}
 
 	/* TODO: return meaningful -errno on errors? */
 	if (file->gzfp) {
@@ -114,8 +159,8 @@ CacheFile * rmdCacheFileOpen(ProgData *pdata, const char *path, CacheFileMode mo
 	}
 
 	f->mode = mode;
-	if (!pdata->args.zerocompression)
-		f->compressed = 1;
+	f->compressed = !pdata->args.zerocompression;
+	f->periodic_datasync_ms = pdata->args.periodic_datasync_ms;
 
 	if (_rmdCacheFileOpen(f, path) < 0)
 		return NULL;
