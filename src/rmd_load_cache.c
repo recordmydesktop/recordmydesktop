@@ -153,7 +153,10 @@ static int rmdReadFrame(CachedFrame *frame, CacheFile *icf)
 
 static int read_header(FrameHeader *fheader, CacheFile *icf)
 {
-	return rmdCacheFileRead(icf, fheader, sizeof(FrameHeader)) == sizeof(FrameHeader);
+	if (!(rmdCacheFileRead(icf, fheader, sizeof(FrameHeader)) == sizeof(FrameHeader)))
+		return 0;
+
+	return !strncmp(fheader->frame_prefix, "FRAM", 4);
 }
 
 void *rmdLoadCache(ProgData *pdata)
