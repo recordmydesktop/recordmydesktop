@@ -197,10 +197,10 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				__depth__) {							\
 												\
 	register u_int##__depth__##_t	t_val;							\
-	register unsigned char		*yuv_U =	(yuv)->u + x_tm / 2 +			\
-							(y_tm * (yuv)->uv_width) / 2,		\
-					*yuv_V =	(yuv)->v + x_tm / 2 +			\
-							(y_tm * (yuv)->uv_width) / 2,		\
+	register unsigned char		*yuv_U =	(yuv)->u + (x_tm >> 1) +		\
+							(y_tm >> 1) * (yuv)->uv_stride,		\
+					*yuv_V =	(yuv)->v + (x_tm >> 1) +		\
+							(y_tm >> 1) * (yuv)->uv_stride,		\
 					*_ur = Ur, *_ug = Ug, *_ubvr = UbVr,			\
 					*_vg = Vg, *_vb = Vb;					\
 	register u_int##__depth__##_t	*datapi = (u_int##__depth__##_t *)data,			\
@@ -228,8 +228,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 			yuv_V++;								\
 		}										\
 												\
-		yuv_U += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;			\
-		yuv_V += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;			\
+		yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));			\
+		yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));			\
 												\
 		datapi += width_tm + w_odd;							\
 		if (sampling == __PXL_AVERAGE)							\
@@ -280,10 +280,10 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				__depth__) {							\
 												\
 	register u_int##__depth__##_t	t_val;							\
-	register unsigned char		*yuv_U =	(yuv)->u + x_tm / 2 +			\
-							(y_tm * (yuv)->uv_width) / 2,		\
-					*yuv_V =	(yuv)->v + x_tm / 2 +			\
-							(y_tm * (yuv)->uv_width) / 2,		\
+	register unsigned char		*yuv_U =	(yuv)->u + (x_tm >> 1) +		\
+							((y_tm >> 1) * (yuv)->uv_stride),	\
+					*yuv_V =	(yuv)->v + (x_tm >> 1) +		\
+							((y_tm >> 1) * (yuv)->uv_stride),	\
 					*_ur = Ur, *_ug	= Ug, *_ubvr = UbVr,			\
 					*_vg = Vg, *_vb = Vb;					\
 												\
@@ -309,12 +309,12 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 								t_val,				\
 								datapi,				\
 								datapi_next,			\
-								_ur,_ug,_ubvr,_vg,_vb,		\
+								_ur, _ug, _ubvr, _vg, _vb,	\
 								sampling,			\
 								__depth__);			\
 												\
-					ublocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
-					vblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
+					ublocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;\
+					vblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;\
 				}								\
 												\
 				datapi += 2;							\
@@ -326,8 +326,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				yuv_V++;							\
 			}									\
 												\
-			yuv_U += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
-			yuv_V += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
+			yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));		\
+			yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));		\
 												\
 			datapi += width_tm + w_odd;						\
 			datapi_back += width_tm + w_odd;					\
@@ -347,8 +347,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 								sampling,			\
 								__depth__);			\
 												\
-					ublocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
-					vblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;	\
+					ublocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;\
+					vblocks[blocknum(x_tm + i, y_tm + k, (yuv)->y_width, Y_UNIT_WIDTH)] = 1;\
 				}								\
 												\
 				datapi += 2;							\
