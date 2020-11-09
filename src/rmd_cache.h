@@ -34,6 +34,10 @@
 #include <stdio.h>
 
 
+CacheFile * rmdCacheFileOpen(ProgData *pdata, const char *path, CacheFileMode mode);
+int rmdCacheFileClose(CacheFile *file);
+ssize_t rmdCacheFileRead(CacheFile *file, void *ptr, size_t len);
+ssize_t rmdCacheFileWrite(CacheFile *file, const void *ptr, size_t len);
 
 /**
 * Change file pointer to a new file while writting

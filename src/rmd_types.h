@@ -184,6 +184,22 @@ typedef struct _EncData{
 	FILE			*fp;
 } EncData;
 
+/* CacheFiles abstract compressed vs. uncompressed files */
+typedef enum CacheFileMode {
+	RMD_CACHE_FILE_MODE_WRITE,
+	RMD_CACHE_FILE_MODE_READ,
+} CacheFileMode;
+
+typedef struct CacheFile {
+	char		*path;
+	unsigned	chapter;
+	size_t		chapter_n_bytes, total_n_bytes;
+	unsigned	compressed:1;
+	CacheFileMode	mode;
+	gzFile		gzfp;
+	FILE		*fp;
+} CacheFile;
+
 //this struct will hold a few basic
 //information, needed for caching the frames.
 typedef struct _CacheData{

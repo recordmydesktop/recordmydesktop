@@ -37,6 +37,107 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#define CACHE_FILE_SIZE_LIMIT (500 * 1024 * 1024)
+
+
+/* open file @ path storing the file handles in *file,
+ * this doesn't store the new path since it's primarily
+ * for the purposes of opening new chapters for the same
+ * base path.
+ */
+static int _rmdCacheFileOpen(CacheFile *file, const char *path)
+{
+	const char	*modestr = "rb";
+
+	assert(file);
+
+	if (file->mode == RMD_CACHE_FILE_MODE_WRITE) {
+		modestr = "wb";
+
+		if (file->compressed)
+			modestr = "wb0f";
+	}
+
+	if (file->compressed) {
+		file->gzfp = gzopen(path, modestr);
+	} else {
+		file->fp = fopen(path, modestr);
+	}
+
+	if (!file->gzfp && !file->fp)
+		return -1;
+
+	file->chapter_n_bytes = 0;
+
+	return 0;
+}
+
+
+/* only close the internal file handle, but don't free file */
+static int _rmdCacheFileClose(CacheFile *file)
+{
+	assert(file);
+
+	/* TODO: return meaningful -errno on errors? */
+	if (file->gzfp) {
+		if (gzclose(file->gzfp) != Z_OK)
+			return -1;
+
+		file->gzfp = NULL;
+	} else if (file->fp) {
+		if (fclose(file->fp))
+			return -1;
+
+		file->fp = NULL;
+	}
+
+	return 0;
+}
+
+
+/* open a CacheFile @ path, in the specified mode, returns NULL on error */
+CacheFile * rmdCacheFileOpen(ProgData *pdata, const char *path, CacheFileMode mode)
+{
+	CacheFile	*f;
+
+	assert(pdata);
+	assert(path);
+
+	f = calloc(1, sizeof(*f));
+	if (!f)
+		return NULL;
+
+	f->path = strdup(path);
+	if (!f->path) {
+		free(f);
+		return NULL;
+	}
+
+	f->mode = mode;
+	if (!pdata->args.zerocompression)
+		f->compressed = 1;
+
+	if (_rmdCacheFileOpen(f, path) < 0)
+		return NULL;
+
+	return f;
+}
+
+
+/* close a CacheFile, returns < 0 on error */
+int rmdCacheFileClose(CacheFile *file)
+{
+	assert(file);
+
+	if (_rmdCacheFileClose(file) < 0)
+		return -1;
+
+	free(file->path);
+	free(file);
+
+	return 0;
+}
+
 
 /**
 *Construct an number postfixed name
@@ -48,7 +149,7 @@
 * \n number to be used as a postfix
 *
 */
-static void rmdCacheFileN(char *name, char **newname, int n) // Nth cache file
+static void _rmdCacheFileN(char *name, char **newname, int n) // Nth cache file
 {
 	char numbuf[8];
 
@@ -58,41 +159,103 @@ static void rmdCacheFileN(char *name, char **newname, int n) // Nth cache file
 	strcat(*newname, numbuf);
 }
 
-int rmdSwapCacheFilesWrite(char *name, int n, gzFile *fp, FILE **ucfp)
+
+/* read from a CacheFile, identical to gzread() */
+ssize_t rmdCacheFileRead(CacheFile *file, void *ptr, size_t len)
 {
-	char *newname = malloc(strlen(name) + 10);
+	ssize_t	ret, read_n_bytes = 0;
 
-	rmdCacheFileN(name, &newname, n);
-	if (*fp == NULL) {
-		fflush(*ucfp);
-		fclose(*ucfp);
-		*ucfp = fopen(newname, "wb");
+	assert(file);
+	assert(ptr);
+
+	assert(file->mode == RMD_CACHE_FILE_MODE_READ);
+
+retry:
+	if (file->gzfp) {
+		int	r;
+
+		r = gzread(file->gzfp, ptr + read_n_bytes, len);
+		if (r < 0)
+			return -1;
+
+		ret = r;
 	} else {
-		gzflush(*fp, Z_FINISH);
-		gzclose(*fp);
-		*fp = gzopen(newname, "wb0f");
+		ret = fread(ptr + read_n_bytes, 1, len, file->fp);
 	}
-	free(newname);
 
-	return ((*fp == NULL) && (*ucfp == NULL));
+	read_n_bytes += ret;
+	file->chapter_n_bytes += read_n_bytes;
+	file->total_n_bytes += read_n_bytes;
+
+	if (ret < len) {
+		char *newpath = malloc(strlen(file->path) + 10);
+
+		len -= ret;
+
+		if (_rmdCacheFileClose(file) < 0) {
+			free(newpath);
+			return -1;
+		}
+
+		/* look for next chapter */
+		_rmdCacheFileN(file->path, &newpath, file->chapter + 1);
+		if (_rmdCacheFileOpen(file, newpath) == 0) {
+			file->chapter++;
+			free(newpath);
+			goto retry;
+		}
+
+		free(newpath);
+	}
+
+	return read_n_bytes;
 }
 
-int rmdSwapCacheFilesRead(char *name, int n, gzFile *fp, FILE **ucfp)
+
+/* write to a CacheFile, identical to gzwrite() */
+ssize_t rmdCacheFileWrite(CacheFile *file, const void *ptr, size_t len)
 {
-	char *newname = malloc(strlen(name) + 10);
+	ssize_t	ret;
 
-	rmdCacheFileN(name, &newname, n);
-	if (*fp == NULL) {
-		fclose(*ucfp);
-		*ucfp = fopen(newname, "rb");
-	} else {
-		gzclose(*fp);
-		*fp = gzopen(newname, "rb");
+	assert(file);
+	assert(ptr);
+
+	assert(file->mode == RMD_CACHE_FILE_MODE_WRITE);
+
+	/* transparently open next chapter if needed */
+	if (file->chapter_n_bytes > CACHE_FILE_SIZE_LIMIT) {
+		char *newpath = malloc(strlen(file->path) + 10);
+
+		if (_rmdCacheFileClose(file) < 0)
+			return -1;
+
+		file->chapter++;
+
+		_rmdCacheFileN(file->path, &newpath, file->chapter);
+		if (_rmdCacheFileOpen(file, newpath) < 0) {
+			free(newpath);
+			return -1;
+		}
 	}
-	free(newname);
 
-	return ((*fp == NULL) && (*ucfp == NULL));
+	if (file->gzfp) {
+		int	r;
+
+		r = gzwrite(file->gzfp, ptr, len);
+		if (r < 0)
+			return -1;
+
+		ret = r;
+	} else {
+		ret = fwrite(ptr, 1, len, file->fp);
+	}
+
+	file->chapter_n_bytes += ret;
+	file->total_n_bytes += ret;
+
+	return ret;
 }
+
 
 int rmdPurgeCache(CacheData *cache_data_t, int sound)
 {
@@ -109,7 +272,7 @@ int rmdPurgeCache(CacheData *cache_data_t, int sound)
 			fprintf(stderr, "Couldn't remove temporary file %s", cache_data_t->imgdata);
 			exit_value = 1;
 		}
-		rmdCacheFileN(cache_data_t->imgdata, &fname, nth_cache);
+		_rmdCacheFileN(cache_data_t->imgdata, &fname, nth_cache);
 		nth_cache++;
 	}
 
