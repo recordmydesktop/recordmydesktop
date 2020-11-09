@@ -115,7 +115,7 @@ void *rmdCaptureAudio(ProgData *pdata)
 
 		//read data into new buffer
 #ifdef HAVE_LIBASOUND
-		while (sret<frames) {
+		while (sret < frames) {
 			int temp_sret = snd_pcm_readi(	pdata->sound_handle,
 							newbuf->data + pdata->sound_framesize * sret,
 							frames-sret);
