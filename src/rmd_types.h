@@ -203,28 +203,25 @@ typedef struct CacheFile {
 //this struct will hold a few basic
 //information, needed for caching the frames.
 typedef struct _CacheData{
-	char	*workdir,	//The directory were the project
-				//will be stored, while recording.
-				//Since this will take a lot of space, the user must be
-				//able to change the location.
-		*projname,	//This is the name of the folder that
-				//will hold the project.
-				//It is rMD-session-%d where %d is the pid
-				//of the current proccess.
-				//This way, running two instances
-				//will not create problems
-				//and also, a frontend can identify
-				//leftovers from a possible crash
-				//and delete them
-		*specsfile,	//workdir+projname+specs.txt
-		*imgdata,	//workdir+projname+img.out.gz
-		*audiodata;	//workdir+projname+audio.pcm
+	char		*workdir,	//The directory were the project
+					//will be stored, while recording.
+					//Since this will take a lot of space, the user must be
+					//able to change the location.
+			*projname,	//This is the name of the folder that
+					//will hold the project.
+					//It is rMD-session-%d where %d is the pid
+					//of the current proccess.
+					//This way, running two instances
+					//will not create problems
+					//and also, a frontend can identify
+					//leftovers from a possible crash
+					//and delete them
+			*specsfile,	//workdir+projname+specs.txt
+			*imgdata,	//workdir+projname+img.out.gz
+			*audiodata;	//workdir+projname+audio.pcm
 
-	gzFile  ifp;		//image data file pointer
-	FILE	*uncifp;	//uncompressed image data file pointer
-
-	FILE	*afp;		//audio data file pointer
-
+	CacheFile	*icf;		//image data cache file
+	FILE		*afp;		//audio data file pointer
 }CacheData;
 
 //sound buffer

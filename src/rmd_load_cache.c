@@ -85,18 +85,12 @@ static void rmdLoadBlock(
 }
 
 //returns number of bytes
-static int rmdReadZF(void * buffer, size_t size, size_t nmemb, FILE *ucfp, gzFile ifp)
+static int rmdReadZF(void * buffer, size_t size, size_t nmemb, CacheFile *icf)
 {
-	if ((ifp != NULL && ucfp != NULL) ||
-	   (ifp == NULL && ucfp == NULL))
-		return -1;
-	else if (ucfp != NULL) {
-		return size * fread(buffer, size, nmemb, ucfp);
-	} else
-		return gzread(ifp, buffer, size * nmemb);
+	return rmdCacheFileRead(icf, buffer, size * nmemb);
 }
 
-static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
+static int rmdReadFrame(CachedFrame *frame, CacheFile *icf)
 {
 	int	index_entry_size = sizeof(u_int32_t);
 
@@ -104,8 +98,7 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 		if (rmdReadZF(	frame->YBlocks,
 				index_entry_size,
 				frame->header->Ynum,
-				ucfp,
-				ifp) != index_entry_size * frame->header->Ynum) {
+				icf) != index_entry_size * frame->header->Ynum) {
 			return -1;
 		}
 	}
@@ -114,8 +107,7 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 		if (rmdReadZF(	frame->UBlocks,
 				index_entry_size,
 				frame->header->Unum,
-				ucfp,
-				ifp) != index_entry_size * frame->header->Unum) {
+				icf) != index_entry_size * frame->header->Unum) {
 			return -1;
 		}
 	}
@@ -124,8 +116,7 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 		if (rmdReadZF(	frame->VBlocks,
 				index_entry_size,
 				frame->header->Vnum,
-				ucfp,
-				ifp) != index_entry_size * frame->header->Vnum) {
+				icf) != index_entry_size * frame->header->Vnum) {
 			return -1;
 		}
 	}
@@ -134,8 +125,7 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 		if (rmdReadZF(	frame->YData,
 				Y_UNIT_BYTES,
 				frame->header->Ynum,
-				ucfp,
-				ifp) != Y_UNIT_BYTES * frame->header->Ynum) {
+				icf) != Y_UNIT_BYTES * frame->header->Ynum) {
 			return -2;
 		}
 	}
@@ -144,8 +134,7 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 		if (rmdReadZF(	frame->UData,
 				UV_UNIT_BYTES,
 				frame->header->Unum,
-				ucfp,
-				ifp) != UV_UNIT_BYTES * frame->header->Unum) {
+				icf) != UV_UNIT_BYTES * frame->header->Unum) {
 			return -2;
 		}
 	}
@@ -154,8 +143,7 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 		if (rmdReadZF(	frame->VData,
 				UV_UNIT_BYTES,
 				frame->header->Vnum,
-				ucfp,
-				ifp) != UV_UNIT_BYTES * frame->header->Vnum) {
+				icf) != UV_UNIT_BYTES * frame->header->Vnum) {
 			return -2;
 		}
 	}
@@ -163,25 +151,19 @@ static int rmdReadFrame(CachedFrame *frame, FILE *ucfp, gzFile ifp)
 	return 0;
 }
 
-static int read_header(ProgData *pdata, gzFile ifp, FILE *ucfp, FrameHeader *fheader)
+static int read_header(FrameHeader *fheader, CacheFile *icf)
 {
-	if (!pdata->args.zerocompression) {
-		return gzread(ifp, fheader, sizeof(FrameHeader)) == sizeof(FrameHeader);
-	} else {
-		return fread(fheader, sizeof(FrameHeader), 1, ucfp) == 1;
-	}
+	return rmdCacheFileRead(icf, fheader, sizeof(FrameHeader)) == sizeof(FrameHeader);
 }
 
 void *rmdLoadCache(ProgData *pdata)
 {
 	yuv_buffer	*yuv = &pdata->enc_data->yuv;
-	gzFile		ifp = NULL;
-	FILE		*ucfp = NULL;
+	CacheFile	*icf;
 	FILE		*afp = pdata->cache_data->afp;
 	FrameHeader	fheader;
 	CachedFrame	frame;
-	int		nth_cache = 1,
-			audio_end = 0,
+	int		audio_end = 0,
 			thread_exit = 0,	//0 success, -1 couldn't find files,1 couldn't remove
 			blocknum_x = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
 			blocknum_y = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH,
@@ -206,18 +188,10 @@ void *rmdLoadCache(ProgData *pdata)
 	frame.VData	= malloc(yuv->uv_width * yuv->uv_height);
 
 	//and the we open our files
-	if (!pdata->args.zerocompression) {
-		ifp = gzopen(pdata->cache_data->imgdata, "rb");
-		if (ifp == NULL) {
-			thread_exit = -1;
-			pthread_exit(&thread_exit);
-		}
-	} else {
-		ucfp = fopen(pdata->cache_data->imgdata, "rb");
-		if (ucfp == NULL) {
-			thread_exit = -1;
-			pthread_exit(&thread_exit);
-		}
+	icf = rmdCacheFileOpen(pdata, pdata->cache_data->imgdata, RMD_CACHE_FILE_MODE_READ);
+	if (!icf) {
+		thread_exit = -1;
+		pthread_exit(&thread_exit);
 	}
 
 	if (!pdata->args.nosound) {
@@ -238,18 +212,18 @@ void *rmdLoadCache(ProgData *pdata)
 		//video load and encoding
 		if (pdata->avd <= 0 || pdata->args.nosound || audio_end) {
 
-			if (read_header(pdata, ifp, ucfp, frame.header)) {
+			if (read_header(frame.header, icf)) {
 
 				fprintf(stdout,	"\r[%d%%] ",
 						((frame.header->capture_frameno) * 100) / pdata->capture_frameno);
+				if (icf->chapter)
+					fprintf(stdout, "\t[Cache File %d]", icf->chapter);
 				fflush(stdout);
 
 				if (	(frame.header->Ynum > blocknum_x * blocknum_y) ||
 					(frame.header->Unum > blocknum_x * blocknum_y) ||
 					(frame.header->Vnum > blocknum_x * blocknum_y) ||
-					rmdReadFrame(	&frame,
-							pdata->args.zerocompression ? ucfp : NULL,
-							pdata->args.zerocompression ? NULL : ifp) < 0) {
+					rmdReadFrame(&frame, icf) < 0) {
 
 					raise(SIGINT);
 					continue;
@@ -285,15 +259,7 @@ void *rmdLoadCache(ProgData *pdata)
 
 				last_capture_frameno = fheader.capture_frameno;
 			} else {
-				if (rmdSwapCacheFilesRead(	pdata->cache_data->imgdata,
-								nth_cache,
-								&ifp,
-								&ucfp)) {
-					raise(SIGINT);
-				} else {
-					fprintf(stderr, "\t[Cache File %d]", nth_cache);
-					nth_cache++;
-				}
+				raise(SIGINT);
 			}
 		//audio load and encoding
 		} else {
@@ -325,6 +291,8 @@ void *rmdLoadCache(ProgData *pdata)
 	free(frame.VData);
 
 	free(sound_data);
+
+	rmdCacheFileClose(icf);
 
 	if (!pdata->args.nosound)
 		fclose(afp);

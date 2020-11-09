@@ -262,6 +262,12 @@ static void rmdBlocksFromList(	RectArea   **root,
 	}
 }
 
+/* This thread just samples the recorded window in response to rmdTimer's
+ * triggers, updating the yuv buffer hopefully at the desired frame rate.
+ * Following every update, the time_frameno is propogated to capture_frameno
+ * and image_buffer_ready is signaled for the cache/encode side to consume the
+ * yuv buffer.
+ */
 void *rmdGetFrame(ProgData *pdata)
 {
 	int	blocks_w = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
