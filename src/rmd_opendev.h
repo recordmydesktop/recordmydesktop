@@ -46,7 +46,7 @@
 *
 * \param periodsize Size of a period(can be NULL)
 *
-* \param periodtime Duration of a period(can be NULL)
+* \param periodtime_us Duration of a period(can be NULL)
 *
 * \param hardpause Set to 1 when the device has to be stopped during pause
 *                  and to 0 when it supports pausing
@@ -59,7 +59,7 @@ snd_pcm_t *rmdOpenDev(const char *pcm_dev,
                       unsigned int *frequency,
                       snd_pcm_uframes_t *buffsize,
                       snd_pcm_uframes_t *periodsize,
-                      unsigned int *periodtime,
+                      unsigned int *periodtime_us,
                       int *hardpause);
 #else
 /**

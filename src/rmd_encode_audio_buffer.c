@@ -175,5 +175,5 @@ void rmdSyncEncodeAudioBuffer(ProgData *pdata, signed char *buff)
 	if (!pdata->running)
 		pdata->enc_data->m_ogg_vs.e_o_s = 1;
 
-	pdata->avd -= pdata->periodtime;
+	pdata->avd -= pdata->periodtime_us;
 }

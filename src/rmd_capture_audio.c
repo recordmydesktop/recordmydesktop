@@ -51,7 +51,7 @@ void *rmdCaptureAudio(ProgData *pdata)
 	rmdThreadsSetName("rmdCaptureAudio");
 
 	//start capturing only after first frame is taken
-	nanosleep(&(struct timespec){ .tv_nsec = pdata->frametime * 1000 }, NULL);
+	nanosleep(&(struct timespec){ .tv_nsec = pdata->frametime_us * 1000 }, NULL);
 
 	while (pdata->running) {
 		int		sret = 0;
@@ -154,7 +154,7 @@ void *rmdCaptureAudio(ProgData *pdata)
 		 * should get accounted for too FIXME TODO
 		 */
 		pthread_mutex_lock(&pdata->avd_mutex);
-		pdata->avd -= pdata->periodtime;
+		pdata->avd -= pdata->periodtime_us;
 		pthread_mutex_unlock(&pdata->avd_mutex);
 
 		//queue the new buffer

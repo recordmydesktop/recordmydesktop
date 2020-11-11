@@ -47,7 +47,7 @@ snd_pcm_t *rmdOpenDev(	const char *pcm_dev,
 			unsigned int *frequency,
 			snd_pcm_uframes_t *buffsize,
 			snd_pcm_uframes_t *periodsize,
-			unsigned int *periodtime,
+			unsigned int *periodtime_us,
 			int *hard_pause)
 {
 	snd_pcm_t *mhandle;
@@ -126,8 +126,8 @@ snd_pcm_t *rmdOpenDev(	const char *pcm_dev,
 	if (periodsize != NULL)
 		snd_pcm_hw_params_get_period_size(hwparams, periodsize, 0);
 
-	if (periodtime != NULL)
-		snd_pcm_hw_params_get_period_time(hwparams, periodtime, 0);
+	if (periodtime_us != NULL)
+		snd_pcm_hw_params_get_period_time(hwparams, periodtime_us, 0);
 
 	fprintf(stderr,
 		"Recording on device %s is set to:\n%d channels at %dHz\n",

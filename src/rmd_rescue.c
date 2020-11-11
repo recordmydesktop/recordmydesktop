@@ -99,7 +99,7 @@ int rmdRescue(const char *path)
 	vblocks = malloc(sizeof(*vblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
 				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
 
-	pdata.frametime = 1000000 / pdata.args.fps;
+	pdata.frametime_us = 1000000 / pdata.args.fps;
 
 	pthread_mutex_init(&pdata.theora_lib_mutex, NULL);
 	pthread_mutex_init(&pdata.vorbis_lib_mutex, NULL);

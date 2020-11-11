@@ -52,7 +52,7 @@ static void sync_streams(ProgData *pdata, unsigned int *frame_step, struct times
 	int	avd;
 
 	pthread_mutex_lock(&pdata->avd_mutex);
-	avd = pdata->avd + pdata->frametime;
+	avd = pdata->avd + pdata->frametime_us;
 
 	/* There are two knobs available for keeping the video synchronized with the audio:
 	 * 1. frame_step; how many frames to encode from this frame (aka dropping frames if > 1)
@@ -67,20 +67,20 @@ static void sync_streams(ProgData *pdata, unsigned int *frame_step, struct times
 	 */
 
 	if (avd < 0) {
-		int	frames_behind = -avd / pdata->frametime;
+		int	frames_behind = -avd / pdata->frametime_us;
 
 		if (frames_behind > 0) {
 			/* more than a whole frame behind, drop frames to catch up */
 			*frame_step += frames_behind;
-			avd += frames_behind * pdata->frametime;
+			avd += frames_behind * pdata->frametime_us;
 		} else {
 			/* less than a whole frame behind, just sleep less */
-			*delay = us_to_timespec(pdata->frametime + avd);
+			*delay = us_to_timespec(pdata->frametime_us + avd);
 		}
 
 	} else if (avd > 0) {
 		/* sleep longer */
-		*delay = us_to_timespec(pdata->frametime + avd);
+		*delay = us_to_timespec(pdata->frametime_us + avd);
 	}
 
 	pdata->avd = avd;

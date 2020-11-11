@@ -314,8 +314,8 @@ struct _ProgData {
 									//later use in YUV buffer
 				  npxl;	 //this is the no pixel convention
 							//when drawing the dummy pointer
-	unsigned int periodtime,//time that a sound buffer lasts (microsecs)
-				frametime;  //time that a frame lasts (microsecs)
+	unsigned int	periodtime_us, //time that a sound buffer lasts (microsecs)
+			frametime_us;  //time that a frame lasts (microsecs)
 	Window  shaped_w;	   //frame
 	int damage_event,	   //damage event base code
 		damage_error,	   //damage error base code

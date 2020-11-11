@@ -112,7 +112,7 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 							&pdata->args.frequency,
 							&pdata->args.buffsize,
 							&pdata->periodsize,
-							&pdata->periodtime,
+							&pdata->periodtime_us,
 							&pdata->hard_pause);
 
 			pdata->sound_framesize=(snd_pcm_format_width(SND_PCM_FORMAT_S16_LE) / 8 *
@@ -124,7 +124,7 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 									pdata->args.channels,
 									pdata->args.frequency);
 
-				pdata->periodtime =	(1000000 * pdata->args.buffsize) /
+				pdata->periodtime_us =	(1000000 * pdata->args.buffsize) /
 							((pdata->args.channels<<1) * pdata->args.frequency);
 			//when using OSS periodsize serves as an alias of buffsize
 			pdata->periodsize = pdata->args.buffsize;
@@ -154,7 +154,7 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 			pdata->periodsize = pdata->args.buffsize;
 			pdata->args.frequency = pdata->jdata->frequency;
 			pdata->args.channels = pdata->jdata->nports;
-			pdata->periodtime =	1000000 * pdata->args.buffsize /
+			pdata->periodtime_us =	1000000 * pdata->args.buffsize /
 						pdata->args.frequency;
 			pdata->sound_framesize =	sizeof(jack_default_audio_sample_t) *
 							pdata->jdata->nports;
@@ -183,7 +183,7 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	vblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
 				(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
 
-	pdata->frametime = 1000000 / pdata->args.fps;
+	pdata->frametime_us = 1000000 / pdata->args.fps;
 
 	return 0;
 

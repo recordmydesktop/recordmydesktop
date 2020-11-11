@@ -119,5 +119,5 @@ void rmdSyncEncodeImageBuffer(ProgData *pdata, unsigned int n_frames)
 		pthread_mutex_unlock(&pdata->libogg_mutex);
 	}
 
-	pdata->avd += pdata->frametime * n_frames;
+	pdata->avd += pdata->frametime_us * n_frames;
 }
