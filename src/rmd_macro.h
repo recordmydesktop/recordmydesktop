@@ -76,8 +76,8 @@
 #define Y_UNIT_WIDTH    0x0010
 #define UV_UNIT_WIDTH   0x0008
 
-#define MAX(a, b) ((a) < (b)) ? (b) : (a)
-#define MIN(a, b) ((a) > (b)) ? (b) : (a)
+#define MAX(a, b) (((a) < (b)) ? (b) : (a))
+#define MIN(a, b) (((a) > (b)) ? (b) : (a))
 
 #endif
 
