@@ -36,7 +36,6 @@
 #include "rmd_get_frame.h"
 #include "rmd_jack.h"
 #include "rmd_register_callbacks.h"
-#include "rmd_timer.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -55,8 +54,7 @@ void rmdThreads(ProgData *pdata)
 			sound_capture_t,
 			sound_encode_t,
 			sound_cache_t,
-			flush_to_ogg_t,
-			timer_t;
+			flush_to_ogg_t;
 
 	if (pdata->args.delay > 0) {
 		fprintf(stderr, "Will sleep for %d seconds now.\n", pdata->args.delay);
@@ -106,11 +104,6 @@ void rmdThreads(ProgData *pdata)
 				(void *)pdata);
 
 	rmdRegisterCallbacks(pdata);
-	pdata->timer_alive = 1;
-	pthread_create(	&timer_t,
-			NULL,
-			(void *)rmdTimer,
-			(void *)pdata);
 	fprintf(stderr,"Capturing!\n");
 
 #ifdef HAVE_LIBJACK
@@ -165,10 +158,6 @@ void rmdThreads(ProgData *pdata)
 		fprintf(stderr,"..");
 
 	fprintf(stderr,".");
-
-	//Now that we are done with recording we cancel the timer
-	pdata->timer_alive = 0;
-	pthread_join(timer_t,NULL);
 }
 
 void rmdThreadsSetName(const char *name)

@@ -101,7 +101,6 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	pdata->aborted			= FALSE;
 	pdata->pause_state_changed	= FALSE;
 	pdata->capture_frameno		= 0;
-	pdata->time_frameno		= 0;
 
 	if (!pdata->args.nosound) {
 		if (!pdata->args.use_jack) {

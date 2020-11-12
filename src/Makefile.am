@@ -61,8 +61,6 @@ recordmydesktop_SOURCES = \
 	rmd_specsfile.h \
 	rmd_threads.c \
 	rmd_threads.h \
-	rmd_timer.c \
-	rmd_timer.h \
 	rmd_types.h \
 	rmd_update_image.c \
 	rmd_update_image.h \

@@ -323,7 +323,6 @@ struct _ProgData {
 		dummy_p_size,	   //dummy pointer size,initially 16x16,always square
 		th_encoding_clean,	  //thread exit inidcator
 		v_encoding_clean,	   //  >>  >>
-		timer_alive,		//determines loop of timer thread
 		hard_pause,		 //if sound device doesn't support pause
 							//we have to close and reopen
 		avd,				//syncronization among audio and video
@@ -335,10 +334,8 @@ struct _ProgData {
 	boolean aborted;			 //1 if we should abort
 	boolean pause_state_changed; //1 if pause state changed
 
-	/* timer advances time_frameno, getframe copies time_frameno to capture_frameno
-	 * access to both is serialized by time_{mutex,cond}
-	 */
-	unsigned int	time_frameno, capture_frameno;
+	unsigned int	capture_frameno;	// frame counter advanced by getframe for encoder/cacher
+	struct timespec	last_frame_ts;		// time of last frame when args.nosound=1 for avd maintenance
 
 	pthread_mutex_t pause_mutex;
 	pthread_mutex_t time_mutex;
