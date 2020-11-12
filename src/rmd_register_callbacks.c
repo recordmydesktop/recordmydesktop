@@ -47,14 +47,10 @@ static void rmdSetPaused(int signum)
 
 static void rmdSetRunning(int signum)
 {
-	if (!*pdata_paused) {
+	*pdata_running = FALSE;
 
-		*pdata_running = FALSE;
-
-		if (signum == SIGABRT) {
-			*pdata_aborted = TRUE;
-		}
-	}
+	if (signum == SIGABRT)
+		*pdata_aborted = TRUE;
 }
 
 void rmdRegisterCallbacks(ProgData *pdata)
