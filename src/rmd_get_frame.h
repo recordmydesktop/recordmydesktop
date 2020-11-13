@@ -31,11 +31,11 @@
 
 
 /**
-* Retrieve frame form xserver, and transform to a yuv buffer,
+* Retrieve frames from xserver, and transform to a yuv buffer,
 * either directly(full shots) or by calling UpdateImage.
 * \param pdata ProgData struct containing all program data
 */
-void *rmdGetFrame(ProgData *pdata);
+void *rmdGetFrames(ProgData *pdata);
 
 
 #endif

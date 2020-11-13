@@ -399,7 +399,7 @@ static boolean paused(ProgData *pdata)
  * and image_buffer_ready is signaled for the cache/encode side to consume the
  * yuv buffer.
  */
-void *rmdGetFrame(ProgData *pdata)
+void *rmdGetFrames(ProgData *pdata)
 {
 	int	blocks_w = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
 		blocks_h = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH;
@@ -413,7 +413,7 @@ void *rmdGetFrame(ProgData *pdata)
 	int init_img1 = 0, init_img2 = 0, img_sel, d_buff;
 	unsigned frameno = 0;
 
-	rmdThreadsSetName("rmdGetFrame");
+	rmdThreadsSetName("rmdGetFrames");
 
 	img_sel = d_buff = pdata->args.full_shots;
 

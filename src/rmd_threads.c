@@ -64,7 +64,7 @@ void rmdThreads(ProgData *pdata)
 	/*start threads*/
 	pthread_create(	&image_capture_t,
 			NULL,
-			(void *)rmdGetFrame,
+			(void *)rmdGetFrames,
 			(void *)pdata);
 
 	if (pdata->args.encOnTheFly)
