@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #include "config.h"
-#include "rmd_get_frame.h"
+#include "rmd_get_frames.h"
 
 #include "rmd_cache.h"
 #include "rmd_frame.h"

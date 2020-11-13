@@ -22,8 +22,8 @@ recordmydesktop_SOURCES = \
 	rmd_flush_to_ogg.h \
 	rmd_frame.c \
 	rmd_frame.h \
-	rmd_get_frame.c \
-	rmd_get_frame.h \
+	rmd_get_frames.c \
+	rmd_get_frames.h \
 	rmd_getzpixmap.c \
 	rmd_getzpixmap.h \
 	rmd_init_encoder.c \

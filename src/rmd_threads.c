@@ -33,7 +33,7 @@
 #include "rmd_encode_audio_buffer.h"
 #include "rmd_encode_image_buffer.h"
 #include "rmd_flush_to_ogg.h"
-#include "rmd_get_frame.h"
+#include "rmd_get_frames.h"
 #include "rmd_jack.h"
 #include "rmd_register_callbacks.h"
 #include "rmd_types.h"
