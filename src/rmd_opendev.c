@@ -52,7 +52,7 @@ snd_pcm_t *rmdOpenDev(	const char *pcm_dev,
 {
 	snd_pcm_t *mhandle;
 	snd_pcm_hw_params_t *hwparams;
-	unsigned int periods = 2;
+	unsigned int periods = 4;
 	unsigned int exactrate = *frequency;
 
 	// The compiler might warn us because the expansion starts with
