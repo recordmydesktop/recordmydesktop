@@ -130,6 +130,11 @@ static void uv_align(XRectangle *cliprect, XRectangle *xrect)
 
 	if (rel.height % 2 && rel.height + rel.y < cliprect->y + cliprect->height)
 		rel.height++;
+
+	xrect->x = rel.x + cliprect->x;
+	xrect->y = rel.y + cliprect->y;
+	xrect->width = rel.width;
+	xrect->height = rel.height;
 }
 
 
