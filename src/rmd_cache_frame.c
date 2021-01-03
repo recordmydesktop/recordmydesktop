@@ -166,7 +166,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 				gzsetparams(icf->gzfp, 0, Z_FILTERED);
 		}
 
-		strncpy(fheader.frame_prefix, "FRAM", 4);
+		memcpy(fheader.frame_prefix, "FRAM", 4);
 		fheader.capture_frameno = capture_frameno;
 		frameno++;
 
