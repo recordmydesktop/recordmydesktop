@@ -217,8 +217,12 @@ void *rmdLoadCache(ProgData *pdata)
 
 			if (read_header(frame.header, icf)) {
 
-				fprintf(stdout,	"\r[%d%%] ",
-						((frame.header->capture_frameno) * 100) / pdata->capture_frameno);
+				if (pdata->capture_frameno)
+					fprintf(stdout,	"\r[%d%%] ",
+							((frame.header->capture_frameno) * 100) / pdata->capture_frameno);
+				else
+					fprintf(stdout, "\r[%d frames rendered] ",
+							frame.header->capture_frameno);
 				if (icf->chapter)
 					fprintf(stdout, "\t[Cache File %d]", icf->chapter);
 				fflush(stdout);
