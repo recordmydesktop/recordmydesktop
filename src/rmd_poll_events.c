@@ -125,10 +125,10 @@ static void uv_align(XRectangle *cliprect, XRectangle *xrect)
 	 * the UV routines will handle the exception - which might temporarily
 	 * mean they just lop the odd row/column off the edge.
 	 */
-	if (rel.width % 2  && rel.width + rel.x < cliprect->x + cliprect->width)
+	if (rel.width % 2 && rel.width + rel.x < cliprect->width)
 		rel.width++;
 
-	if (rel.height % 2 && rel.height + rel.y < cliprect->y + cliprect->height)
+	if (rel.height % 2 && rel.height + rel.y < cliprect->height)
 		rel.height++;
 
 	xrect->x = rel.x + cliprect->x;
