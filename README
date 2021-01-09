@@ -1,4 +1,4 @@
-This is a fork of John Varohakis' recordMyDesktop.
+This is a fork of John Varouhakis' recordMyDesktop.
 
 It's a small commandline tool for creating .ogv recordings of X desktops,
 complete with audio via ALSA, OSS, or JACK.
