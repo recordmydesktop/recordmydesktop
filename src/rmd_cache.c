@@ -124,24 +124,34 @@ static int _rmdCacheFileOpen(CacheFile *file, const char *path)
 /* only close the internal file handle, but don't free file */
 static int _rmdCacheFileClose(CacheFile *file)
 {
+	gzFile	gzfp;
+	FILE	*fp;
+
 	assert(file);
+
+	if (!(gzfp = file->gzfp) && !(fp = file->fp))
+		return 0;
 
 	if (file->mode == RMD_CACHE_FILE_MODE_WRITE) {
 		pthread_cancel(file->syncer_thread);
 		pthread_join(file->syncer_thread, NULL);
 	}
 
+	/* Always NULL out the handles, even if the close fails, otherwise
+	 * a double-free kind of thing could occur.  This is especially true
+	 * for when a new chapter close fails (ENOSPC), an explicit close may
+	 * still occur and if the handles are non-NULL things go boom.
+	 */
+	file->gzfp = NULL;
+	file->fp = NULL;
+
 	/* TODO: return meaningful -errno on errors? */
-	if (file->gzfp) {
-		if (gzclose(file->gzfp) != Z_OK)
+	if (gzfp) {
+		if (gzclose(gzfp) != Z_OK)
 			return -1;
-
-		file->gzfp = NULL;
-	} else if (file->fp) {
-		if (fclose(file->fp))
+	} else if (fp) {
+		if (fclose(fp))
 			return -1;
-
-		file->fp = NULL;
 	}
 
 	return 0;
