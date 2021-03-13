@@ -307,7 +307,6 @@ static boolean sync_next_frame(ProgData *pdata)
 		if (pdata->last_frame_ts.tv_sec) {
 			pthread_mutex_lock(&pdata->avd_mutex);
 			pdata->avd -= timespec_delta_in_us(&now, &pdata->last_frame_ts);
-			avd = pdata->avd;
 			pthread_mutex_unlock(&pdata->avd_mutex);
 		}
 
