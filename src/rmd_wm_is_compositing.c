@@ -42,14 +42,14 @@ boolean rmdWMIsCompositing(Display *dpy, int screen)
 	char buf[32];
 	char *window_manager=rmdWMCheck( dpy, RootWindow( dpy, screen ) );
 
-	//If the wm name is queried successfully the wm is compliant (source  
+	//If the wm name is queried successfully the wm is compliant (source
 	//http://standards.freedesktop.org/wm-spec/1.4/ar01s03.html#id2568282 )
 	//in which case we will also free() the allcoated string.
 
 	if (window_manager == NULL)
 		return FALSE;
 	else
-		free(window_manager); 
+		free(window_manager);
 
 	snprintf( buf, sizeof(buf), "_NET_WM_CM_S%d", screen);
 	atom = XInternAtom(dpy, buf, True);

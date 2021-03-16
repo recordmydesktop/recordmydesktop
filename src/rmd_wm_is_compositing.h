@@ -37,12 +37,12 @@
 *
 * \param screen screen number/id that the window manager runs on
 *
-* \returns TRUE if compositing, false otherwise or when 
+* \returns TRUE if compositing, false otherwise or when
 *          the window manager doesn't support the required
-*          freedesktop.org hints for the test to be done 
+*          freedesktop.org hints for the test to be done
 *          succesfully.
 */
 
-boolean rmdWMIsCompositing( Display *dpy, int screen) ; 
+boolean rmdWMIsCompositing( Display *dpy, int screen);
 
 #endif

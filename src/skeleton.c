@@ -5,7 +5,7 @@
 
 /* This file depends on WORDS_BIGENDIAN being defined to 1 if the host
  * processor stores words with the most significant byte first (like Motorola
- * and SPARC, unlike Intel and VAX). 
+ * and SPARC, unlike Intel and VAX).
  * On little endian systems, WORDS_BIGENDIAN should be undefined.
  *
  * When using GNU Autotools, the correct value will be written into config.h
@@ -21,9 +21,9 @@
 
 #include "skeleton.h"
 
-#ifdef WIN32                                                                   
+#ifdef WIN32
 #define snprintf _snprintf
-#endif 
+#endif
 
 static  unsigned short
 _le_16 (unsigned short s)
@@ -80,7 +80,7 @@ _le_64 (ogg_int64_t l)
 /* write an ogg_page to a file pointer */
 int write_ogg_page_to_file(ogg_page *og, FILE *out) {
    int written;
-   
+
    written = fwrite(og->header,1, og->header_len, out);
    if (written > 0)
      written += fwrite(og->body,1, og->body_len, out);
@@ -88,8 +88,8 @@ int write_ogg_page_to_file(ogg_page *og, FILE *out) {
    return written;
 }
 
-int add_message_header_field(fisbone_packet *fp, 
-                                        char *header_key, 
+int add_message_header_field(fisbone_packet *fp,
+                                        char *header_key,
                                         char *header_value) {
 
     /* size of both key and value + ': ' + CRLF */
@@ -100,10 +100,10 @@ int add_message_header_field(fisbone_packet *fp,
         int new_size = (fp->current_header_size + this_message_size+1) * sizeof(char);
         fp->message_header_fields = _ogg_realloc(fp->message_header_fields, new_size);
     }
-    snprintf(fp->message_header_fields + fp->current_header_size, 
-                this_message_size+1, 
-                "%s: %s\r\n", 
-                header_key, 
+    snprintf(fp->message_header_fields + fp->current_header_size,
+                this_message_size+1,
+                "%s: %s\r\n",
+                header_key,
                 header_value);
     fp->current_header_size += this_message_size;
 
@@ -137,19 +137,19 @@ int ogg_from_fishead(fishead_packet *fp,ogg_packet *op) {
     return 0;
 }
 
-/* create a ogg_packet from a fisbone_packet structure. 
+/* create a ogg_packet from a fisbone_packet structure.
  * call this method after the fisbone_packet is filled and all message header fields are added
  * by calling add_message_header_field method.
  */
 int ogg_from_fisbone(fisbone_packet *fp,ogg_packet *op) {
-    
+
     int packet_size;
 
     if (!fp || !op) return -1;
 
     packet_size = FISBONE_SIZE + fp->current_header_size;
 
-    memset (op, 0, sizeof (*op));       
+    memset (op, 0, sizeof (*op));
     op->packet = _ogg_calloc (packet_size, sizeof(unsigned char));
     if (!op->packet) return -1;
 

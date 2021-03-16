@@ -87,7 +87,7 @@ typedef int boolean;
 
 #define RMD_MAX_JACK_PORTS (100)
 
-// Forward declarations 
+// Forward declarations
 typedef struct _ProgData ProgData;
 
 typedef struct _Image {
@@ -330,7 +330,7 @@ struct _ProgData {
 
 	/** Progam state vars */
 	boolean running;			 //1 while the program is capturing/paused/encoding
-	boolean paused;			  //1 while the program is paused 
+	boolean paused;			  //1 while the program is paused
 	boolean aborted;			 //1 if we should abort
 	boolean pause_state_changed; //1 if pause state changed
 

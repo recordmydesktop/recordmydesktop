@@ -79,13 +79,13 @@ unsigned char *rmdMakeDummyPointer(	Display *display,
 	*npxl = ((wp[0] - 1) != bp[0]) ? wp[0] - 100 : wp[0] - 102;
 	for (i = 0; i < size; i++) {
 		for (k = 0; k < size; k++) {
-			ret[(i * size + k) * 4 + __ABYTE] = (pmask[type][i][k] == 'w') ? 
+			ret[(i * size + k) * 4 + __ABYTE] = (pmask[type][i][k] == 'w') ?
 				wp[0]:(pmask[type][i][k] == 'b') ? bp[0] : *npxl;
-			ret[(i * size + k) * 4 + __RBYTE] = (pmask[type][i][k] == 'w') ? 
+			ret[(i * size + k) * 4 + __RBYTE] = (pmask[type][i][k] == 'w') ?
 				wp[1]:(pmask[type][i][k] == 'b') ? bp[1] : *npxl;
-			ret[(i * size + k) * 4 + __GBYTE] = (pmask[type][i][k] == 'w') ? 
+			ret[(i * size + k) * 4 + __GBYTE] = (pmask[type][i][k] == 'w') ?
 				wp[2]:(pmask[type][i][k] == 'b') ? bp[2] : *npxl;
-			ret[(i * size + k) * 4 + __BBYTE] = (pmask[type][i][k] == 'w') ? 
+			ret[(i * size + k) * 4 + __BBYTE] = (pmask[type][i][k] == 'w') ?
 				wp[3]:(pmask[type][i][k] == 'b') ? bp[3] : *npxl;
 		}
 	}

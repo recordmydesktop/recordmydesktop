@@ -31,7 +31,7 @@
 
 
 /*
- * Check a shortcut combination and if valid, 
+ * Check a shortcut combination and if valid,
  * register it, on the root window.
  *
  * \param dpy Connection to the X Server
@@ -40,12 +40,12 @@
  *
  * \param shortcut String represantation of the shortcut
  *
- * \param HotKey Pre-allocated struct that is filled with the 
- *               modifiers and the keycode, for checks on incoming 
+ * \param HotKey Pre-allocated struct that is filled with the
+ *               modifiers and the keycode, for checks on incoming
  *               keypress events. Left untouched if the call fails.
  *
- *  
- *  \returns 0 on Success, 1 on Failure. 
+ *
+ *  \returns 0 on Success, 1 on Failure.
  *
  */
 int rmdRegisterShortcut(Display *dpy,

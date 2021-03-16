@@ -32,7 +32,7 @@
  *  problem, by behaving identically with roundf
  *  and being portable (floorf and ceilf, that are
  *  used in the implementation, are defined in C89)
- * 
+ *
  *  \param val Number to be rounded
  *
  *  \returns val rounded
@@ -41,4 +41,3 @@
 double rmdRoundf( double val );
 
 #endif
-

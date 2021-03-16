@@ -103,7 +103,7 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready)
 		char *new_name = malloc(fname_length + 5);
 		strcpy(new_name, fname);
 		strcat(new_name, ".ogv");
-		
+
 		free(pdata->args.filename);
 		pdata->args.filename = new_name;
 	}
@@ -112,14 +112,14 @@ void rmdInitEncoder(ProgData *pdata, EncData *enc_data_t, int buffer_ready)
 		rmdIncrementalNaming(&(pdata)->args.filename);
 		fprintf(stderr, "Output file: %s\n", pdata->args.filename);
 	}
-		
+
 	enc_data_t->fp = fopen((pdata)->args.filename, "w");
 	if (enc_data_t->fp == NULL) {
 		fprintf(stderr, "Cannot open file %s for writting!\n", (pdata)->args.filename);
 		exit(13);
 	}
 
-	//each stream must have a unique 
+	//each stream must have a unique
 	srand(time(NULL));
 	y0 = rand() + 1;
 	y1 = rand() + 1;

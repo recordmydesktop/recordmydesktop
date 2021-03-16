@@ -211,17 +211,15 @@ void rmdEventLoop(ProgData *pdata)
 				}
 			}
 		} else if (event.type == Expose) {
-			
 			if (event.xexpose.count != 0)
 				continue;
 			else if (!pdata->args.noframe) {
 				rmdDrawFrame(	pdata->dpy,
-						pdata->specs.screen,  
+						pdata->specs.screen,
 						pdata->shaped_w,
 						pdata->brwin.rrect.width,
 						pdata->brwin.rrect.height);
 			}
-
 		} else if (!pdata->args.full_shots) {
 			if (event.type == MapNotify ) {
 				XWindowAttributes attribs;

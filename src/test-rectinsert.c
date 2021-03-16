@@ -107,7 +107,7 @@ static void GetState(RectArea *root, boolean *state)
         current = current->next;
     }
 }
- 
+
 static boolean rmdStatesEqual(boolean *a, boolean *b)
 {
     int x, y;
@@ -126,7 +126,7 @@ static boolean rmdStatesEqual(boolean *a, boolean *b)
 static void rmdPrintState(boolean *state)
 {
     int x, y;
-    
+
     for (y = 0; y < STATE_HEIGHT; y++) {
         printf("    ");
 
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
             printf("  FAILURE!\n");
             printf("  Current state:\n");
             rmdPrintState(current_state);
-                
+
             printf("  Expected state:\n");
             rmdPrintState(rectinsert_test_data[i].expected_state);
 
@@ -181,6 +181,6 @@ int main(int argc, char **argv)
         printf("\n");
         i++;
     }
-  
+
     return result;
 }

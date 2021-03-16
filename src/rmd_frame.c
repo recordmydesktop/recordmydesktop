@@ -39,7 +39,7 @@
 
 
 void rmdDrawFrame(	Display *dpy,
-			int screen,  
+			int screen,
 			Window win,
 			int width,
 			int height)

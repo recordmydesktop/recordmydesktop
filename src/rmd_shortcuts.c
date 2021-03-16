@@ -31,7 +31,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xlibint.h>
-#include <X11/keysym.h> 
+#include <X11/keysym.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -61,10 +61,10 @@ int rmdRegisterShortcut(	Display *dpy,
 		modifier_mask = modifier_mask | Mod4Mask;
 	if (strstr(shortcut, "Mod5"))
 		modifier_mask = modifier_mask | Mod5Mask;
-	
+
 	//we register the shortcut on the root
 	//window, which means on every keypress event,
-	//so I think it's neccessary to have at least one 
+	//so I think it's neccessary to have at least one
 	//modifier.
 	if (modifier_mask == 0)
 		return 1;
@@ -77,8 +77,7 @@ int rmdRegisterShortcut(	Display *dpy,
 	} else
 		return 1;
 
-
-	/* Key grabbing stuff taken from tilda who took it from yeahconsole 
+	/* Key grabbing stuff taken from tilda who took it from yeahconsole
 	 * who took it from evilwm */
 
 	{

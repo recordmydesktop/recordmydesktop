@@ -379,7 +379,7 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 					fprintf(stderr,
 							"Warning, will ignore --use-jack flags, no libjack support in build.\n");
 				}
-			}				
+			}
 
 			default:
 				break;
@@ -415,11 +415,11 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 			case POPT_ERROR_NOARG:
 				fprintf(stderr, "Missing argument\n");
 				break;
-						
+
 			case POPT_ERROR_BADNUMBER:
 				fprintf(stderr, "Bad number\n");
 				break;
-						
+
 			default:
 				fprintf(stderr, "libpopt error: %d\n", arg_id);
 				break;
@@ -487,7 +487,7 @@ static boolean rmdValidateArguments(const ProgArgs *args)
 	return success;
 }
 
-static void rmdPrintAndExit(	poptContext con, 
+static void rmdPrintAndExit(	poptContext con,
 				enum poptCallbackReason reason,
 				const struct poptOption *opt,
 				const char *arg,

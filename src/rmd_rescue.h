@@ -28,7 +28,7 @@
 #define RMD_RESCUE_H 1
 
 /*
- * Rescue a previous recording, found in 
+ * Rescue a previous recording, found in
  * the given path.
  *
  * \param path Path to the cache folder.
@@ -37,6 +37,5 @@
  *
  */
 int rmdRescue(const char *path);
-
 
 #endif

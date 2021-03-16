@@ -167,7 +167,7 @@ void rmdSyncEncodeAudioBuffer(ProgData *pdata, signed char *buff)
 		vorbis_analysis(&pdata->enc_data->m_vo_block, NULL);
 		vorbis_bitrate_addblock(&pdata->enc_data->m_vo_block);
 
-		while (vorbis_bitrate_flushpacket(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_ogg_pckt2)) 
+		while (vorbis_bitrate_flushpacket(&pdata->enc_data->m_vo_dsp, &pdata->enc_data->m_ogg_pckt2))
 			ogg_stream_packetin(&pdata->enc_data->m_ogg_vs, &pdata->enc_data->m_ogg_pckt2);
 	}
 	pthread_mutex_unlock(&pdata->libogg_mutex);

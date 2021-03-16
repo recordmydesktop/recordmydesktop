@@ -38,21 +38,20 @@
  *
  * \returns 0 on Success, 1 on failure
  *
- */ 
+ */
 int rmdWriteSpecsFile(ProgData *pdata);
-
 
 
 /*
  * Read the  text file that holds the required
  * capture attributes, in the cache directory.
  *
- * \param pdata ProgData struct that will be fille 
+ * \param pdata ProgData struct that will be filled
  *        with  all program data
  *
  * \returns 0 on Success, 1 on failure
  *
- */ 
+ */
 int rmdReadSpecsFile(ProgData *pdata);
 
 
