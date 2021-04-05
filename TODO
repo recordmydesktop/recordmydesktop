@@ -1,11 +1,3 @@
 * add --unmute option to unmute the sound capture device if required,
   restoring the mute after finished capturing if it started muted.
 
-* understand decoding errors when playing produced ogv files in
-  mpv/ffmpeg:
-
-  [ffmpeg/demuxer] ogg: Broken file, non-keyframe not correctly marked.
-  [ffmpeg/demuxer] ogg: Broken file, keyframe not correctly marked.
-
-* understand and correct video corruption artifacts, seems likely
-  related to the above decoding errors.
