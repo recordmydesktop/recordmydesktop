@@ -87,8 +87,8 @@ static void clip_dummy_pointer_area(XRectangle *area, XRectangle *clip, XRectang
 	register u_int##__depth__##_t *datapi = 					\
 			((u_int##__depth__##_t *)data) + y_tm * buffer_width + x_tm;	\
 											\
-	for(int k = 0; k < height_tm; k++) {						\
-		for(int i = 0; i < width_tm; i++) {					\
+	for (int k = 0; k < height_tm; k++) {						\
+		for (int i = 0; i < width_tm; i++) {					\
 			*datapi += 1;							\
 			datapi++;							\
 		}									\

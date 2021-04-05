@@ -399,7 +399,7 @@ int rmdRectInsert(RectArea **root, const XRectangle *xrect)
 								newnode1->next=NULL;
 							}
 						} else {
-							for(i=0;i<nrects;i++) {
+							for (i=0;i<nrects;i++) {
 								if (xrect_return[i].width > 0 &&
 								   xrect_return[i].height > 0)
 									total_insertions+=

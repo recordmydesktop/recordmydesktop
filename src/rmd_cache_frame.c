@@ -72,7 +72,7 @@ static int rmdFlushBlock(
 
 		for (int j = 0;j < blockwidth; j++) {
 
-			for(int i = 0;i < blockwidth; i++)
+			for (int i = 0;i < blockwidth; i++)
 				(*out_buf_reg++) = (*buf_reg++);
 
 			out_buffer_bytes += blockwidth;
@@ -129,7 +129,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 		//find and flush different blocks
 		if (firstrun) {
 			firstrun = 0;
-			for(int j = 0; j < blocknum_x * blocknum_y; j++) {
+			for (int j = 0; j < blocknum_x * blocknum_y; j++) {
 					yblocks[ynum] = 1;
 					y_short_blocks[ynum] = j;
 					ynum++;
@@ -142,7 +142,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 			}
 		} else {
 			/**COMPRESS ARRAYS*/
-			for(int j = 0; j < blocknum_x * blocknum_y; j++) {
+			for (int j = 0; j < blocknum_x * blocknum_y; j++) {
 				if (yblocks[j]) {
 					y_short_blocks[ynum] = j;
 					ynum++;
@@ -187,7 +187,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 
 		//flush the blocks for each buffer
 		if (ynum) {
-			for(int j = 0; j < ynum; j++)
+			for (int j = 0; j < ynum; j++)
 				nbytes += rmdFlushBlock(pdata->enc_data->yuv.y,
 							y_short_blocks[j],
 							pdata->enc_data->yuv.y_width,
@@ -198,7 +198,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 		}
 
 		if (unum) {
-			for(int j = 0; j < unum; j++)
+			for (int j = 0; j < unum; j++)
 				nbytes += rmdFlushBlock(pdata->enc_data->yuv.u,
 							u_short_blocks[j],
 							pdata->enc_data->yuv.uv_width,
@@ -209,7 +209,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 		}
 
 		if (vnum) {
-			for(int j = 0; j < vnum; j++)
+			for (int j = 0; j < vnum; j++)
 				nbytes += rmdFlushBlock(pdata->enc_data->yuv.v,
 							v_short_blocks[j],
 							pdata->enc_data->yuv.uv_width,

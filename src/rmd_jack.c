@@ -53,7 +53,7 @@ static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t)
 	if (!jdata->pdata->running || jdata->pdata->paused || !jdata->capture_started)
 		return 0;
 
-	for(int i = 0; i < jdata->nports; i++)
+	for (int i = 0; i < jdata->nports; i++)
 		jdata->portbuf[i] = jack_port_get_buffer(jdata->ports[i], nframes);
 
 
@@ -61,7 +61,7 @@ static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t)
 //vorbis analysis buffer wants uninterleaved data
 //so we are simply placing the buffers for every channel
 //sequentially on the ringbuffer
-	for(int i = 0; i < jdata->nports; i++)
+	for (int i = 0; i < jdata->nports; i++)
 		jack_ringbuffer_write(	jdata->sound_buffer,
 					(void *)(jdata->portbuf[i]),
 					nframes *
@@ -87,7 +87,7 @@ static int rmdSetupPorts(JackData *jdata)
 	jdata->portbuf = malloc(sizeof(jack_default_audio_sample_t *) * jdata->nports);
 	memset(jdata->portbuf, 0, sizeof(jack_default_audio_sample_t *) * jdata->nports);
 
-	for(int i = 0; i < jdata->nports; i++) {
+	for (int i = 0; i < jdata->nports; i++) {
 		char name[64];//recordMyDesktop:input_n<64 is enough for full name
 		char num[8];
 		strcpy(name, "input_");
