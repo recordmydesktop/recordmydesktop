@@ -70,7 +70,7 @@ void rmdThreads(ProgData *pdata)
 	if (pdata->args.encOnTheFly)
 		pthread_create(	&image_encode_t,
 				NULL,
-				(void *)rmdEncodeImageBuffer,
+				(void *)rmdEncodeImageBuffers,
 				(void *)pdata);
 	else
 		pthread_create(	&image_cache_t,

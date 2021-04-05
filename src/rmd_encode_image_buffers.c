@@ -33,7 +33,7 @@
 #include <errno.h>
 
 
-void *rmdEncodeImageBuffer(ProgData *pdata)
+void *rmdEncodeImageBuffers(ProgData *pdata)
 {
 	unsigned int	encode_frameno = 0, last_encode_frameno = 0;
 

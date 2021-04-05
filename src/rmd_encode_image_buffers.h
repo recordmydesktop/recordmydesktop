@@ -36,7 +36,7 @@
 * \param pdata ProgData struct containing all program data
 * \param n_frames number of frames to encode from image buffer
 */
-void *rmdEncodeImageBuffer(ProgData *pdata);
+void *rmdEncodeImageBuffers(ProgData *pdata);
 
 /**
 * As rmdEncodeImageBuffer, only with the assumption that
