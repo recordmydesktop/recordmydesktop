@@ -30,7 +30,7 @@
 #include "rmd_cache_audio.h"
 #include "rmd_cache_frame.h"
 #include "rmd_capture_audio.h"
-#include "rmd_encode_audio_buffer.h"
+#include "rmd_encode_audio_buffers.h"
 #include "rmd_encode_image_buffer.h"
 #include "rmd_flush_to_ogg.h"
 #include "rmd_get_frames.h"

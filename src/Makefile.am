@@ -12,8 +12,8 @@ recordmydesktop_SOURCES = \
 	rmd_capture_audio.h \
 	rmd_encode_cache.c \
 	rmd_encode_cache.h \
-	rmd_encode_audio_buffer.c \
-	rmd_encode_audio_buffer.h \
+	rmd_encode_audio_buffers.c \
+	rmd_encode_audio_buffers.h \
 	rmd_encode_image_buffer.c \
 	rmd_encode_image_buffer.h \
 	rmd_error.c \
