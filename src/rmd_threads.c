@@ -88,7 +88,7 @@ void rmdThreads(ProgData *pdata)
 		if (pdata->args.encOnTheFly)
 			pthread_create(	&sound_encode_t,
 					NULL,
-					(void *)rmdEncodeAudioBuffer,
+					(void *)rmdEncodeAudioBuffers,
 					(void *)pdata);
 		else
 			pthread_create(	&sound_cache_t,

@@ -37,7 +37,7 @@
 #include <errno.h>
 
 
-void *rmdEncodeAudioBuffer(ProgData *pdata)
+void *rmdEncodeAudioBuffers(ProgData *pdata)
 {
 	int	sampread = pdata->periodsize;
 #ifdef HAVE_LIBJACK

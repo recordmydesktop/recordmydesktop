@@ -36,7 +36,7 @@
 *
 * \param pdata ProgData struct containing all program data
 */
-void *rmdEncodeAudioBuffer(ProgData *pdata);
+void *rmdEncodeAudioBuffers(ProgData *pdata);
 
 /**
 * As rmdEncodeAudioBuffer, only with the assumption that
