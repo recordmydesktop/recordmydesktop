@@ -66,17 +66,17 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
     // Test #2
 
-    { "Put a rect in place and make sure it gets an even size and position",
+    { "Put another rect in place",
       
       { 15, 2, 4, 3 },
 
       { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        O,O,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,O,O,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
+        O,O,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
 
-        O,O,O,O,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
+        O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
@@ -99,15 +99,15 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
     { "Put a new rect within an existing rect",
 
-      { 14, 2, 4, 2 },
+      { 15, 2, 2, 2 },
 
       { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        O,O,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,O,O,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
+        O,O,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
 
-        O,O,O,O,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
+        O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
@@ -128,17 +128,17 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
     // Test #4
 
-    { "Put a new rect over an existing rect and make sure it beocomes even",
+    { "Put a new rect over an existing rect",
 
       { 1, 1, 3, 3 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,O,O,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
 
-        O,O,O,O,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
+        O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
@@ -164,13 +164,13 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
       { 10, 4, 6, 6 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,O,
 
-        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
@@ -195,13 +195,13 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
       { 0, 8, 20, 2 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,O,
 
-        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+        O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,O,O,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         E,E,E,E,E, E,E,E,E,E, E,E,E,E,E, E,E,E,E,E,
@@ -226,13 +226,13 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
       { 2, 2, 2, 18 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,O,
 
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         E,E,E,E,E, E,E,E,E,E, E,E,E,E,E, E,E,E,E,E,
@@ -257,13 +257,13 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
       { 8, 14, 4, 4 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,O,
 
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         E,E,E,E,E, E,E,E,E,E, E,E,E,E,E, E,E,E,E,E,
@@ -288,13 +288,13 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
       { 16, 14, 2, 2 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,O,
 
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         E,E,E,E,E, E,E,E,E,E, E,E,E,E,E, E,E,E,E,E,
@@ -319,13 +319,13 @@ RectInsertTestdataEntry rectinsert_test_data[] = {
 
       { 6, 12, 14, 8 },
 
-      { E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        E,E,E,E,O, O,O,O,O,O, O,O,O,O,E, E,E,E,E,E,
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+      { O,O,O,O,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, O,O,O,O,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,E,E,E,O, O,O,O,O,O, O,O,O,O,O, E,E,E,E,O,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,O,
 
-        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,E,E,E,E,
+        O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         O,O,E,E,O, O,O,O,O,O, E,E,E,E,E, E,O,O,O,O,
         E,E,E,E,E, E,E,E,E,E, E,E,E,E,E, E,E,E,E,E,
