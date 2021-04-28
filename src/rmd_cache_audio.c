@@ -60,14 +60,14 @@ void *rmdCacheAudioBuffer(ProgData *pdata)
 //insignificant fraction.
 
 	while (pdata->running) {
-		SndBuffer	*buff = NULL;
-
 		pthread_mutex_lock(&pdata->pause_mutex);
 		while (pdata->paused)
 			pthread_cond_wait(&pdata->pause_cond, &pdata->pause_mutex);
 		pthread_mutex_unlock(&pdata->pause_mutex);
 
 		if (!pdata->args.use_jack) {
+			SndBuffer	*buff;
+
 			pthread_mutex_lock(&pdata->sound_buffer_mutex);
 			while (!pdata->sound_buffer && pdata->running)
 				pthread_cond_wait(&pdata->sound_data_read, &pdata->sound_buffer_mutex);
