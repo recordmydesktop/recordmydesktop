@@ -30,6 +30,7 @@
 #include "rmd_flush_to_ogg.h"
 #include "rmd_init_encoder.h"
 #include "rmd_load_cache.h"
+#include "rmd_threads.h"
 #include "rmd_types.h"
 
 #include <pthread.h>
@@ -38,8 +39,7 @@
 #include <stdlib.h>
 
 
-
-void rmdEncodeCache(ProgData *pdata)
+int rmdEncodeCache(ProgData *pdata)
 {
 	pthread_t	flush_to_ogg_t, load_cache_t;
 
@@ -61,13 +61,22 @@ void rmdEncodeCache(ProgData *pdata)
 			pdata->sound_buffer = pdata->sound_buffer->next;
 		}
 	}
-	pthread_create(&flush_to_ogg_t, NULL, (void *)rmdFlushToOgg, (void *)pdata);
+
+	if (rmdThread(&flush_to_ogg_t, rmdFlushToOgg, pdata)) {
+		fprintf(stderr, "Error creating rmdFlushToOgg thread!!!\n");
+		return 1;
+	}
 
 	//start loading image and audio
-	pthread_create(&load_cache_t, NULL, (void *)rmdLoadCache, (void *)pdata);
+	if (rmdThread(&load_cache_t, rmdLoadCache, pdata)) {
+		fprintf(stderr, "Error creating rmdLoadCache thread!!!\n");
+		return 1;
+	}
 
 	//join and finish
 	pthread_join(load_cache_t, NULL);
 	fprintf(stderr, "Encoding finished!\nWait a moment please...\n");
 	pthread_join(flush_to_ogg_t, NULL);
+
+	return 0;
 }

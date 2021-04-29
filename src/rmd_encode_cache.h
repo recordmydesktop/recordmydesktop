@@ -35,7 +35,7 @@
 * ogg stream.
 * \param pdata ProgData struct containing all program data
 */
-void rmdEncodeCache(ProgData *pdata);
+int rmdEncodeCache(ProgData *pdata);
 
 
 #endif

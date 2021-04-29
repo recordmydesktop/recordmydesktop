@@ -158,8 +158,10 @@ int main(int argc, char **argv)
 
 	//encode and then cleanup cache
 	if (!pdata.args.encOnTheFly && !pdata.args.no_encode) {
-		if (!pdata.aborted)
-			rmdEncodeCache(&pdata);
+		if (!pdata.aborted) {
+			if (rmdEncodeCache(&pdata))
+				return 1;
+		}
 
 		fprintf(stderr, "Cleanning up cache...\n");
 		if (rmdPurgeCache(pdata.cache_data, !pdata.args.nosound))

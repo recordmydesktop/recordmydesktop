@@ -114,8 +114,9 @@ int rmdRescue(const char *path)
 
 	rmdRegisterCallbacks(&pdata);
 	fprintf(stderr, "Restoring %s!!!\n", path);
-	
-	rmdEncodeCache(&pdata);
+
+	if (rmdEncodeCache(&pdata))
+		return 1;
 
 	fprintf(stderr, "Done!!!\n");
 	fprintf(stderr, "Goodbye!\n");
