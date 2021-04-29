@@ -35,28 +35,28 @@
 
 int rmdWriteSpecsFile(ProgData *pdata)
 {
-	FILE *fp;
+	FILE	*fp;
 
-	fp=fopen(pdata->cache_data->specsfile,"wb");
+	fp = fopen(pdata->cache_data->specsfile, "wb");
 	if (!fp)
 		return 1;
 
-	fprintf(fp,"recordMyDesktop = %s\n",VERSION);
-	fprintf(fp,"Width = %hu\n",pdata->brwin.rrect.width);
-	fprintf(fp,"Height = %hu\n",pdata->brwin.rrect.height);
-	fprintf(fp,"Filename = %s\n",pdata->args.filename);
-	fprintf(fp,"FPS = %f\n",pdata->args.fps);
-	fprintf(fp,"NoSound = %d\n",pdata->args.nosound);
-	fprintf(fp,"Frequency = %d\n",pdata->args.frequency);
-	fprintf(fp,"Channels = %d\n",pdata->args.channels);
-	fprintf(fp,"BufferSize = %lu\n",(unsigned long)pdata->args.buffsize);
-	fprintf(fp,"SoundFrameSize = %d\n",pdata->sound_framesize);
-	fprintf(fp,"PeriodSize = %lu\n",(unsigned long)pdata->periodsize);
-	fprintf(fp,"UsedJack = %d\n",pdata->args.use_jack);
-	fprintf(fp,"v_bitrate = %d\n",pdata->args.v_bitrate);
-	fprintf(fp,"v_quality = %d\n",pdata->args.v_quality);
-	fprintf(fp,"s_quality = %d\n",pdata->args.s_quality);
-	fprintf(fp,"ZeroCompression = %d\n",pdata->args.zerocompression);
+	fprintf(fp, "recordMyDesktop = %s\n", VERSION);
+	fprintf(fp, "Width = %hu\n", pdata->brwin.rrect.width);
+	fprintf(fp, "Height = %hu\n", pdata->brwin.rrect.height);
+	fprintf(fp, "Filename = %s\n", pdata->args.filename);
+	fprintf(fp, "FPS = %f\n", pdata->args.fps);
+	fprintf(fp, "NoSound = %d\n", pdata->args.nosound);
+	fprintf(fp, "Frequency = %d\n", pdata->args.frequency);
+	fprintf(fp, "Channels = %d\n", pdata->args.channels);
+	fprintf(fp, "BufferSize = %lu\n", (unsigned long)pdata->args.buffsize);
+	fprintf(fp, "SoundFrameSize = %d\n", pdata->sound_framesize);
+	fprintf(fp, "PeriodSize = %lu\n", (unsigned long)pdata->periodsize);
+	fprintf(fp, "UsedJack = %d\n", pdata->args.use_jack);
+	fprintf(fp, "v_bitrate = %d\n", pdata->args.v_bitrate);
+	fprintf(fp, "v_quality = %d\n", pdata->args.v_quality);
+	fprintf(fp, "s_quality = %d\n", pdata->args.s_quality);
+	fprintf(fp, "ZeroCompression = %d\n", pdata->args.zerocompression);
 
 	fclose(fp);
 
@@ -65,84 +65,84 @@ int rmdWriteSpecsFile(ProgData *pdata)
 
 int rmdReadSpecsFile(ProgData *pdata)
 {
-	char Cached_Version[256];
-	FILE *fp;
+	char	Cached_Version[256];
+	FILE	*fp;
 
-	fp=fopen(pdata->cache_data->specsfile,"rb");
+	fp = fopen(pdata->cache_data->specsfile, "rb");
 	if (!fp)
 		return 1;
 
 	free(pdata->args.filename);
-	pdata->args.filename=malloc(512);
+	pdata->args.filename = malloc(512);
 
 	//Take that single-point-of-exit advocates !!!
 	//15 points of exit, just for your pleasure.
 	//Also, Vi(m) rules, emacs sucks.
 
-	if (fscanf(fp,"recordMyDesktop = %s\n",Cached_Version)!=1) {
-		fprintf(stderr,"Error reading VERSION attribute!!!\n");
+	if (fscanf(fp, "recordMyDesktop = %s\n", Cached_Version) != 1) {
+		fprintf(stderr, "Error reading VERSION attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"Width = %hu\n",&pdata->brwin.rrect.width)!=1) {
-		fprintf(stderr,"Error reading Width attribute!!!\n");
+	if (fscanf(fp, "Width = %hu\n", &pdata->brwin.rrect.width) != 1) {
+		fprintf(stderr, "Error reading Width attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"Height = %hu\n",&pdata->brwin.rrect.height)!=1) {
-		fprintf(stderr,"Error reading Height attribute!!!\n");
+	if (fscanf(fp, "Height = %hu\n", &pdata->brwin.rrect.height) != 1) {
+		fprintf(stderr, "Error reading Height attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"Filename = %s\n",pdata->args.filename)!=1) {
-		fprintf(stderr,"Error reading Filename attribute!!!\n");
+	if (fscanf(fp, "Filename = %s\n", pdata->args.filename) != 1) {
+		fprintf(stderr, "Error reading Filename attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"FPS = %f\n",&pdata->args.fps)!=1) {
-		fprintf(stderr,"Error reading FPS attribute!!!\n");
+	if (fscanf(fp, "FPS = %f\n", &pdata->args.fps) != 1) {
+		fprintf(stderr, "Error reading FPS attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"NoSound = %d\n",&pdata->args.nosound)!=1) {
-		fprintf(stderr,"Error reading NoSound attribute!!!\n");
+	if (fscanf(fp, "NoSound = %d\n", &pdata->args.nosound) != 1) {
+		fprintf(stderr, "Error reading NoSound attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"Frequency = %d\n",&pdata->args.frequency)!=1) {
-		fprintf(stderr,"Error reading Frequency attribute!!!\n");
+	if (fscanf(fp, "Frequency = %d\n", &pdata->args.frequency) != 1) {
+		fprintf(stderr, "Error reading Frequency attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"Channels = %d\n",&pdata->args.channels)!=1) {
-		fprintf(stderr,"Error reading Channels attribute!!!\n");
+	if (fscanf(fp, "Channels = %d\n", &pdata->args.channels) != 1) {
+		fprintf(stderr, "Error reading Channels attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"BufferSize = %lu\n",
-	(unsigned long *)&pdata->args.buffsize)!=1) {
-		fprintf(stderr,"Error reading BufferSize attribute!!!\n");
+	if (fscanf(fp, "BufferSize = %lu\n",
+	    (unsigned long *)&pdata->args.buffsize) != 1) {
+		fprintf(stderr, "Error reading BufferSize attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"SoundFrameSize = %d\n",&pdata->sound_framesize)!=1) {
-		fprintf(stderr,"Error reading SoundFrameSize attribute!!!\n");
+	if (fscanf(fp, "SoundFrameSize = %d\n", &pdata->sound_framesize) != 1) {
+		fprintf(stderr, "Error reading SoundFrameSize attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"PeriodSize = %lu\n",
-	(unsigned long *)&pdata->periodsize)!=1) {
-		fprintf(stderr,"Error reading PeriodSize attribute!!!\n");
+	if (fscanf(fp, "PeriodSize = %lu\n",
+	    (unsigned long *)&pdata->periodsize) != 1) {
+		fprintf(stderr, "Error reading PeriodSize attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"UsedJack = %u\n",&pdata->args.use_jack)!=1) {
-		fprintf(stderr,"Error reading UsedJack attribute!!!\n");
+	if (fscanf(fp, "UsedJack = %u\n", &pdata->args.use_jack) != 1) {
+		fprintf(stderr, "Error reading UsedJack attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"v_bitrate = %d\n",&pdata->args.v_bitrate)!=1) {
-		fprintf(stderr,"Error reading v_bitrate attribute!!!\n");
+	if (fscanf(fp, "v_bitrate = %d\n", &pdata->args.v_bitrate) != 1) {
+		fprintf(stderr, "Error reading v_bitrate attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"v_quality = %d\n",&pdata->args.v_quality)!=1) {
-		fprintf(stderr,"Error reading v_quality attribute!!!\n");
+	if (fscanf(fp, "v_quality = %d\n", &pdata->args.v_quality) != 1) {
+		fprintf(stderr, "Error reading v_quality attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"s_quality = %d\n",&pdata->args.s_quality)!=1) {
-		fprintf(stderr,"Error reading s_quality attribute!!!\n");
+	if (fscanf(fp, "s_quality = %d\n", &pdata->args.s_quality) != 1) {
+		fprintf(stderr, "Error reading s_quality attribute!!!\n");
 		return 1;
 	}
-	if (fscanf(fp,"ZeroCompression = %d\n",&pdata->args.zerocompression)!=1) {
-		fprintf(stderr,"Error reading ZeroCompression attribute!!!\n");
+	if (fscanf(fp, "ZeroCompression = %d\n", &pdata->args.zerocompression) != 1) {
+		fprintf(stderr, "Error reading ZeroCompression attribute!!!\n");
 		return 1;
 	}
 
