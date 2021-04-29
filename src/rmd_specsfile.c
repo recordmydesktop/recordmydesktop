@@ -41,24 +41,48 @@ int rmdWriteSpecsFile(ProgData *pdata)
 	if (!fp)
 		return 1;
 
-	fprintf(fp, "recordMyDesktop = %s\n", VERSION);
-	fprintf(fp, "Width = %hu\n", pdata->brwin.rrect.width);
-	fprintf(fp, "Height = %hu\n", pdata->brwin.rrect.height);
-	fprintf(fp, "Filename = %s\n", pdata->args.filename);
-	fprintf(fp, "FPS = %f\n", pdata->args.fps);
-	fprintf(fp, "NoSound = %d\n", pdata->args.nosound);
-	fprintf(fp, "Frequency = %d\n", pdata->args.frequency);
-	fprintf(fp, "Channels = %d\n", pdata->args.channels);
-	fprintf(fp, "BufferSize = %lu\n", (unsigned long)pdata->args.buffsize);
-	fprintf(fp, "SoundFrameSize = %d\n", pdata->sound_framesize);
-	fprintf(fp, "PeriodSize = %lu\n", (unsigned long)pdata->periodsize);
-	fprintf(fp, "UsedJack = %d\n", pdata->args.use_jack);
-	fprintf(fp, "v_bitrate = %d\n", pdata->args.v_bitrate);
-	fprintf(fp, "v_quality = %d\n", pdata->args.v_quality);
-	fprintf(fp, "s_quality = %d\n", pdata->args.s_quality);
-	fprintf(fp, "ZeroCompression = %d\n", pdata->args.zerocompression);
+	if (fprintf(fp, "recordMyDesktop = %s\n"
+			"Width = %hu\n"
+			"Height = %hu\n"
+			"Filename = %s\n"
+			"FPS = %f\n"
+			"NoSound = %d\n"
+			"Frequency = %d\n"
+			"Channels = %d\n"
+			"BufferSize = %lu\n"
+			"SoundFrameSize = %d\n"
+			"PeriodSize = %lu\n"
+			"UsedJack = %d\n"
+			"v_bitrate = %d\n"
+			"v_quality = %d\n"
+			"s_quality = %d\n"
+			"ZeroCompression = %d\n",
+			VERSION,
+			pdata->brwin.rrect.width,
+			pdata->brwin.rrect.height,
+			pdata->args.filename,
+			pdata->args.fps,
+			pdata->args.nosound,
+			pdata->args.frequency,
+			pdata->args.channels,
+			(unsigned long)pdata->args.buffsize,
+			pdata->sound_framesize,
+			(unsigned long)pdata->periodsize,
+			pdata->args.use_jack,
+			pdata->args.v_bitrate,
+			pdata->args.v_quality,
+			pdata->args.s_quality,
+			pdata->args.zerocompression) < 0) {
 
-	fclose(fp);
+		fprintf(stderr, "Error writing specsfile!!!\n");
+		(void) fclose(fp);
+		return 1;
+	}
+
+	if (fclose(fp) != 0) {
+		fprintf(stderr, "Error closing specsfile!!!\n");
+		return 1;
+	}
 
 	return 0;
 }
