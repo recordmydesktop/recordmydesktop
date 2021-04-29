@@ -43,48 +43,46 @@ unsigned char	*yblocks,
 
 void rmdMakeMatrices (void)
 {
-	int i;
+	/* assuming 8-bit precision */
+	float	Yscale = 219.0, Yoffset = 16.0;
+	float	Cscale = 224.0, Coffset = 128.0;
+	float	RGBscale = 255.0;
 
- 	/* assuming 8-bit precision */
- 	float Yscale = 219.0, Yoffset = 16.0;
- 	float Cscale = 224.0, Coffset = 128.0;
- 	float RGBscale = 255.0;
+	float	r, g, b;
+	float	yr, yg, yb;
+	float	ur, ug, ub;
+	float	vg, vb;	/* vr intentionally missing */
 
- 	float	r, g, b;
- 	float	yr, yg, yb;
- 	float	ur, ug, ub;
- 	float	 vg, vb;	/* vr intentionally missing */
+	/* as for ITU-R BT-601-6 specifications: */
+	r = 0.299;
+	b = 0.114;
+	g = 1.0 - r - b;
 
- 	/* as for ITU-R BT-601-6 specifications: */
- 	r = 0.299;
- 	b = 0.114;
- 	g = 1.0 - r - b;
+	/*	as a note, here are the coefficients
+		as for ITU-R BT-709 specifications:
+		r=0.2126;	b=0.0722;	g=1.0-r-b; */
 
- 	/*	as a note, here are the coefficients
- 		as for ITU-R BT-709 specifications:
- 		r=0.2126;	b=0.0722;	g=1.0-r-b; */
+	yr = r * Yscale / RGBscale;
+	yg = g * Yscale / RGBscale;
+	yb = b * Yscale / RGBscale;
+	ur = (-0.5 * r / (1 - b)) * Cscale / RGBscale;
+	ug = (-0.5 * g / (1 - b)) * Cscale / RGBscale;
+	ub = ( 0.5 * Cscale / RGBscale);
+	/* vr = ub so UbVr = ub*i = vr*i */
+	vg = (-0.5 * g / (1 - r)) * Cscale / RGBscale;
+	vb = (-0.5 * b / (1 - r)) * Cscale / RGBscale;
 
- 	yr = r * Yscale / RGBscale;
- 	yg = g * Yscale / RGBscale;
- 	yb = b * Yscale / RGBscale;
- 	ur = ( -0.5 * r / ( 1 - b ) ) * Cscale / RGBscale;
- 	ug = ( -0.5 * g / ( 1 - b ) ) * Cscale / RGBscale;
- 	ub = ( 0.5 * Cscale / RGBscale);
- 	/* vr = ub so UbVr = ub*i = vr*i */
- 	vg = ( -0.5 * g / ( 1 - r ) ) * Cscale / RGBscale;
- 	vb = ( -0.5 * b / ( 1 - r ) ) * Cscale / RGBscale;
+	for (int i = 0; i < 256; i++) {
+		Yr[i] = (unsigned char)rmdRoundf(Yoffset + yr * i);
+		Yg[i] = (unsigned char)rmdRoundf(yg * i);
+		Yb[i] = (unsigned char)rmdRoundf(yb * i);
 
-	 for (i = 0; i < 256; i++) {
-		 Yr[i] = (unsigned char) rmdRoundf( Yoffset + yr * i );
-		 Yg[i] = (unsigned char) rmdRoundf( yg * i );
-		 Yb[i] = (unsigned char) rmdRoundf( yb * i );
+		Ur[i] = (unsigned char)rmdRoundf(Coffset + ur * i);
+		Ug[i] = (unsigned char)rmdRoundf(ug * i);
+		UbVr[i] = (unsigned char)rmdRoundf(ub * i);
 
-		 Ur[i] = (unsigned char) rmdRoundf( Coffset + ur * i );
-		 Ug[i] = (unsigned char) rmdRoundf( ug * i );
-		 UbVr[i] = (unsigned char) rmdRoundf( ub * i );
-
-		 Vg[i] = (unsigned char) rmdRoundf( vg * i );
-		 Vb[i] = (unsigned char) rmdRoundf( Coffset + vb * i );
+		Vg[i] = (unsigned char)rmdRoundf(vg * i);
+		Vb[i] = (unsigned char)rmdRoundf(Coffset + vb * i);
 	}
 }
 
@@ -284,7 +282,7 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 							((y_tm >> 1) * (yuv)->uv_stride),	\
 					*yuv_V =	(yuv)->v + (x_tm >> 1) +		\
 							((y_tm >> 1) * (yuv)->uv_stride),	\
-					*_ur = Ur, *_ug	= Ug, *_ubvr = UbVr,			\
+					*_ur = Ur, *_ug = Ug, *_ubvr = UbVr,			\
 					*_vg = Vg, *_vb = Vb;					\
 												\
 	register u_int##__depth__##_t	*datapi = (u_int##__depth__##_t *)data,			\
@@ -452,10 +450,11 @@ static inline unsigned char avg_4_pixels(	unsigned char *data_array,
 						int i_tm,
 						int offset)
 {
-    return 	((data_array[(k_tm*width_img+i_tm)*RMD_ULONG_SIZE_T+offset]+
-		data_array[((k_tm-1)*width_img+i_tm)*RMD_ULONG_SIZE_T+offset]+
-		data_array[(k_tm*width_img+i_tm-1)*RMD_ULONG_SIZE_T+offset]+
-		data_array[((k_tm-1)*width_img+i_tm-1)*RMD_ULONG_SIZE_T+offset])/4);
+	return	((	data_array[(k_tm * width_img + i_tm) * RMD_ULONG_SIZE_T + offset]  +
+			data_array[((k_tm - 1) * width_img + i_tm) * RMD_ULONG_SIZE_T + offset]  +
+			data_array[(k_tm * width_img + i_tm - 1) * RMD_ULONG_SIZE_T + offset]  +
+			data_array[((k_tm - 1) * width_img + i_tm - 1) * RMD_ULONG_SIZE_T + offset]
+		) >> 2);
 }
 
 void rmdXFixesPointerToYuv(	yuv_buffer *yuv,
@@ -505,7 +504,7 @@ void rmdXFixesPointerToYuv(	yuv_buffer *yuv,
 					((Ur[avg2] + Ug[avg1] + UbVr[avg0]) % (UCHAR_MAX + 1))
 					* avg3) / UCHAR_MAX;
 
-				yuv->v[idx]=
+				yuv->v[idx] =
 					(yuv->v[idx] * (UCHAR_MAX - avg3) +
 					((UbVr[avg2] + Vg[avg1] + Vb[avg0]) % (UCHAR_MAX + 1))
 					* avg3) / UCHAR_MAX;
