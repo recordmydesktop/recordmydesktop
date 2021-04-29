@@ -150,7 +150,8 @@ int main(int argc, char **argv)
 	}
 
 	//this is where the capturing happens.
-	rmdThreads(&pdata);
+	if (rmdThreads(&pdata))
+		return 1;
 
 	XCloseDisplay(pdata.dpy);
 	fprintf(stderr, ".\n");

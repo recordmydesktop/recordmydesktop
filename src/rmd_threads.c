@@ -46,7 +46,16 @@
 #include <time.h>
 #include <unistd.h>
 
-void rmdThreads(ProgData *pdata)
+
+int rmdThread(pthread_t *thread, void *(*func)(ProgData *), ProgData *pdata)
+{
+	if (pthread_create(thread, NULL, (void *)func, (void *)pdata) != 0)
+		return 1;
+
+	return 0;
+}
+
+int rmdThreads(ProgData *pdata)
 {
 	pthread_t	image_capture_t,
 			image_encode_t,
@@ -62,46 +71,50 @@ void rmdThreads(ProgData *pdata)
 	}
 
 	/*start threads*/
-	pthread_create(	&image_capture_t,
-			NULL,
-			(void *)rmdGetFrames,
-			(void *)pdata);
-
-	if (pdata->args.encOnTheFly)
-		pthread_create(	&image_encode_t,
-				NULL,
-				(void *)rmdEncodeImageBuffers,
-				(void *)pdata);
-	else
-		pthread_create(	&image_cache_t,
-				NULL,
-				(void *)rmdCacheImageBuffer,
-				(void *)pdata);
-
-	if (!pdata->args.nosound) {
-		if (!pdata->args.use_jack)
-			pthread_create(	&sound_capture_t,
-					NULL,
-					(void *)rmdCaptureAudio,
-					(void *)pdata);
-
-		if (pdata->args.encOnTheFly)
-			pthread_create(	&sound_encode_t,
-					NULL,
-					(void *)rmdEncodeAudioBuffers,
-					(void *)pdata);
-		else
-			pthread_create(	&sound_cache_t,
-					NULL,
-					(void *)rmdCacheAudioBuffer,
-					(void *)pdata);
+	if (rmdThread(&image_capture_t, rmdGetFrames, pdata)) {
+		fprintf(stderr, "Error creating rmdGetFrames thread!!!\n");
+		return 1;
 	}
 
-	if (pdata->args.encOnTheFly)
-		pthread_create(	&flush_to_ogg_t,
-				NULL,
-				(void *)rmdFlushToOgg,
-				(void *)pdata);
+	if (pdata->args.encOnTheFly) {
+		if (rmdThread(&image_encode_t, rmdEncodeImageBuffers, pdata)) {
+			fprintf(stderr, "Error creating rmdEncodeImageBuffers thread!!!\n");
+			return 1;
+		}
+	} else {
+		if (rmdThread(&image_cache_t, rmdCacheImageBuffer, pdata)) {
+			fprintf(stderr, "Error creating rmdCacheImageBuffer thread!!!\n");
+			return 1;
+		}
+	}
+
+	if (!pdata->args.nosound) {
+		if (!pdata->args.use_jack) {
+			if (rmdThread(&sound_capture_t, rmdCaptureAudio, pdata)) {
+				fprintf(stderr, "Error creating rmdCaptureAudio thread!!!\n");
+				return 1;
+			}
+		}
+
+		if (pdata->args.encOnTheFly) {
+			if (rmdThread(&sound_encode_t, rmdEncodeAudioBuffers, pdata)) {
+				fprintf(stderr, "Error creating rmdEncodeAudioBuffers thread!!!\n");
+				return 1;
+			}
+		} else {
+			if (rmdThread(&sound_cache_t, rmdCacheAudioBuffer, pdata)) {
+				fprintf(stderr, "Error creating rmdCacheAudioBuffer thread!!!\n");
+				return 1;
+			}
+		}
+	}
+
+	if (pdata->args.encOnTheFly) {
+		if (rmdThread(&flush_to_ogg_t, rmdFlushToOgg, pdata)) {
+			fprintf(stderr, "Error creating rmdFlushToOgg thread!!!\n");
+			return 1;
+		}
+	}
 
 	rmdRegisterCallbacks(pdata);
 	fprintf(stderr,"Capturing!\n");
@@ -158,6 +171,8 @@ void rmdThreads(ProgData *pdata)
 		fprintf(stderr,"..");
 
 	fprintf(stderr,".");
+
+	return 0;
 }
 
 void rmdThreadsSetName(const char *name)

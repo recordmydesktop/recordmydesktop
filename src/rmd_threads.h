@@ -30,6 +30,7 @@
 #include "rmd_types.h"
 
 
+int rmdThread(pthread_t *thread, void *(*func)(ProgData *), ProgData *pdata);
 /**
 * Launch and wait capture threads.
 * Also creates and waits the encoding threads when
@@ -37,7 +38,7 @@
 *
 * \param pdata ProgData struct containing all program data
 */
-void rmdThreads(ProgData *pdata);
+int rmdThreads(ProgData *pdata);
 void rmdThreadsSetName(const char *name);
 
 
