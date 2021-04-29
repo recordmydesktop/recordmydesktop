@@ -506,7 +506,7 @@ void rmdXFixesPointerToYuv(	yuv_buffer *yuv,
 					* avg3) / UCHAR_MAX;
 
 				yuv->v[idx]=
-					(yuv->u[idx] * (UCHAR_MAX - avg3) +
+					(yuv->v[idx] * (UCHAR_MAX - avg3) +
 					((UbVr[avg2] + Vg[avg1] + Vb[avg0]) % (UCHAR_MAX + 1))
 					* avg3) / UCHAR_MAX;
 			}
