@@ -151,7 +151,7 @@ static int rmdFirstFrame(ProgData *pdata, Image *image)
 						IPC_CREAT|0777);
 
 		if (image->shm_info.shmid == -1) {
-			fprintf(stderr, "Failed to obtain Shared Memory segment!\n");
+			fprintf(stderr, "Failed to obtain shared memory segment!\n");
 			return 12;
 		}
 
