@@ -204,10 +204,8 @@ static void rmdMoveCaptureArea(	XRectangle *rect,
 	int t_x = 0, t_y = 0;
 
 	t_x = cursor_x - rect->width / 2;
-	t_x = (t_x >> 1) << 1;
 	rect->x = (t_x < 0) ? 0 : ((t_x + rect->width > width) ? width - rect->width : t_x);
 	t_y = cursor_y - rect->height / 2;
-	t_y = (t_y >> 1) << 1;
 	rect->y = (t_y < 0 ) ? 0 : ((t_y + rect->height > height) ? height - rect->height : t_y);
 }
 
