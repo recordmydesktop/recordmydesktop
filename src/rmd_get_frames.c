@@ -563,8 +563,8 @@ void *rmdGetFrames(ProgData *pdata)
 
 			if (pdata->args.follow_mouse) {
 				rmdMoveCaptureArea(	&pdata->brwin.rrect,
-							mouse_pos_abs.x + pdata->args.xfixes_cursor ? xcim->xhot : 0,
-							mouse_pos_abs.y + pdata->args.xfixes_cursor ? xcim->yhot : 0,
+							mouse_pos_abs.x + (pdata->args.xfixes_cursor ? xcim->xhot : 0),
+							mouse_pos_abs.y + (pdata->args.xfixes_cursor ? xcim->yhot : 0),
 							pdata->specs.width,
 							pdata->specs.height);
 
