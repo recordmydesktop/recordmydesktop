@@ -130,7 +130,7 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "dummy-cursor", '\0',
 		  POPT_ARG_STRING, NULL, RMD_ARG_DUMMY_CURSOR,
-		  "Color of the dummy cursor [black|white]",
+		  "Color of the dummy cursor [black|white].",
 		  "color" },
 
 		{ "no-cursor", '\0',
@@ -140,12 +140,12 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "no-shared", '\0',
 		  POPT_ARG_NONE, &arg_return->noshared, 0,
-		  "Disable usage of MIT-shared memory extension(Not Recommended!).",
+		  "Disable usage of MIT-shared memory extension (Not Recommended!).",
 		  NULL },
 
 		{ "full-shots", '\0',
 		  POPT_ARG_NONE, &arg_return->full_shots, 0,
-		  "Take full screenshot at every frame(Not recomended!).",
+		  "Take full screenshot at every frame (Not recomended!).",
 		  NULL },
 
 		{ "follow-mouse", '\0',
@@ -188,7 +188,7 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "device", '\0',
 		  POPT_ARG_STRING, &arg_return->device, 0,
-		  "Sound device(default " DEFAULT_AUDIO_DEVICE ").",
+		  "Sound device (default " DEFAULT_AUDIO_DEVICE ").",
 		  "SOUND_DEVICE" },
 
 		{ "use-jack", '\0',
@@ -211,17 +211,17 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "v_quality", '\0',
 		  POPT_ARG_INT, &arg_return->v_quality, 0,
-		  "A number from 0 to 63 for desired encoded video quality(default 63).",
+		  "A number from 0 to 63 for desired encoded video quality (default 63).",
 		  "n" },
 
 		{ "v_bitrate", '\0',
 		  POPT_ARG_INT, &arg_return->v_bitrate, 0,
-		  "A number from 0 to 2000000 for desired encoded video bitrate(default 0).",
+		  "A number from 0 to 2000000 for desired encoded video bitrate (default 0).",
 		  "n" },
 
 		{ "s_quality", '\0',
 		  POPT_ARG_INT, &arg_return->s_quality, 0,
-		  "Desired audio quality(-1 to 10).",
+		  "Desired audio quality (-1 to 10).",
 		  "n" },
 
 		POPT_TABLEEND };
@@ -239,12 +239,12 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "no-wm-check", '\0',
 		  POPT_ARG_NONE, &arg_return->nowmcheck, 0,
-		  "Do not try to detect the window manager(and set options according to it)",
+		  "Do not try to detect the window manager (and set options according to it).",
 		  NULL },
 
 		{ "no-frame", '\0',
 		  POPT_ARG_NONE, &arg_return->noframe, 0,
-		  "Don not show the frame that visualizes the recorded area.",
+		  "Do not show the frame that visualizes the recorded area.",
 		  NULL },
 
 		{ "pause-shortcut", '\0',
@@ -269,12 +269,12 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "workdir", '\0',
 		  POPT_ARG_STRING, &arg_return->workdir, 0,
-		  "Location where a temporary directory will be created to hold project files(default $HOME).",
+		  "Location where a temporary directory will be created to hold project files (default $HOME).",
 		  "DIR" },
 
 		{ "delay", '\0',
 		  POPT_ARG_STRING, &arg_return->delay, RMD_ARG_DELAY,
-		  "Number of secs(default), minutes or hours before capture starts(number can be float)",
+		  "Number of seconds (default), minutes or hours before capture starts (number can be float)",
 		  "n[H|h|M|m]" },
 
 		{ "overwrite", '\0',
@@ -284,7 +284,7 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 		{ "output", 'o',
 		  POPT_ARG_STRING, &arg_return->filename, 0,
-		  "Name of recorded video(default out.ogv).",
+		  "Name of recorded video (default out.ogv).",
 		  "filename" },
 
 		POPT_TABLEEND };
