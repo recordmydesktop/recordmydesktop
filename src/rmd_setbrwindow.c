@@ -44,8 +44,8 @@ boolean rmdSetBRWindow(	Display *dpy,
 		brwin->winrect.width	= specs->width;
 		brwin->winrect.height	= specs->height;
 
-		brwin->rrect.x	= args->x;
-		brwin->rrect.y	= args->y;
+		brwin->rrect.x		= args->x;
+		brwin->rrect.y		= args->y;
 		brwin->rrect.width	= args->width ? args->width : brwin->winrect.width - args->x;
 		brwin->rrect.height	= args->height ? args->height : brwin->winrect.height - args->y;
 
@@ -94,13 +94,14 @@ boolean rmdSetBRWindow(	Display *dpy,
 			return FALSE;
 		}
 
-		brwin->rrect.x	= brwin->winrect.x + args->x;
-		brwin->rrect.y	= brwin->winrect.y + args->y;
+		brwin->rrect.x		= brwin->winrect.x + args->x;
+		brwin->rrect.y		= brwin->winrect.y + args->y;
 		brwin->rrect.width	= args->width ? args->width : brwin->winrect.width - args->x;
 		brwin->rrect.height	= args->height ? args->height : brwin->winrect.height - args->y;
 
 		if (	args->x + brwin->rrect.width > brwin->winrect.width ||
 			args->y + brwin->rrect.height > brwin->winrect.height) {
+
 			fprintf(stderr, "Specified Area is larger than window!\n");
 			return FALSE;
 		}
