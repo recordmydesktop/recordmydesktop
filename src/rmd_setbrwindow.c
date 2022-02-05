@@ -63,11 +63,15 @@ boolean rmdSetBRWindow(	Display *dpy,
 		Window			wchid;
 		XWindowAttributes	attribs;
 
+		XSelectInput(dpy, args->windowid, VisibilityChangeMask | StructureNotifyMask);
 		XGetWindowAttributes(dpy, args->windowid, &attribs);
 
-		if (attribs.map_state == IsUnviewable || attribs.map_state == IsUnmapped) {
-			fprintf(stderr, "Window must be mapped and visible!\n");
-			return FALSE;
+		while (attribs.map_state == IsUnviewable || attribs.map_state == IsUnmapped) {
+			XEvent	ev;
+
+			fprintf(stderr, "Waiting for window to be mapped and visible!\n");
+			XWindowEvent(dpy, args->windowid, VisibilityChangeMask|StructureNotifyMask, &ev);
+			XGetWindowAttributes(dpy, args->windowid, &attribs);
 		}
 
 		XTranslateCoordinates(	dpy,
