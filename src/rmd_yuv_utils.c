@@ -226,8 +226,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 			yuv_V++;								\
 		}										\
 												\
-		yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));			\
-		yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));			\
+		yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd) >> 1));			\
+		yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd) >> 1));			\
 												\
 		datapi += width_tm + w_odd;							\
 		if (sampling == __PXL_AVERAGE)							\
@@ -324,8 +324,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				yuv_V++;							\
 			}									\
 												\
-			yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));		\
-			yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd * 2) >> 1));		\
+			yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd) >> 1));		\
+			yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd) >> 1));		\
 												\
 			datapi += width_tm + w_odd;						\
 			datapi_back += width_tm + w_odd;					\
@@ -356,8 +356,8 @@ static inline int blocknum(int xv, int yv, int widthv, int blocksize)
 				yuv_V++;							\
 			}									\
 												\
-			yuv_U += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
-			yuv_V += ((yuv)->y_stride - (width_tm - w_odd * 2)) >> 1;		\
+			yuv_U += ((yuv)->uv_stride - ((width_tm - w_odd) >> 1));		\
+			yuv_V += ((yuv)->uv_stride - ((width_tm - w_odd) >> 1));		\
 												\
 			datapi += width_tm + w_odd;						\
 			datapi_back += width_tm + w_odd;					\
