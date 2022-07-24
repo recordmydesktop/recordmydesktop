@@ -192,9 +192,9 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 		  "SOUND_DEVICE" },
 
 		{ "use-jack", '\0',
-		  POPT_ARG_STRING | RMD_USE_JACK_EXTRA_FLAG, &arg_return->x, RMD_ARG_USE_JACK,
-		  "Record audio from the specified list of space-separated jack ports.",
-		  "port1 port2... portn" },
+		  POPT_ARG_STRING | RMD_USE_JACK_EXTRA_FLAG, 0, RMD_ARG_USE_JACK,
+		  "Record audio from the specified jack port (repeat flag for multiple ports, max 100).",
+		  "JACK_PORT" },
 
 		{ "no-sound", '\0',
 		  POPT_ARG_NONE, &arg_return->nosound, 0,
@@ -305,7 +305,7 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 	// Parse the arguments
 	while ((arg_id = poptGetNextOpt(popt_context)) > 0) {
-		char *arg = poptGetOptArg(popt_context);
+		const char *arg = poptGetOptArg(popt_context);
 
 		// Most arguments are handled completely by libpopt but we
 		// handle some by ourself, namely those in this switch case
@@ -355,23 +355,17 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 
 			case RMD_ARG_USE_JACK:
 			{
-				arg_return->jack_nports = 0;
-
-				while (arg) {
-
+				if (arg && arg_return->jack_nports < RMD_MAX_JACK_PORTS) {
+					/* since JACK port names seem to have no reserved chars, to
+					 * specify multiple ports one must simply specify --use-jack
+					 * for each port.
+					 */
+					arg_return->jack_port_names[arg_return->jack_nports] = strdup(arg);
 					arg_return->jack_nports++;
-
-					arg_return->jack_port_names[arg_return->jack_nports - 1] = malloc(strlen(arg) + 1);
-					strcpy(arg_return->jack_port_names[arg_return->jack_nports - 1], arg);
-
-					arg = poptGetOptArg(popt_context);
-				}
-
-				if (arg_return->jack_nports > 0) {
 					arg_return->use_jack = 1;
 				} else {
 					fprintf(stderr,
-							"Argument Usage: --use-jack port1 port2... portn\n");
+							"Argument Usage: --use-jack port1 [--use-jack port2]...\n");
 					success = FALSE;
 				}
 

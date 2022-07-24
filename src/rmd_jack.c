@@ -88,11 +88,9 @@ static int rmdSetupPorts(JackData *jdata)
 	memset(jdata->portbuf, 0, sizeof(jack_default_audio_sample_t *) * jdata->nports);
 
 	for (int i = 0; i < jdata->nports; i++) {
-		char name[64];//recordMyDesktop:input_n<64 is enough for full name
-		char num[8];
-		strcpy(name, "input_");
-		snprintf(num, 8, "%d", i + 1);
-		strcat(name, num);
+		char name[64];
+
+		snprintf(name, sizeof(name), "input_%d", i + 1);
 
 		jdata->ports[i] = jack_port_register(	jdata->client,
 							name,
