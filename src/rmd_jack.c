@@ -62,6 +62,9 @@ static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t)
 	for (int i = 0; i < jdata->nports; i++)
 		jdata->portbuf[i] = jack_port_get_buffer(jdata->ports[i], nframes);
 
+	pthread_mutex_lock(&jdata->pdata->avd_mutex);
+	jdata->pdata->avd -= jdata->pdata->periodtime_us;
+	pthread_mutex_unlock(&jdata->pdata->avd_mutex);
 
 	pthread_mutex_lock(jdata->sound_buffer_mutex);
 //vorbis analysis buffer wants uninterleaved data
