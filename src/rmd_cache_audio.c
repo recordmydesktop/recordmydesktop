@@ -102,6 +102,10 @@ void *rmdCacheAudioBuffer(ProgData *pdata)
 		}
 	}
 
+#ifdef HAVE_LIBJACK
+	free(jackbuf);
+#endif
+
 	fclose(pdata->cache_data->afp);
 	pthread_exit(&errno);
 }
