@@ -50,8 +50,14 @@ static int rmdJackCapture(jack_nframes_t nframes, void *jdata_t)
 {
 	JackData *jdata = (JackData *)jdata_t;
 
-	if (!jdata->pdata->running || jdata->pdata->paused || !jdata->capture_started)
+	if (!jdata->pdata->running || jdata->pdata->paused || !jdata->capture_started) {
+		/* still produce a signal on sound_data_read just to ensure the other side
+		 * wakes up and realizes running/paused etc.
+		 */
+		pthread_cond_signal(jdata->sound_data_read);
+
 		return 0;
+	}
 
 	for (int i = 0; i < jdata->nports; i++)
 		jdata->portbuf[i] = jack_port_get_buffer(jdata->ports[i], nframes);
@@ -122,7 +128,10 @@ static void rmdJackShutdown(void *jdata_t)
 {
 	JackData *jdata = (JackData *)jdata_t;
 
+	pthread_mutex_unlock(jdata->sound_buffer_mutex);
 	jdata->pdata->running = FALSE;
+	pthread_cond_signal(jdata->sound_data_read);
+	pthread_mutex_lock(jdata->sound_buffer_mutex);
 
 	fprintf (stderr, "JACK shutdown\n");
 }
