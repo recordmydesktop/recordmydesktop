@@ -90,8 +90,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 			blocknum_x = pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
 			blocknum_y = pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH,
 			firstrun = 1,
-			frameno = 0,
-			nbytes = 0;
+			frameno = 0;
 	u_int32_t	ynum, unum, vnum,
 			y_short_blocks[blocknum_x * blocknum_y],
 			u_short_blocks[blocknum_x * blocknum_y],
@@ -108,6 +107,7 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 		exit(13);
 
 	while (pdata->running) {
+		int		nbytes = 0;
 		FrameHeader	fheader;
 
 		ynum = unum = vnum = 0;
@@ -223,8 +223,8 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 		pthread_mutex_unlock(&pdata->yuv_mutex);
 
 		nbytes += rmdFlushBlock(NULL, 0, 0, 0, 0, icf, 1);
+		total_bytes += nbytes;
 	}
-	total_bytes += nbytes;
 
 	{
 		unsigned int bytes_per_pixel = pdata->specs.depth >= 24 ? 4 : 2;
