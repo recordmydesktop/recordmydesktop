@@ -151,6 +151,7 @@ typedef struct _ProgArgs{
 	char *workdir;	  //directory to be used for cache files(default $HOME)
 	char *pause_shortcut;   //pause/unpause shortcut sequence(Control+Alt+p)
 	char *stop_shortcut;	//stop shortcut sequence(Control+Alt+s)
+	int need_shortcuts;	//exit fatally when shortcuts can't be installed
 	int noframe;			//don't draw a frame around the recording area
 	int zerocompression;	//image data are always flushed uncompressed
 	unsigned periodic_datasync_ms; //interval between background async fdatasync calls while writing cache files, when zero no periodic fdatasync is performed

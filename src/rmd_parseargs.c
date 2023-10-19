@@ -257,6 +257,11 @@ boolean rmdParseArgs(int argc, char **argv, ProgArgs *arg_return)
 		  "Shortcut that will be used to stop the recording (default Control+Mod1+s).",
 		  "MOD+KEY" },
 
+		{ "need-shortcuts", '\0',
+		  POPT_ARG_NONE, &arg_return->need_shortcuts, 0,
+		  "Treat shorcut installation failures as fatal.",
+		  NULL },
+
 		{ "compress-cache", '\0',
 		  POPT_ARG_NONE, &compress_cache, 0,
 		  "Image data are cached with light compression.",

@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
 	if (pdata.args.display != NULL) {
 		pdata.dpy = XOpenDisplay(pdata.args.display);
-		XSetErrorHandler(rmdErrorHandler);
+		XSetErrorHandler(pdata.args.need_shortcuts ? rmdGrabErrorsFatalErrorHandler : rmdErrorHandler);
 	} else {
 		fprintf(stderr, "No display specified for connection!\n");
 		exit(8);

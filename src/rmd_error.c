@@ -35,7 +35,7 @@
 
 
 
-int rmdErrorHandler(Display *dpy, XErrorEvent *e)
+static int rmdSharedErrorHandler(Display *dpy, XErrorEvent *e, boolean grabsfatal)
 {
 	char	error_desc[1024];
 
@@ -49,8 +49,19 @@ int rmdErrorHandler(Display *dpy, XErrorEvent *e)
 
 	if ((e->error_code == BadAccess) && (e->request_code == X_GrabKey)) {
 		fprintf(stderr, "Bad Access on XGrabKey.\n" "Shortcut already assigned.\n");
-		return 0;
+		if (!grabsfatal)
+			return 0;
 	}
 
 	exit(1);
+}
+
+int rmdErrorHandler(Display *dpy, XErrorEvent *e)
+{
+	return rmdSharedErrorHandler(dpy, e, FALSE /* grabsfatal */);
+}
+
+int rmdGrabErrorsFatalErrorHandler(Display *dpy, XErrorEvent *e)
+{
+	return rmdSharedErrorHandler(dpy, e, TRUE /* grabsfatal */);
 }

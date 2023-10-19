@@ -45,5 +45,8 @@
  */
 int rmdErrorHandler(Display *dpy,XErrorEvent *e);
 
+/* identical to rmdErrorHandler, but exits on grab errors (--needs-shortcuts) */
+int rmdGrabErrorsFatalErrorHandler(Display *dpy, XErrorEvent *e);
+
 
 #endif
