@@ -53,8 +53,8 @@ static int clip_event_area(XDamageNotifyEvent *e, XRectangle *cliprect, XRectang
 #endif
 	if (	e->area.x <= cliprect->x &&
 		e->area.y <= cliprect->y &&
-		e->area.width >= cliprect->width &&
-		e->area.height >= cliprect->height) {
+		e->area.x + e->area.width >= cliprect->x + cliprect->width &&
+		e->area.y + e->area.height >= cliprect->y + cliprect->height) {
 
 		/* area completely covers cliprect, cliprect becomes the area */
 		res->x = cliprect->x;
