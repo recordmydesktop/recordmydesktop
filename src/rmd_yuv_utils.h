@@ -70,4 +70,7 @@ void rmdXFixesPointerToYuv(	yuv_buffer *yuv,
 				int y_offset,
 				int column_discard_stride);
 
+/* FIXME TODO: get rid of the arguments / refactor the blocks crap, see .c file */
+void rmdYuvBlocksReset(unsigned int blocks_w, unsigned int blocks_h);
+
 #endif

@@ -169,18 +169,23 @@ int rmdInitializeData(ProgData *pdata, EncData *enc_data, CacheData *cache_data)
 	else
 		rmdInitCacheData(pdata, enc_data, cache_data);
 
-	for (int i = 0; i < pdata->enc_data->yuv.y_width * pdata->enc_data->yuv.y_height; i++)
-		pdata->enc_data->yuv.y[i] = 0;
+	{ /* FIXME TODO: move to an rmdInitYuv() */
+		for (int i = 0; i < pdata->enc_data->yuv.y_width * pdata->enc_data->yuv.y_height; i++)
+			pdata->enc_data->yuv.y[i] = 0;
 
-	for (int i = 0; i < pdata->enc_data->yuv.uv_width * pdata->enc_data->yuv.uv_height; i++)
-		pdata->enc_data->yuv.v[i] = pdata->enc_data->yuv.u[i] = 127;
+		for (int i = 0; i < pdata->enc_data->yuv.uv_width * pdata->enc_data->yuv.uv_height; i++)
+			pdata->enc_data->yuv.v[i] = pdata->enc_data->yuv.u[i] = 127;
 
-	yblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
-				(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
-	ublocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
-				(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
-	vblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
-				(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
+		yblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
+					(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
+		ublocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
+					(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
+		vblocks = malloc((pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH) *
+					(pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH));
+
+		rmdYuvBlocksReset(pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
+				  pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH);
+	}
 
 	pdata->frametime_us = 1000000 / pdata->args.fps;
 

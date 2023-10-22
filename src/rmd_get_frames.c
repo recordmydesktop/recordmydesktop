@@ -210,14 +210,6 @@ static void rmdMoveCaptureArea(	XRectangle *rect,
 }
 
 
-static void rmdBlocksReset(unsigned int blocks_w, unsigned int blocks_h)
-{
-	memset(yblocks, 0, blocks_w * blocks_h * sizeof(*yblocks));
-	memset(ublocks, 0, blocks_w * blocks_h * sizeof(*ublocks));
-	memset(vblocks, 0, blocks_w * blocks_h * sizeof(*vblocks));
-}
-
-
 /**
 *   Extract cache blocks from damage list
 *
@@ -237,8 +229,6 @@ static void rmdBlocksFromList(	RectArea   **root,
 				unsigned int blocks_w,
 				unsigned int blocks_h)
 {
-	rmdBlocksReset(blocks_w, blocks_h);
-
 	for (RectArea *temp = *root; temp; temp = temp->next) {
 		int	row_start, row_end, column_start, column_end;
 
@@ -618,7 +608,6 @@ void *rmdGetFrames(ProgData *pdata)
 				}
 
 				pthread_mutex_lock(&pdata->yuv_mutex);
-				rmdBlocksReset(blocks_w, blocks_h);
 				rmdUpdateYuvBuffer(	&pdata->enc_data->yuv,
 							front_buff,
 							back_buff,

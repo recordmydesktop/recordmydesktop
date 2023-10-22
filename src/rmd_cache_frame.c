@@ -219,6 +219,8 @@ void *rmdCacheImageBuffer(ProgData *pdata)
 							0);
 		}
 
+		rmdYuvBlocksReset(pdata->enc_data->yuv.y_width / Y_UNIT_WIDTH,
+				  pdata->enc_data->yuv.y_height / Y_UNIT_WIDTH);
 		//release main buffer
 		pthread_mutex_unlock(&pdata->yuv_mutex);
 

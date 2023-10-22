@@ -86,18 +86,23 @@ int rmdRescue(const char *path)
 	enc_data.yuv.uv_height = height / 2;
 	enc_data.yuv.uv_stride = width / 2;
 
-	for (int i = 0; i < (enc_data.yuv.y_width * enc_data.yuv.y_height); i++)
-		enc_data.yuv.y[i] = 0;
+	{ /* FIXME TODO: move to a rmdYuvInit() */
+		for (int i = 0; i < (enc_data.yuv.y_width * enc_data.yuv.y_height); i++)
+			enc_data.yuv.y[i] = 0;
 
-	for (int i = 0; i < (enc_data.yuv.uv_width * enc_data.yuv.uv_height); i++)
-		enc_data.yuv.v[i] = enc_data.yuv.u[i] = 127;
+		for (int i = 0; i < (enc_data.yuv.uv_width * enc_data.yuv.uv_height); i++)
+			enc_data.yuv.v[i] = enc_data.yuv.u[i] = 127;
 
-	yblocks = malloc(sizeof(*yblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
-				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
-	ublocks = malloc(sizeof(*ublocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
-				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
-	vblocks = malloc(sizeof(*vblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
-				(enc_data.yuv.y_height / Y_UNIT_WIDTH));
+		yblocks = malloc(sizeof(*yblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
+					(enc_data.yuv.y_height / Y_UNIT_WIDTH));
+		ublocks = malloc(sizeof(*ublocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
+					(enc_data.yuv.y_height / Y_UNIT_WIDTH));
+		vblocks = malloc(sizeof(*vblocks) * (enc_data.yuv.y_width / Y_UNIT_WIDTH) *
+					(enc_data.yuv.y_height / Y_UNIT_WIDTH));
+
+		rmdYuvBlocksReset(enc_data.yuv.y_width / Y_UNIT_WIDTH,
+				  enc_data.yuv.y_height / Y_UNIT_WIDTH);
+	}
 
 	pdata.frametime_us = 1000000 / pdata.args.fps;
 

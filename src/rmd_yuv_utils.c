@@ -512,3 +512,16 @@ void rmdXFixesPointerToYuv(	yuv_buffer *yuv,
 		}
 	}
 }
+
+
+/* FIXME TODO: it makes no sense for this to have dimension parameters,
+ * the blocks when allocated should just have their sizes set within them.
+ * This code is absolutely terrible, every time I have to work on this I
+ * regret rescuing this project a little bit more.
+ */
+void rmdYuvBlocksReset(unsigned int blocks_w, unsigned int blocks_h)
+{
+	memset(yblocks, 0, blocks_w * blocks_h * sizeof(*yblocks));
+	memset(ublocks, 0, blocks_w * blocks_h * sizeof(*ublocks));
+	memset(vblocks, 0, blocks_w * blocks_h * sizeof(*vblocks));
+}
