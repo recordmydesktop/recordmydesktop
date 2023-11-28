@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT( [recordmydesktop], [0.5.1], )
+AC_INIT( [recordmydesktop], [0.6.0], )
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([src/rmd.c])
